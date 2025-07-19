@@ -592,7 +592,7 @@ def order_confirmation():
 
 @app.route("/")
 def home():
-    return "Hello, Shopluxe!"
+    return render_template('index.html', products=products)
 
 @app.route("/healthz")
 def health_check():
