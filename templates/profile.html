@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+  <div class="card shadow-lg border-0">
+    <div class="card-body">
+
+      <h3 class="card-title text-center mb-4">👤 My Profile</h3>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-info text-center">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST">
+        <div class="mb-3">
+          <label for="name" class="form-label">Full Name</label>
+          <input type="text" name="name" id="name" class="form-control" value="{{ user.name }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" class="form-control" value="{{ user.email }}" disabled>
+        </div>
+
+        <div class="mb-3">
+          <label for="current_password" class="form-label">Current Password</label>
+          <input type="password" name="current_password" id="current_password" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">New Password</label>
+          <input type="password" name="password" id="password" class="form-control" placeholder="Leave blank to keep current password">
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Update Profile</button>
+      </form>
+
+      <div class="text-center mt-4">
+        <a href="{{ url_for('logout') }}"
+           class="btn btn-outline-danger"
+           onclick="return confirm('Are you sure you want to logout?')">
+         🚪 Logout
+       </a>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

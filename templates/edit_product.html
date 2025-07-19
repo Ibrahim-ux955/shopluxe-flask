@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 600px;">
+  <h2 class="mb-4">Edit Product</h2>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-warning">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="name" class="form-label">Product Name</label>
+      <input type="text" name="name" id="name" class="form-control" value="{{ product.name }}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="price" class="form-label">Price</label>
+      <input type="text" name="price" id="price" class="form-control" value="{{ product.price }}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="category" class="form-label">Category</label>
+      <input type="text" name="category" id="category" class="form-control" value="{{ product.category }}">
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea name="description" id="description" class="form-control" rows="3">{{ product.description }}</textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="stock" class="form-label">Stock Count</label>
+      <input type="number" name="stock" id="stock" class="form-control" min="0" value="{{ product.stock }}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="image" class="form-label">Change Image (optional)</label>
+      <input type="file" name="image" id="image" class="form-control">
+      <small>Current image: {{ product.image }}</small><br>
+      <img src="{{ url_for('static', filename='shoes/' + product.image) }}" alt="{{ product.name }}" style="max-width: 200px; margin-top: 10px;">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Product</button>
+    <a href="{{ url_for('admin') }}" class="btn btn-secondary ms-2">Cancel</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow p-4">
+        <h3 class="text-center mb-4">🧾 Checkout</h3>
+
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <input type="text" name="phone" class="form-control" required>
+          </div>
+
+          <h5 class="mt-4">Items in Your Cart</h5>
+          <ul class="list-group mb-3">
+            {% for item in cart_items %}
+              <li class="list-group-item d-flex justify-content-between">
+                {{ item.name }} x{{ item.quantity }}
+                <span>GH₵ {{ item.price }}</span>
+              </li>
+            {% endfor %}
+            <li class="list-group-item d-flex justify-content-between">
+              <strong>Total:</strong>
+              <strong>GH₵ {{ total }}</strong>
+            </li>
+          </ul>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-success w-100">✅ Confirm Order</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Full-page Wallpaper Background -->
+<div style="background: url('{{ url_for('static', filename='banner/wallpaper.jpg') }}') center/cover no-repeat fixed; padding: 30px; border-radius: 10px;">
+
+  <!-- Hero Banner with Background Image -->
+  <div class="text-white d-flex flex-column flex-md-row align-items-center justify-content-between p-5 mb-5"
+       style="background: url('{{ url_for('static', filename='banner/hero-bg.jpg') }}') center/cover no-repeat;
+              border-radius: 10px; min-height: 300px;">
+
+    <div class="text-center text-md-start mb-4 mb-md-0">
+      <img src="{{ url_for('static', filename='logo/shopluxe.png') }}" alt="ShopLuxe Logo" style="height: 220px;">
+    </div>
+
+    <div class="text-center text-md-end">
+      <h2 class="mb-2">Welcome to <span class="text-warning">ShopLuxe</span></h2>
+      <p class="text-light fs-5 mb-3">Luxury you can afford. Discover fashion, footwear & accessories.</p>
+      <a href="{{ url_for('index') }}" class="btn btn-warning text-dark fw-bold px-4 py-2">Shop Now</a>
+    </div>
+  </div>
+
+  <h4 class="mb-4 text-center text-white">🔥 Featured Products</h4>
+
+  <div class="row">
+    {% if products %}
+      {% for product in products %}
+      <div class="col-6 col-md-4 col-lg-3 mb-4">
+        <a href="{{ url_for('product_detail', index=loop.index0) }}" class="text-decoration-none text-light">
+          <div class="card bg-dark border-0 shadow-sm h-100 text-center position-relative">
+            <img src="{{ url_for('static', filename='shoes/' + product.image) }}"
+                 alt="{{ product.name }}"
+                 style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 5px;">
+            
+            {% if product.stock is defined %}
+              {% if product.stock == 0 %}
+                <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
+              {% elif product.stock <= 3 %}
+                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
+              {% endif %}
+            {% endif %}
+
+            <div class="p-2">
+              <p class="mb-1 fw-semibold text-white" style="font-size: 15px;">{{ product.name }}</p>
+              <p class="fw-bold mb-0 text-white">GH₵ {{ product.price }}</p>
+
+              {% if product.description %}
+                <p class="text-light small">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</p>
+              {% endif %}
+            </div>
+          </div>
+        </a>      
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12 text-center mt-5 text-white">
+        <h5 class="text-muted">🚫 Sorry, no products found in this category.</h5>
+        <p>Try exploring other categories or check back later!</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

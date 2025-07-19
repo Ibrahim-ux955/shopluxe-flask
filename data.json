@@ -1,0 +1,29 @@
+[
+    {
+        "name": "Berk",
+        "price": "200",
+        "category": "Bags",
+        "image": "images.jpg",
+        "timestamp": "2025-07-10T15:03:53.600977",
+        "reviews": [],
+        "description": "",
+        "stock": 10
+    },
+    {
+        "name": "Berk",
+        "price": "200",
+        "category": "Bags",
+        "image": "images.jpg",
+        "timestamp": "2025-07-10T15:04:29.433229",
+        "reviews": []
+    },
+    {
+        "name": "Berk",
+        "price": "200",
+        "category": "Bags",
+        "description": "brand new",
+        "stock": 1,
+        "image": "images.jpg",
+        "timestamp": "2025-07-10T19:15:04.939008"
+    }
+]
