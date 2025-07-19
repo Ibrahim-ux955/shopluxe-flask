@@ -590,6 +590,16 @@ def order_confirmation():
         return redirect(url_for('cart'))
     return render_template('order_confirmation.html', order=order_info)
 
+@app.route("/")
+def home():
+    return "Hello, Shopluxe!"
+
+@app.route("/healthz")
+def health_check():
+    return "OK", 200
+
+if __name__ == "__main__":
+    app.run()
 
 
     
