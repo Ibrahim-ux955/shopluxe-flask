@@ -36,61 +36,71 @@
       <span class="ms-2 fw-bold">ShopLuxe</span>
     </a>
 
-    <div class="dropdown ms-3">
-      <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        🛍️ Categories
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">
-          <img src="{{ url_for('static', filename='icons/shoe.png') }}" class="category-icon">Shoes</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">
-          <img src="{{ url_for('static', filename='icons/men.png') }}" class="category-icon">Men</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">
-          <img src="{{ url_for('static', filename='icons/women.png') }}" class="category-icon">Women</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Children') }}">
-          <img src="{{ url_for('static', filename='icons/children.png') }}" class="category-icon">Children</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Watches') }}">
-          <img src="{{ url_for('static', filename='icons/watch.png') }}" class="category-icon">Watches</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Jewelry') }}">
-          <img src="{{ url_for('static', filename='icons/jewelry.png') }}" class="category-icon">Jewelry</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">
-          <img src="{{ url_for('static', filename='icons/accessories.png') }}" class="category-icon">Accessories</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">
-          <img src="{{ url_for('static', filename='icons/bag.png') }}" class="category-icon">Bags</a></li>
-      </ul>
-    </div>
+    <!-- Mobile Navbar Toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <form class="d-flex ms-auto" method="get" action="{{ url_for('index') }}">
-      <input class="form-control me-2" type="search" name="q" placeholder="Search" value="{{ query if query else '' }}">
-      <button class="btn btn-success" type="submit">Search</button>
-    </form>
-
-    <a class="btn btn-outline-light ms-2 me-2" href="{{ url_for('cart') }}">
-      🛒 Cart ({{ session.cart|length if session.cart else 0 }})
-    </a>
-    
-    
-    
-
-    <a class="btn btn-success ms-3 me-2" href="{{ url_for('admin_login') }}">Admin</a>
-
-    {% if session.user %}
-      <div class="dropdown">
-        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-          👤 {{ session.user.name }}
+    <!-- Collapsible Navbar Content -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <div class="dropdown ms-lg-3 mt-2 mt-lg-0">
+        <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          🛍️ Categories
         </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="{{ url_for('profile') }}">My Profile</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">
+            <img src="{{ url_for('static', filename='icons/shoe.png') }}" class="category-icon">Shoes</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">
+            <img src="{{ url_for('static', filename='icons/men.png') }}" class="category-icon">Men</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">
+            <img src="{{ url_for('static', filename='icons/women.png') }}" class="category-icon">Women</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Children') }}">
+            <img src="{{ url_for('static', filename='icons/children.png') }}" class="category-icon">Children</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Watches') }}">
+            <img src="{{ url_for('static', filename='icons/watch.png') }}" class="category-icon">Watches</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Jewelry') }}">
+            <img src="{{ url_for('static', filename='icons/jewelry.png') }}" class="category-icon">Jewelry</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">
+            <img src="{{ url_for('static', filename='icons/accessories.png') }}" class="category-icon">Accessories</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">
+            <img src="{{ url_for('static', filename='icons/bag.png') }}" class="category-icon">Bags</a></li>
         </ul>
       </div>
-    {% else %}
-      <a class="btn btn-outline-light me-2" href="{{ url_for('login') }}">Login</a> 
-      <a class="btn btn-outline-light" href="{{ url_for('signup') }}">Sign Up</a>
-    {% endif %}
+
+      <!-- Search form -->
+      <form class="d-flex flex-wrap ms-lg-auto mt-3 mt-lg-0 me-lg-2" method="get" action="{{ url_for('index') }}">
+        <input class="form-control me-2 mb-2 mb-lg-0" type="search" name="q" placeholder="Search" value="{{ query if query else '' }}">
+        <button class="btn btn-success" type="submit">Search</button>
+      </form>
+
+      <!-- Cart button -->
+      <a class="btn btn-outline-light ms-lg-2 me-2 mt-2 mt-lg-0" href="{{ url_for('cart') }}">
+        🛒 Cart ({{ session.cart|length if session.cart else 0 }})
+      </a>
+
+      <!-- Admin button -->
+      <a class="btn btn-success ms-lg-2 me-2 mt-2 mt-lg-0" href="{{ url_for('admin_login') }}">Admin</a>
+
+      <!-- User login/logout -->
+      {% if session.user %}
+        <div class="dropdown mt-2 mt-lg-0">
+          <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            👤 {{ session.user.name }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{{ url_for('profile') }}">My Profile</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+          </ul>
+        </div>
+      {% else %}
+        <a class="btn btn-outline-light me-2 mt-2 mt-lg-0" href="{{ url_for('login') }}">Login</a>
+        <a class="btn btn-outline-light mt-2 mt-lg-0" href="{{ url_for('signup') }}">Sign Up</a>
+      {% endif %}
+    </div>
   </div>
 </nav>
 
+<!-- Main content -->
 <div class="container mt-4">
   {% with messages = get_flashed_messages() %}
     {% if messages %}
