@@ -1,22 +1,23 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <!-- Full-page Wallpaper Background -->
-<div style="background: url('{{ url_for('static', filename='banner/wallpaper.jpg') }}') center/cover no-repeat fixed; padding: 30px; border-radius: 10px;">
+<div style="background: url('{% static 'banner/wallpaper.jpg' %}') center/cover no-repeat fixed; padding: 30px; border-radius: 10px;">
 
   <!-- Hero Banner -->
   <div class="text-white d-flex flex-column flex-md-row align-items-center justify-content-between p-5 mb-5"
-       style="background: url('{{ url_for('static', filename='banner/hero-bg.jpg') }}') center/cover no-repeat;
+       style="background: url('{% static 'banner/hero-bg.jpg' %}') center/cover no-repeat;
               border-radius: 10px; min-height: 300px;">
 
     <div class="text-center text-md-start mb-4 mb-md-0">
-      <img src="{{ url_for('static', filename='logo/shopluxe.png') }}" alt="ShopLuxe Logo" style="height: 220px;">
+      <img src="{% static 'logo/shopluxe.png' %}" alt="ShopLuxe Logo" style="height: 220px;">
     </div>
 
     <div class="text-center text-md-end">
       <h2 class="mb-2">Welcome to <span class="text-warning">ShopLuxe</span></h2>
       <p class="text-light fs-5 mb-3">Luxury you can afford. Discover fashion, footwear & accessories.</p>
-      <a href="{{ url_for('index') }}" class="btn btn-warning text-dark fw-bold px-4 py-2">Shop Now</a>
+      <a href="{% url 'index' %}" class="btn btn-warning text-dark fw-bold px-4 py-2">Shop Now</a>
     </div>
   </div>
 
@@ -26,22 +27,20 @@
     {% if featured_products %}
       {% for product in featured_products %}
       <div class="col-6 col-md-4 col-lg-3 mb-4 d-flex">
-        <a href="{{ url_for('product_detail', index=loop.index0) }}" class="text-decoration-none flex-fill">
+        <a href="{% url 'product_detail' product.id %}" class="text-decoration-none flex-fill">
           <div class="card shadow-sm flex-fill text-center position-relative border-0">
             
             <!-- Product Image -->
-            <img src="{{ url_for('static', filename='shoes/' + product.image) }}"
+            <img src="{% static 'shoes/' %}{{ product.image }}"
                  alt="{{ product.name }}"
                  class="img-fluid"
                  style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px 8px 0 0;">
 
             <!-- Stock Badges -->
-            {% if product.stock is defined %}
-              {% if product.stock == 0 %}
-                <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
-              {% elif product.stock <= 3 %}
-                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
-              {% endif %}
+            {% if product.stock == 0 %}
+              <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
+            {% elif product.stock <= 3 %}
+              <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
             {% endif %}
 
             <!-- Card Body -->
@@ -49,7 +48,7 @@
               <p class="mb-1 fw-semibold" style="font-size: 15px;">{{ product.name }}</p>
               <p class="fw-bold mb-1">GH₵ {{ product.price }}</p>
               {% if product.description %}
-                <p class="text-light small mb-0">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</p>
+                <p class="text-light small mb-0">{{ product.description|truncatechars:50 }}</p>
               {% endif %}
             </div>
           </div>
@@ -69,22 +68,20 @@
     {% if products %}
       {% for product in products %}
       <div class="col-6 col-md-4 col-lg-3 mb-4 d-flex">
-        <a href="{{ url_for('product_detail', index=loop.index0) }}" class="text-decoration-none flex-fill">
+        <a href="{% url 'product_detail' product.id %}" class="text-decoration-none flex-fill">
           <div class="card shadow-sm flex-fill text-center position-relative border-0">
             
             <!-- Product Image -->
-            <img src="{{ url_for('static', filename='shoes/' + product.image) }}"
+            <img src="{% static 'shoes/' %}{{ product.image }}"
                  alt="{{ product.name }}"
                  class="img-fluid"
                  style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px 8px 0 0;">
 
             <!-- Stock Badges -->
-            {% if product.stock is defined %}
-              {% if product.stock == 0 %}
-                <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
-              {% elif product.stock <= 3 %}
-                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
-              {% endif %}
+            {% if product.stock == 0 %}
+              <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
+            {% elif product.stock <= 3 %}
+              <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
             {% endif %}
 
             <!-- Card Body -->
@@ -92,7 +89,7 @@
               <p class="mb-1 fw-semibold" style="font-size: 15px;">{{ product.name }}</p>
               <p class="fw-bold mb-1">GH₵ {{ product.price }}</p>
               {% if product.description %}
-                <p class="text-light small mb-0">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</p>
+                <p class="text-light small mb-0">{{ product.description|truncatechars:50 }}</p>
               {% endif %}
             </div>
           </div>
