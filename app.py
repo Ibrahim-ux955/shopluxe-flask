@@ -445,6 +445,22 @@ def test_logo():
     <img src="/static/logo/shopluxe.png" alt="Test Logo" style="height:100px;">
     '''
     
+@app.route('/shop')
+def shop():
+    category = request.args.get('category', 'all')
+    
+    if category == 'all':
+        products = get_all_products()
+    else:
+        products = get_products_by_category(category)
+
+    featured_products = get_featured_products()
+
+    return render_template('shop.html',
+                           products=products,
+                           featured_products=featured_products,
+                           selected_category=category)
+    
 # ------------------ CART ROUTES ------------------
 
 # Initialize cart in session if not present
