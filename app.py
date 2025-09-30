@@ -67,19 +67,38 @@ def save_users(data):
 def index():
     query = request.args.get('q', '').strip().lower()
     all_products = load_data()
+
+    # Get featured products (not filtered by search)
+    featured_products = [p for p in all_products if p.get('featured')]
+
     if query:
         filtered = [p for p in all_products if query in p['name'].lower()]
         products = [{'index': i, **p} for i, p in enumerate(filtered)]
     else:
         products = [{'index': i, **p} for i, p in enumerate(all_products)]
-    return render_template('index.html', products=products, query=query)
+
+    return render_template(
+        'index.html',
+        products=products,
+        featured_products=featured_products,
+        query=query,
+        selected_category='All'  # Optional, for category button highlighting
+    )
+
 
 @app.route('/filtered/<category>')
 def filtered(category):
     all_products = load_data()
-    filtered_products = [p for p in all_products if category.lower() in p['category'].lower()]
+    
+    if category.lower() == 'all':
+        filtered_products = all_products
+    else:
+        filtered_products = [p for p in all_products if category.lower() in p['category'].lower()]
+    
     products = [{'index': i, **p} for i, p in enumerate(filtered_products)]
-    return render_template('index.html', products=products, query='')
+    
+    return render_template('index.html', products=products, query='', selected_category=category)
+
 
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
