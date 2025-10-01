@@ -16,52 +16,57 @@
     </div>
   </div>
 
+  <!-- Category Navigation Tabs -->
   <div class="d-flex justify-content-center flex-wrap mb-5">
-  <a href="{{ url_for('filtered', category='All') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'All' %}active{% endif %}">All</a>
-  <a href="{{ url_for('filtered', category='Shoes') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'Shoes' %}active{% endif %}">Shoes</a>
-  <a href="{{ url_for('filtered', category='Men') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'Men' %}active{% endif %}">Men</a>
-  <a href="{{ url_for('filtered', category='Women') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'Women' %}active{% endif %}">Women</a>
-  <a href="{{ url_for('filtered', category='Children') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'Children' %}active{% endif %}">Children</a>
-  <a href="{{ url_for('filtered', category='Watches') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'Watches' %}active{% endif %}">Watches</a>
-  <a href="{{ url_for('filtered', category='Jewelry') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'Jewelry' %}active{% endif %}">Jewelry</a>
-  <a href="{{ url_for('filtered', category='Accessories') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'Accessories' %}active{% endif %}">Accessories</a>
-  <a href="{{ url_for('filtered', category='Bags') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'Bags' %}active{% endif %}">Bags</a>
-</div>
+    <a href="{{ url_for('shop', category='all') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'all' %}active{% endif %}">All</a>
+    <a href="{{ url_for('shop', category='shoe') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'shoe' %}active{% endif %}">Shoe</a>
+    <a href="{{ url_for('shop', category='men') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'men' %}active{% endif %}">Men</a>
+    <a href="{{ url_for('shop', category='women') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'women' %}active{% endif %}">Women</a>
+    <a href="{{ url_for('shop', category='children') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'children' %}active{% endif %}">Children</a>
+    <a href="{{ url_for('shop', category='watches') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'watches' %}active{% endif %}">Watches</a>
+    <a href="{{ url_for('shop', category='jewelry') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'jewelry' %}active{% endif %}">Jewelry</a>
+    <a href="{{ url_for('shop', category='accessories') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'accessories' %}active{% endif %}">Accessories</a>
+    <a href="{{ url_for('shop', category='bag') }}" class="btn btn-outline-dark m-2 {% if selected_category == 'bag' %}active{% endif %}">Bag</a>
+  </div>
 
-
-  {% if featured_products and featured_products|length > 0 %}
-<h4 class="mb-4 text-center text-dark">🔥 Featured Products</h4>
-<div class="row">
-  {% for product in featured_products %}
-    <div class="col-6 col-md-4 col-lg-3 mb-4 d-flex">
-      <a href="{{ url_for('product_detail', index=product.index) }}" class="text-decoration-none flex-fill">
-        <div class="card shadow-sm flex-fill text-center position-relative border-0">
-          <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
-               alt="{{ product.name }}" 
-               class="img-fluid" 
-               style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px 8px 0 0;">
-          
-          {% if product.stock is defined %}
-            {% if product.stock == 0 %}
-              <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
-            {% elif product.stock <= 3 %}
-              <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
+  <!-- Featured Products -->
+  <h4 class="mb-4 text-center text-dark">🔥 Featured Products</h4>
+  <div class="row">
+    {% if featured_products %}
+      {% for product in featured_products %}
+      <div class="col-6 col-md-4 col-lg-3 mb-4 d-flex">
+        <a href="{{ url_for('product_detail', index=loop.index0) }}" class="text-decoration-none flex-fill">
+          <div class="card shadow-sm flex-fill text-center position-relative border-0">
+            <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
+                 alt="{{ product.name }}" 
+                 class="img-fluid" 
+                 style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px 8px 0 0;">
+            
+            {% if product.stock is defined %}
+              {% if product.stock == 0 %}
+                <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
+              {% elif product.stock <= 3 %}
+                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
+              {% endif %}
             {% endif %}
-          {% endif %}
 
-          <div class="p-2 rounded-bottom" style="background-color: #f8f9fa;">
-            <p class="mb-1 fw-semibold text-dark" style="font-size:15px;">{{ product.name }}</p>
-            <p class="fw-bold mb-1 text-dark">GH₵ {{ product.price }}</p>
-            {% if product.description %}
-              <p class="small mb-0 text-dark">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</p>
-            {% endif %}
+            <div class="p-2 rounded-bottom" style="background-color: #f8f9fa;">
+              <p class="mb-1 fw-semibold text-dark" style="font-size:15px;">{{ product.name }}</p>
+              <p class="fw-bold mb-1 text-dark">GH₵ {{ product.price }}</p>
+              {% if product.description %}
+                <p class="small mb-0 text-dark">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</p>
+              {% endif %}
+            </div>
           </div>
-        </div>
-      </a>
-    </div>
-  {% endfor %}
-</div>
-{% endif %}
+        </a>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12 text-center mt-5">
+        <h5 class="text-dark">🚫 No featured products available right now.</h5>
+      </div>
+    {% endif %}
+  </div>
 
   <!-- All Products -->
   <h4 class="mt-5 mb-4 text-center text-dark">🛍️ All Products</h4>
