@@ -62,6 +62,21 @@ def load_users():
 def save_users(data):
     with open(USERS_FILE, 'w') as f: json.dump(data, f, indent=4)
 
+# Get all products
+def get_all_products():
+    return load_data()  # Returns the full list of products
+
+# Get products by category
+def get_products_by_category(category):
+    products = load_data()
+    return [p for p in products if p.get('category', '').lower() == category.lower()]
+
+# Get featured products (e.g., newest 4 products)
+def get_featured_products():
+    products = load_data()
+    # Sort products by timestamp descending
+    products_sorted = sorted(products, key=lambda x: x.get('timestamp', ''), reverse=True)
+    return products_sorted[:4]  # Returns top 4 newest products
 # Routes
 from datetime import datetime
 
@@ -89,10 +104,35 @@ def index():
 
 @app.route('/filtered/<category>')
 def filtered(category):
+    current_time = datetime.now()
     all_products = load_data()
-    filtered_products = [p for p in all_products if category.lower() in p['category'].lower()]
+
+    # Convert string timestamps to datetime objects
+    for p in all_products:
+        if isinstance(p.get('timestamp'), str):
+            p['timestamp'] = datetime.fromisoformat(p['timestamp'])
+
+    # Filter products by category
+    if category.lower() == 'all':
+        filtered_products = all_products
+    else:
+        filtered_products = [p for p in all_products if category.lower() in p['category'].lower()]
+
+    # Add index to each product for links
     products = [{'index': i, **p} for i, p in enumerate(filtered_products)]
-    return render_template('index.html', products=products, query='')
+
+    # Define featured products: added in the last 7 days
+    featured_products = [p for p in filtered_products if (current_time - p['timestamp']).days <= 7]
+
+    return render_template(
+        'index.html',
+        products=products,
+        featured_products=featured_products,
+        current_time=current_time,
+        selected_category=category
+    )
+
+
 
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
@@ -472,17 +512,22 @@ def test_logo():
 def shop():
     category = request.args.get('category', 'all')
     
-    if category == 'all':
+    if category.lower() == 'all':
         products = get_all_products()
     else:
         products = get_products_by_category(category)
 
     featured_products = get_featured_products()
+    current_time = datetime.now()
 
-    return render_template('shop.html',
-                           products=products,
-                           featured_products=featured_products,
-                           selected_category=category)
+    return render_template(
+        'shop.html',
+        products=products,
+        featured_products=featured_products,
+        selected_category=category,
+        current_time=current_time
+    )
+
     
 # ------------------ CART ROUTES ------------------
 
