@@ -7,7 +7,6 @@
         "timestamp": "2025-07-10T15:04:29.433229",
         "reviews": []
     },
-    
     {
         "name": "Pad",
         "price": "200",
@@ -17,7 +16,6 @@
         "image": "pad.jpg",
         "timestamp": "2025-07-10T19:15:04.939008"
     },
-
     {
         "name": "2",
         "price": "200",
@@ -26,7 +24,6 @@
         "timestamp": "2025-07-10T15:04:29.433229",
         "reviews": []
     },
-
     {
         "name": "2",
         "price": "200",
@@ -34,5 +31,23 @@
         "image": "K.jpg",
         "timestamp": "2025-07-10T15:04:29.433229",
         "reviews": []
+    },
+    {
+        "name": "Ibrahim Mohammed",
+        "price": "250",
+        "category": "Watches",
+        "description": "dd",
+        "stock": 90,
+        "image": "acura-nsx-2019-9b-1920x1080.jpg",
+        "timestamp": "2025-10-01T13:23:56.503350"
+    },
+    {
+        "name": "Ibrahim Mohammed",
+        "price": "250",
+        "category": "Watches",
+        "description": "good",
+        "stock": 90,
+        "image": "pubg-mobile-x-indian-motorcycle-x9-1920x1080.jpg",
+        "timestamp": "2025-10-01T13:51:34.816471"
     }
 ]

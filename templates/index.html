@@ -41,12 +41,19 @@
                  alt="{{ product.name }}" 
                  class="img-fluid" 
                  style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px 8px 0 0;">
-            
+
             {% if product.stock is defined %}
               {% if product.stock == 0 %}
                 <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
               {% elif product.stock <= 3 %}
                 <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
+              {% endif %}
+            {% endif %}
+
+            {% if product.timestamp is defined %}
+              {% set product_time = product.timestamp %}
+              {% if (current_time - product_time).days <= 7 %}
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
               {% endif %}
             {% endif %}
 
@@ -80,12 +87,19 @@
                  alt="{{ product.name }}" 
                  class="img-fluid" 
                  style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px 8px 0 0;">
-            
+
             {% if product.stock is defined %}
               {% if product.stock == 0 %}
                 <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
               {% elif product.stock <= 3 %}
                 <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
+              {% endif %}
+            {% endif %}
+
+            {% if product.timestamp is defined %}
+              {% set product_time = product.timestamp %}
+              {% if (current_time - product_time).days <= 7 %}
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
               {% endif %}
             {% endif %}
 
