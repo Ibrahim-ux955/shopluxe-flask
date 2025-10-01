@@ -63,16 +63,29 @@ def save_users(data):
     with open(USERS_FILE, 'w') as f: json.dump(data, f, indent=4)
 
 # Routes
+from datetime import datetime
+
 @app.route('/')
 def index():
-    query = request.args.get('q', '').strip().lower()
-    all_products = load_data()
-    if query:
-        filtered = [p for p in all_products if query in p['name'].lower()]
-        products = [{'index': i, **p} for i, p in enumerate(filtered)]
-    else:
-        products = [{'index': i, **p} for i, p in enumerate(all_products)]
-    return render_template('index.html', products=products, query=query)
+    products = load_data()
+    current_time = datetime.now()
+
+    # Convert string timestamps to datetime objects
+    for p in products:
+        if isinstance(p.get('timestamp'), str):
+            p['timestamp'] = datetime.fromisoformat(p['timestamp'])
+
+    # Define featured products: added in the last 7 days
+    featured_products = [p for p in products if (current_time - p['timestamp']).days <= 7]
+
+    return render_template(
+        'index.html',
+        products=products,
+        featured_products=featured_products,
+        current_time=current_time,
+        selected_category='all'
+    )
+
 
 @app.route('/filtered/<category>')
 def filtered(category):
@@ -159,7 +172,17 @@ def admin():
         flash("✅ Product added!")
         return redirect(url_for('admin'))
     products = load_data()
-    return render_template('admin.html', products=products, reviews=load_reviews())
+    return render_template('index.html', products=products, query='')
+
+  # <-- Add this
+
+  
+
+
+@app.template_filter('todatetime')
+def todatetime_filter(s):
+    return datetime.fromisoformat(s)
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
