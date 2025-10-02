@@ -417,18 +417,40 @@ def delete(index):
 def product_detail(index):
     products = load_data()
     reviews = load_reviews()
+    
     if 0 <= index < len(products):
         product = products[index]
         product['index'] = index
+
+        # --- Related products ---
         product_category = product.get('category', '').strip().lower()
         related = [
             {'index': i, **p} for i, p in enumerate(products)
             if p.get('category', '').strip().lower() == product_category and i != index
         ][:4]
+
+        # --- Product reviews ---
         product_reviews = [r for r in reviews if r['product_index'] == index]
-        return render_template('product_detail.html', product=product, related=related, reviews=product_reviews)
+
+        # --- Product images for thumbnails ---
+        product_images = [product.get('image')]  # main image first
+        # Add additional images if they exist
+        for key in ['image2', 'image3', 'image4']:
+            img = product.get(key)
+            if img:  # only add if image exists and is not empty
+                product_images.append(img)
+
+        return render_template(
+            'product_detail.html',
+            product=product,
+            related=related,
+            reviews=product_reviews,
+            product_images=product_images  # pass to template
+        )
+
     flash("⚠️ Product not found.")
     return redirect(url_for('index'))
+
 
 @app.route('/submit_review/<int:index>', methods=['POST'])
 def submit_review(index):
@@ -692,8 +714,3 @@ def health_check():
 if __name__ == "__main__":
     app.run()
 
-
-    
-
-if __name__ == '__main__':
-    app.run(debug=True)

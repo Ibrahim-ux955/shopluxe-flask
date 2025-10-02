@@ -13,17 +13,51 @@
              style="max-height: 400px; object-fit: cover;">
 
         <!-- ✅ Thumbnails under main image -->
-        <div class="d-flex justify-content-center gap-2 mb-4">
-          <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
-               alt="thumb" class="thumb-img"
-               style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
-          <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
-               alt="thumb" class="thumb-img"
-               style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
-          <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
-               alt="thumb" class="thumb-img"
-               style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
-        </div>
+        <!-- ✅ Thumbnails under main image -->
+<div class="d-flex justify-content-center gap-2 mb-4">
+  {% for img in product_images %}
+    <img src="{{ url_for('static', filename='shoes/' + img) }}" 
+         alt="thumb" class="thumb-img"
+         style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+  {% endfor %}
+</div>
+
+
+<!-- ✅ Script for swapping images with active highlight & fade -->
+<script>
+  const mainImage = document.getElementById('mainImage');
+  const thumbs = document.querySelectorAll('.thumb-img');
+
+  thumbs.forEach(thumb => {
+    thumb.addEventListener('click', function() {
+      // Fade effect
+      mainImage.style.opacity = 0;
+      setTimeout(() => {
+        mainImage.src = this.src;
+        mainImage.style.opacity = 1;
+      }, 150);
+
+      // Highlight active thumbnail
+      thumbs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Set first thumbnail as active on load
+  if (thumbs.length > 0) thumbs[0].classList.add('active');
+</script>
+
+<!-- ✅ CSS for active thumbnail -->
+<style>
+  .thumb-img.active {
+    border: 2px solid #007bff !important;
+  }
+
+  #mainImage {
+    transition: opacity 0.3s ease-in-out;
+  }
+</style>
+
 
         <h2>{{ product.name }}</h2>
         <p class="text-success fw-bold fs-4">GH₵ {{ product.price }}</p>
