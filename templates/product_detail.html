@@ -5,10 +5,26 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card shadow-sm p-4 text-center">
-        <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
+        <!-- ✅ Main Product Image -->
+        <img id="mainImage"
+             src="{{ url_for('static', filename='shoes/' + product.image) }}" 
              alt="{{ product.name }}" 
              class="img-fluid mb-4" 
              style="max-height: 400px; object-fit: cover;">
+
+        <!-- ✅ Thumbnails under main image -->
+        <div class="d-flex justify-content-center gap-2 mb-4">
+          <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
+               alt="thumb" class="thumb-img"
+               style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+          <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
+               alt="thumb" class="thumb-img"
+               style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+          <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
+               alt="thumb" class="thumb-img"
+               style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+        </div>
+
         <h2>{{ product.name }}</h2>
         <p class="text-success fw-bold fs-4">GH₵ {{ product.price }}</p>
         <p class="text-muted">Category: {{ product.category }}</p>
@@ -76,4 +92,13 @@
     {% endif %}
   </div>
 </div>
+
+<!-- ✅ Script for swapping images -->
+<script>
+  document.querySelectorAll('.thumb-img').forEach(thumb => {
+    thumb.addEventListener('click', function() {
+      document.getElementById('mainImage').src = this.src;
+    });
+  });
+</script>
 {% endblock %}
