@@ -61,12 +61,16 @@
               {% endif %}
             {% endif %}
 
-            {% if product.timestamp is defined %}
-              {% set product_time = product.timestamp %}
-              {% if (current_time - product_time).days <= 7 %}
-                <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
-              {% endif %}
-            {% endif %}
+           {% if product.timestamp is defined %}
+  {% set product_time = product.timestamp|todatetime %}
+  {% if product_time and (current_time - product_time).days <= 7 %}
+    <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
+  {% endif %}
+{% endif %}
+
+
+
+
 
             <div class="p-2 rounded-bottom" style="background-color: #f8f9fa;">
               <p class="mb-1 fw-semibold text-dark" style="font-size:15px;">{{ product.name }}</p>
@@ -108,11 +112,12 @@
             {% endif %}
 
             {% if product.timestamp is defined %}
-              {% set product_time = product.timestamp %}
-              {% if (current_time - product_time).days <= 7 %}
-                <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
-              {% endif %}
-            {% endif %}
+  {% set product_time = product.timestamp|todatetime %}
+  {% if product_time and (current_time - product_time).days <= 7 %}
+    <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
+  {% endif %}
+{% endif %}
+
 
             <div class="p-2 rounded-bottom" style="background-color: #f8f9fa;">
               <p class="mb-1 fw-semibold text-dark" style="font-size:15px;">{{ product.name }}</p>

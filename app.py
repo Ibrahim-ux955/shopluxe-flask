@@ -212,16 +212,23 @@ def admin():
         flash("✅ Product added!")
         return redirect(url_for('admin'))
     products = load_data()
-    return render_template('index.html', products=products, query='')
+    return render_template('admin.html', products=products, current_time=datetime.now())
+
+
 
   # <-- Add this
-
-  
-
-
 @app.template_filter('todatetime')
 def todatetime_filter(s):
-    return datetime.fromisoformat(s)
+    if isinstance(s, datetime):
+        return s
+    if isinstance(s, str):
+        try:
+            return datetime.fromisoformat(s)
+        except ValueError:
+            return None  # or handle error
+    return None
+  
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -686,10 +693,6 @@ if __name__ == "__main__":
     app.run()
 
 
-    
-
-if __name__ == '__main__':
-    app.run(debug=True)
     
 
 if __name__ == '__main__':
