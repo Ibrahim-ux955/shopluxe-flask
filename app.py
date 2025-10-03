@@ -536,31 +536,58 @@ def restock_notify(index):
     flash("✅ You’ll be notified when it's back in stock!")
     return redirect(url_for('product_detail', index=index))
 
-@app.route('/edit/<int:index>', methods=['GET', 'POST'])
-def edit_product(index):
+@app.route('/edit/<product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
+
     products = load_data()
-    if index < 0 or index >= len(products):
-        flash("❌ Invalid product")
+    product = next((p for p in products if p.get('id') == product_id), None)
+    if not product:
+        flash("❌ Product not found.")
         return redirect(url_for('admin'))
-    product = products[index]
+
     if request.method == 'POST':
+        # Update basic fields
         product['name'] = request.form.get('name').title()
         product['price'] = request.form.get('price')
         product['category'] = request.form.get('category').title()
         product['description'] = request.form.get('description')
         product['stock'] = int(request.form.get('stock'))
-        image = request.files.get('image')
-        if image and image.filename != '':
-            filename = secure_filename(image.filename)
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            product['image'] = filename
-        products[index] = product
+
+        # Handle removing images
+        remove_images = request.form.getlist('remove_images')
+        if 'images' not in product:
+            product['images'] = [product.get('image')] if product.get('image') else []
+
+        product['images'] = [img for img in product['images'] if img not in remove_images]
+
+        # Delete removed images from filesystem
+        for img in remove_images:
+            img_path = os.path.join(app.config['UPLOAD_FOLDER'], img)
+            if os.path.exists(img_path):
+                os.remove(img_path)
+
+        # Handle new image uploads
+        new_files = request.files.getlist('new_images')
+        for f in new_files:
+            if f and f.filename != '':
+                filename = secure_filename(f.filename)
+                f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                product['images'].append(filename)
+
+        # Ensure main 'image' field always exists
+        if product['images']:
+            product['image'] = product['images'][0]
+        else:
+            product['image'] = None
+
         save_data(products)
-        flash("✅ Product updated successfully")
+        flash("✅ Product updated successfully!")
         return redirect(url_for('admin'))
-    return render_template('edit_product.html', product=product, index=index, reviews=load_reviews())
+
+    return render_template('edit_product.html', product=product)
+
 
 @app.route('/test_email')
 def test_email():
