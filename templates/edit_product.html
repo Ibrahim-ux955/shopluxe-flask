@@ -13,36 +13,56 @@
   {% endwith %}
 
   <form method="POST" enctype="multipart/form-data">
+    <!-- Name -->
     <div class="mb-3">
       <label for="name" class="form-label">Product Name</label>
       <input type="text" name="name" id="name" class="form-control" value="{{ product.name }}" required>
     </div>
 
+    <!-- Price -->
     <div class="mb-3">
       <label for="price" class="form-label">Price</label>
       <input type="text" name="price" id="price" class="form-control" value="{{ product.price }}" required>
     </div>
 
+    <!-- Category -->
     <div class="mb-3">
       <label for="category" class="form-label">Category</label>
       <input type="text" name="category" id="category" class="form-control" value="{{ product.category }}">
     </div>
 
+    <!-- Description -->
     <div class="mb-3">
       <label for="description" class="form-label">Description</label>
       <textarea name="description" id="description" class="form-control" rows="3">{{ product.description }}</textarea>
     </div>
 
+    <!-- Stock -->
     <div class="mb-3">
       <label for="stock" class="form-label">Stock Count</label>
       <input type="number" name="stock" id="stock" class="form-control" min="0" value="{{ product.stock }}" required>
     </div>
 
+    <!-- Existing Thumbnails with remove checkbox -->
     <div class="mb-3">
-      <label for="image" class="form-label">Change Image (optional)</label>
-      <input type="file" name="image" id="image" class="form-control">
-      <small>Current image: {{ product.image }}</small><br>
-      <img src="{{ url_for('static', filename='shoes/' + product.image) }}" alt="{{ product.name }}" style="max-width: 200px; margin-top: 10px;">
+      <label class="form-label">Current Images</label>
+      <div class="d-flex flex-wrap gap-2">
+        {% for img in product.images %}
+          <div class="text-center" style="position: relative;">
+            <img src="{{ url_for('static', filename='shoes/' + img) }}" alt="{{ product.name }}" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px;">
+            <div>
+              <input type="checkbox" name="remove_images" value="{{ img }}" id="remove_{{ loop.index }}">
+              <label for="remove_{{ loop.index }}" style="font-size: 12px;">Remove</label>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Upload new images -->
+    <div class="mb-3">
+      <label for="new_images" class="form-label">Add New Images</label>
+      <input type="file" name="new_images" id="new_images" class="form-control" multiple>
     </div>
 
     <button type="submit" class="btn btn-primary">Update Product</button>
