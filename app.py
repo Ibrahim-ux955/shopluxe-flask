@@ -426,22 +426,25 @@ def delete(index):
 def product_detail(index):
     products = load_data()
     reviews = load_reviews()
+    
     if 0 <= index < len(products):
         product = products[index]
         product['index'] = index
 
-        # ✅ Ensure both 'image' and 'images' exist
+        # ✅ Ensure 'images' always exists
         if 'images' not in product and 'image' in product:
             product['images'] = [product['image']]
         elif 'images' in product and 'image' not in product:
             product['image'] = product['images'][0]
 
+        # --- Related products ---
         product_category = product.get('category', '').strip().lower()
         related = [
             {'index': i, **p} for i, p in enumerate(products)
             if p.get('category', '').strip().lower() == product_category and i != index
         ][:4]
 
+        # --- Product reviews ---
         product_reviews = [r for r in reviews if r['product_index'] == index]
 
         return render_template(
@@ -717,8 +720,3 @@ def health_check():
 if __name__ == "__main__":
     app.run()
 
-
-    
-
-if __name__ == '__main__':
-    app.run(debug=True)
