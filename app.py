@@ -424,17 +424,24 @@ def logout():
 def delete(index):
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
+
     products = load_data()
     if 0 <= index < len(products):
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], products[index]['image'])
-        if os.path.exists(image_path):
-            os.remove(image_path)
+        # Only try to delete image if it exists
+        if 'image' in products[index] and products[index]['image']:
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], products[index]['image'])
+            if os.path.exists(image_path):
+                os.remove(image_path)
+
+        # Remove product from the list
         del products[index]
         save_data(products)
         flash("🗑️ Product deleted.")
     else:
         flash("❌ Invalid product index.")
+
     return redirect(url_for('admin'))
+
 
 @app.route('/product/<product_id>')
 def product_detail(product_id):
@@ -452,13 +459,18 @@ def product_detail(product_id):
 
     # Related products (max 4)
     product_category = product.get('category', '').strip().lower()
-    related = [
-        {'index': i, **p} for i, p in enumerate(products)
-        if p.get('category', '').strip().lower() == product_category and p['id'] != product_id
-    ][:4]
+    related = []
+    for p in products:
+        if p.get('category', '').strip().lower() == product_category and p.get('id') != product_id:
+            # Ensure each related product has an 'id'
+            if 'id' not in p:
+                continue
+            related.append(p)
+        if len(related) >= 4:
+            break
 
     # Images for product_detail page
-    product_images = product.get('images') or [product.get('image')]
+    product_images = product.get('images') or ([product.get('image')] if product.get('image') else [])
 
     # Product reviews
     product_reviews = [r for r in reviews if r.get('product_index') == product['index']]

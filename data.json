@@ -1,76 +1,5 @@
 [
     {
-        "name": "Berk",
-        "price": "200",
-        "category": "Bags",
-        "images": [
-            "ibrahim1.jpg",
-            "ibrahim2.jpg",
-            "ibrahim3.jpg"
-        ],
-        "timestamp": "2025-07-10T15:04:29.433229",
-        "reviews": [],
-        "id": "950f8bba-f7c8-45f7-8668-c93e6ce09c7f"
-    },
-    {
-        "name": "Pad",
-        "price": "200",
-        "category": "Bags",
-        "description": "brand new",
-        "stock": 1,
-        "images": [
-            "pad.jpg"
-        ],
-        "timestamp": "2025-07-10T19:15:04.939008",
-        "id": "8c65e2ab-796e-4612-9c3b-90850eba9f61"
-    },
-    {
-        "name": "2",
-        "price": "200",
-        "category": "Bags",
-        "images": [
-            "ibrahim2.jpg"
-        ],
-        "timestamp": "2025-07-10T15:04:29.433229",
-        "reviews": [],
-        "id": "93d6de08-85b7-4d4f-8bd2-7c5802a00473"
-    },
-    {
-        "name": "2",
-        "price": "200",
-        "category": "Bags",
-        "images": [
-            "K.jpg"
-        ],
-        "timestamp": "2025-07-10T15:04:29.433229",
-        "reviews": [],
-        "id": "bfc0dce5-e027-49c5-b427-4fa8e8ec517e"
-    },
-    {
-        "name": "Ibrahim Mohammed",
-        "price": "250",
-        "category": "Watches",
-        "description": "dd",
-        "stock": 90,
-        "images": [
-            "acura-nsx-2019-9b-1920x1080.jpg"
-        ],
-        "timestamp": "2025-10-01T13:23:56.503350",
-        "id": "62f229d1-d637-43aa-8ef8-569d1542229f"
-    },
-    {
-        "name": "Ibrahim Mohammed",
-        "price": "250",
-        "category": "Watches",
-        "description": "good",
-        "stock": 90,
-        "images": [
-            "pubg-mobile-x-indian-motorcycle-x9-1920x1080.jpg"
-        ],
-        "timestamp": "2025-10-01T13:51:34.816471",
-        "id": "073b55d0-e939-46b2-8907-a3022c83631a"
-    },
-    {
         "id": "f3a8a18a-3acd-4fa5-9269-d7c3fa08e98b",
         "name": "Z",
         "price": "678",
@@ -82,5 +11,18 @@
             "8b900e48-aadf-4638-8bcf-1f464f846856.jpeg"
         ],
         "timestamp": "2025-10-03T21:57:08.984314"
+    },
+    {
+        "id": "11c0a7fd-987b-4e64-99c6-1cb0f1d4e8dd",
+        "name": "Charger",
+        "price": "80",
+        "category": "Accessories",
+        "description": "rgfgfd",
+        "stock": 50,
+        "image": "acura-nsx-2019-9b-1920x1080.jpg",
+        "images": [
+            "acura-nsx-2019-9b-1920x1080.jpg"
+        ],
+        "timestamp": "2025-10-03T22:06:20.403827"
     }
 ]
