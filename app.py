@@ -200,43 +200,52 @@ def admin():
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
 
-    if request.method == 'POST':
-        name = request.form.get('name').title()
-        price = request.form.get('price')
-        category = request.form.get('category').title()
-        description = request.form.get('description')
-        stock = int(request.form.get('stock'))
+    products = load_data()
+    reviews = load_reviews()  # optional, if you want to display reviews in admin
 
-        image = request.files.get('image')
-        if not image or image.filename == '':
-            flash("❌ Please upload an image")
+    if request.method == 'POST':
+        name = request.form.get('name', '').title()
+        price = request.form.get('price', '')
+        category = request.form.get('category', '').title()
+        description = request.form.get('description', '')
+        stock = int(request.form.get('stock', 0))
+
+        # ✅ Handle multiple image uploads
+        uploaded_files = request.files.getlist('images')
+        if not uploaded_files or all(f.filename == '' for f in uploaded_files):
+            flash("❌ Please upload at least one image")
             return redirect(url_for('admin'))
 
-        filename = secure_filename(image.filename)
-        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        image_filenames = []
+        for file in uploaded_files:
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                image_filenames.append(filename)
 
+        # Create new product
         new_product = {
-            'id': str(uuid4()),  # ✅ automatically assign unique ID
+            'id': str(uuid4()),  # unique ID
             'name': name,
             'price': price,
             'category': category,
             'description': description,
             'stock': stock,
-            'image': filename,
-            'images': [filename],
+            'images': image_filenames,
             'timestamp': datetime.now().isoformat()
         }
 
-        products = load_data()
         products.append(new_product)
         save_data(products)
-
-        flash("✅ Product added!")
+        flash("✅ Product added successfully!")
         return redirect(url_for('admin'))
 
-    products = load_data()
-    return render_template('admin.html', products=products, reviews=[], current_time=datetime.now())
-
+    return render_template(
+        'admin.html',
+        products=products,
+        reviews=reviews,
+        current_time=datetime.now()
+    )
 
 
   # <-- Add this
