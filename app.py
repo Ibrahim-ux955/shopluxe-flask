@@ -185,31 +185,40 @@ def admin_login():
 def admin():
     if not session.get('admin_logged_in'):
         return redirect(url_for('admin_login'))
+
     if request.method == 'POST':
         name = request.form.get('name').title()
         price = request.form.get('price')
         category = request.form.get('category').title()
         description = request.form.get('description')
         stock = int(request.form.get('stock'))
+
         image = request.files.get('image')
         if not image or image.filename == '':
             flash("❌ Please upload an image")
             return redirect(url_for('admin'))
+
+        # ✅ Save image file
         filename = secure_filename(image.filename)
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        # ✅ Ensure both 'image' and 'images' exist
         new_product = {
             'name': name,
             'price': price,
             'category': category,
             'description': description,
             'stock': stock,
-            'image': filename,
+            'image': filename,              # single reference
+            'images': [filename],           # list version
             'timestamp': datetime.now().isoformat()
         }
+
         products = load_data()
         products.append(new_product)
         save_data(products)
 
+        # ✅ Low-stock email notification
         if stock <= 3:
             try:
                 msg = Message('⚠️ Low Stock Alert', recipients=[app.config['MAIL_USERNAME']])
@@ -220,8 +229,10 @@ def admin():
 
         flash("✅ Product added!")
         return redirect(url_for('admin'))
+
     products = load_data()
     return render_template('admin.html', products=products, current_time=datetime.now())
+
 
 
 
