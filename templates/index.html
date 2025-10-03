@@ -17,8 +17,7 @@
   </div>
 
   <!-- Category Navigation Tabs -->
-  <!-- Category Navigation Tabs -->
-<div class="d-flex justify-content-center flex-wrap mb-5">
+  <div class="d-flex justify-content-center flex-wrap mb-5">
     <a href="{{ url_for('filtered', category='All') }}" 
        class="btn btn-outline-dark m-2 {% if selected_category == 'All' %}active{% endif %}">All</a>
     <a href="{{ url_for('filtered', category='Shoes') }}" 
@@ -37,8 +36,7 @@
        class="btn btn-outline-dark m-2 {% if selected_category == 'Accessories' %}active{% endif %}">Accessories</a>
     <a href="{{ url_for('filtered', category='Bags') }}" 
        class="btn btn-outline-dark m-2 {% if selected_category == 'Bags' %}active{% endif %}">Bag</a>
-</div>
-
+  </div>
 
   <!-- Featured Products -->
   <h4 class="mb-4 text-center text-dark">🔥 Featured Products</h4>
@@ -46,7 +44,7 @@
     {% if featured_products %}
       {% for product in featured_products %}
       <div class="col-6 col-md-4 col-lg-3 mb-4 d-flex">
-        <a href="{{ url_for('product_detail', index=loop.index0) }}" class="text-decoration-none flex-fill">
+        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-decoration-none flex-fill">
           <div class="card shadow-sm flex-fill text-center position-relative border-0">
             <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
                  alt="{{ product.name }}" 
@@ -61,16 +59,12 @@
               {% endif %}
             {% endif %}
 
-           {% if product.timestamp is defined %}
-  {% set product_time = product.timestamp|todatetime %}
-  {% if product_time and (current_time - product_time).days <= 7 %}
-    <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
-  {% endif %}
-{% endif %}
-
-
-
-
+            {% if product.timestamp is defined %}
+              {% set product_time = product.timestamp|todatetime %}
+              {% if product_time and (current_time - product_time).days <= 7 %}
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
+              {% endif %}
+            {% endif %}
 
             <div class="p-2 rounded-bottom" style="background-color: #f8f9fa;">
               <p class="mb-1 fw-semibold text-dark" style="font-size:15px;">{{ product.name }}</p>
@@ -96,7 +90,7 @@
     {% if products %}
       {% for product in products %}
       <div class="col-6 col-md-4 col-lg-3 mb-4 d-flex">
-        <a href="{{ url_for('product_detail', index=loop.index0) }}" class="text-decoration-none flex-fill">
+        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-decoration-none flex-fill">
           <div class="card shadow-sm flex-fill text-center position-relative border-0">
             <img src="{{ url_for('static', filename='shoes/' + product.image) }}" 
                  alt="{{ product.name }}" 
@@ -112,12 +106,11 @@
             {% endif %}
 
             {% if product.timestamp is defined %}
-  {% set product_time = product.timestamp|todatetime %}
-  {% if product_time and (current_time - product_time).days <= 7 %}
-    <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
-  {% endif %}
-{% endif %}
-
+              {% set product_time = product.timestamp|todatetime %}
+              {% if product_time and (current_time - product_time).days <= 7 %}
+                <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
+              {% endif %}
+            {% endif %}
 
             <div class="p-2 rounded-bottom" style="background-color: #f8f9fa;">
               <p class="mb-1 fw-semibold text-dark" style="font-size:15px;">{{ product.name }}</p>
