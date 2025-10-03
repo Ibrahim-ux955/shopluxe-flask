@@ -5,8 +5,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer  # ✅ Add this
-import os, json
+import os, json, uuid
+from uuid import uuid4
 from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 app.jinja_env.globals['session'] = session
@@ -77,6 +79,18 @@ def get_featured_products():
     # Sort products by timestamp descending
     products_sorted = sorted(products, key=lambda x: x.get('timestamp', ''), reverse=True)
     return products_sorted[:4]  # Returns top 4 newest products
+  
+def ensure_product_ids():
+    products = load_data()
+    updated = False
+    for p in products:
+        if 'id' not in p:
+            p['id'] = str(uuid4())
+            updated = True
+    if updated:
+        save_data(products)
+
+ensure_product_ids()  
 # Routes
 from datetime import datetime
 
@@ -198,19 +212,18 @@ def admin():
             flash("❌ Please upload an image")
             return redirect(url_for('admin'))
 
-        # ✅ Save image file
         filename = secure_filename(image.filename)
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        # ✅ Ensure both 'image' and 'images' exist
         new_product = {
+            'id': str(uuid4()),  # ✅ automatically assign unique ID
             'name': name,
             'price': price,
             'category': category,
             'description': description,
             'stock': stock,
-            'image': filename,              # single reference
-            'images': [filename],           # list version
+            'image': filename,
+            'images': [filename],
             'timestamp': datetime.now().isoformat()
         }
 
@@ -218,21 +231,11 @@ def admin():
         products.append(new_product)
         save_data(products)
 
-        # ✅ Low-stock email notification
-        if stock <= 3:
-            try:
-                msg = Message('⚠️ Low Stock Alert', recipients=[app.config['MAIL_USERNAME']])
-                msg.body = f"Low stock alert!\n\nProduct: {name}\nStock: {stock}"
-                mail.send(msg)
-            except Exception as e:
-                print("Email send failed:", e)
-
         flash("✅ Product added!")
         return redirect(url_for('admin'))
 
     products = load_data()
-    return render_template('admin.html', products=products, current_time=datetime.now())
-
+    return render_template('admin.html', products=products, reviews=[], current_time=datetime.now())
 
 
 
@@ -433,40 +436,40 @@ def delete(index):
         flash("❌ Invalid product index.")
     return redirect(url_for('admin'))
 
-@app.route('/product/<int:index>')
-def product_detail(index):
+@app.route('/product/<product_id>')
+def product_detail(product_id):
     products = load_data()
     reviews = load_reviews()
-    
-    if 0 <= index < len(products):
-        product = products[index]
-        product['index'] = index
 
-        # ✅ Ensure 'images' always exists
-        if 'images' not in product and 'image' in product:
-            product['images'] = [product['image']]
-        elif 'images' in product and 'image' not in product:
-            product['image'] = product['images'][0]
+    # Find product by ID safely
+    product = next((p for p in products if p.get('id') == product_id), None)
+    if not product:
+        flash("⚠️ Product not found.")
+        return redirect(url_for('index'))
 
-        # --- Related products ---
-        product_category = product.get('category', '').strip().lower()
-        related = [
-            {'index': i, **p} for i, p in enumerate(products)
-            if p.get('category', '').strip().lower() == product_category and i != index
-        ][:4]
+    # Optional: add 'index' for templates needing it
+    product['index'] = products.index(product)
 
-        # --- Product reviews ---
-        product_reviews = [r for r in reviews if r['product_index'] == index]
+    # Related products (max 4)
+    product_category = product.get('category', '').strip().lower()
+    related = [
+        {'index': i, **p} for i, p in enumerate(products)
+        if p.get('category', '').strip().lower() == product_category and p['id'] != product_id
+    ][:4]
 
-        return render_template(
-            'product_detail.html',
-            product=product,
-            related=related,
-            reviews=product_reviews
-        )
+    # Images for product_detail page
+    product_images = product.get('images') or [product.get('image')]
 
-    flash("⚠️ Product not found.")
-    return redirect(url_for('index'))
+    # Product reviews
+    product_reviews = [r for r in reviews if r.get('product_index') == product['index']]
+
+    return render_template(
+        'product_detail.html',
+        product=product,
+        related=related,
+        reviews=product_reviews,
+        product_images=product_images
+    )
 
 
 @app.route('/submit_review/<int:index>', methods=['POST'])
