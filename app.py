@@ -90,8 +90,16 @@ def index():
         if isinstance(p.get('timestamp'), str):
             p['timestamp'] = datetime.fromisoformat(p['timestamp'])
 
+        # ✅ Ensure both "image" and "images" exist
+        if 'images' not in p and 'image' in p:
+            p['images'] = [p['image']]
+        elif 'images' in p and 'image' not in p:
+            p['image'] = p['images'][0]
+
     # Define featured products: added in the last 7 days
-    featured_products = [p for p in products if (current_time - p['timestamp']).days <= 7]
+    featured_products = [
+        p for p in products if (current_time - p['timestamp']).days <= 7
+    ]
 
     return render_template(
         'index.html',
@@ -100,6 +108,7 @@ def index():
         current_time=current_time,
         selected_category='all'
     )
+
 
 
 @app.route('/filtered/<category>')
@@ -420,15 +429,31 @@ def product_detail(index):
     if 0 <= index < len(products):
         product = products[index]
         product['index'] = index
+
+        # ✅ Ensure both 'image' and 'images' exist
+        if 'images' not in product and 'image' in product:
+            product['images'] = [product['image']]
+        elif 'images' in product and 'image' not in product:
+            product['image'] = product['images'][0]
+
         product_category = product.get('category', '').strip().lower()
         related = [
             {'index': i, **p} for i, p in enumerate(products)
             if p.get('category', '').strip().lower() == product_category and i != index
         ][:4]
+
         product_reviews = [r for r in reviews if r['product_index'] == index]
-        return render_template('product_detail.html', product=product, related=related, reviews=product_reviews)
+
+        return render_template(
+            'product_detail.html',
+            product=product,
+            related=related,
+            reviews=product_reviews
+        )
+
     flash("⚠️ Product not found.")
     return redirect(url_for('index'))
+
 
 @app.route('/submit_review/<int:index>', methods=['POST'])
 def submit_review(index):
