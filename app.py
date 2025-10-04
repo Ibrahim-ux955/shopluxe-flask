@@ -27,11 +27,17 @@ REVIEWS_FILE = 'reviews.json'
 USERS_FILE = 'users.json'
 ADMIN_PASSWORD = 'Mohammed_@3'
 
-# Gmail API config
-CLIENT_SECRETS_FILE = "client_secret.json"
+## Gmail API config
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # Only for testing HTTP
 
+# Create client_secret.json from environment variable if not exists
+CLIENT_SECRETS_FILE = "client_secret.json"
+if not os.path.exists(CLIENT_SECRETS_FILE):
+    secret_json = os.environ.get("GMAIL_CLIENT_SECRET")  # your env variable on Render
+    if secret_json:
+        with open(CLIENT_SECRETS_FILE, "w") as f:
+            f.write(secret_json)
 # ------------------------------
 # Gmail OAuth Routes
 # ------------------------------
