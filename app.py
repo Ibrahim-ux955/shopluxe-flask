@@ -31,13 +31,24 @@ ADMIN_PASSWORD = 'Mohammed_@3'
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # Only for testing HTTP
 
-# Create client_secret.json from environment variable if not exists
+# Path where the client secret file will be created
 CLIENT_SECRETS_FILE = "client_secret.json"
+
+# Only write if file doesn't exist
 if not os.path.exists(CLIENT_SECRETS_FILE):
-    secret_json = os.environ.get("GMAIL_CLIENT_SECRET")  # your env variable on Render
-    if secret_json:
-        with open(CLIENT_SECRETS_FILE, "w") as f:
-            f.write(secret_json)
+    secret_json_str = os.environ.get("GMAIL_CLIENT_SECRET")
+    if not secret_json_str:
+        raise Exception("Environment variable GMAIL_CLIENT_SECRET not set!")
+    
+    try:
+        # Validate it's proper JSON
+        secret_json = json.loads(secret_json_str)
+    except json.JSONDecodeError:
+        raise Exception("GMAIL_CLIENT_SECRET is not valid JSON!")
+    
+    # Write to file
+    with open(CLIENT_SECRETS_FILE, "w") as f:
+        json.dump(secret_json, f, indent=4)
 # ------------------------------
 # Gmail OAuth Routes
 # ------------------------------
@@ -828,20 +839,49 @@ Check your dashboard for more details.
 @app.route('/confirm_order', methods=['POST'])
 def confirm_order():
     cart = get_cart()
-    # Convert price to float just in case
+    products = load_data()
+
+    # Build cart_items with full product info
+    cart_items = []
     for item in cart:
-        item['price'] = float(item.get('price', 0))
+        index = item.get('index')
+        quantity = item.get('quantity', 1)
+        if 0 <= index < len(products):
+            product = products[index].copy()
+            product['quantity'] = quantity
+            # Ensure price is float
+            product['price'] = float(product.get('price', 0))
+            cart_items.append(product)
 
-    total = sum(item['price'] * item['quantity'] for item in cart)
+    total = sum(item['price'] * item['quantity'] for item in cart_items)
 
-    session['order_info'] = {
+    order_info = {
         'name': request.form['name'],
         'email': request.form['email'],
         'phone': request.form['phone'],
-        'items': cart,
+        'items': cart_items,
         'total': total
     }
+
+    session['order_info'] = order_info
+
+    # ----------------------------
+    # Send confirmation email
+    # ----------------------------
+    email_body = f"Hi {order_info['name']},\n\nThank you for your order! Here are your order details:\n\n"
+    for item in cart_items:
+        email_body += f"- {item['name']} x{item['quantity']} : GH₵ {item['price']}\n"
+    email_body += f"\nTotal: GH₵ {total}\n\nShopluxe Team"
+
+    try:
+        send_gmail(order_info['email'], "Shopluxe Order Confirmation", email_body)
+        flash("✅ Order confirmed! A confirmation email has been sent.")
+    except Exception as e:
+        print("❌ Failed to send email:", e)
+        flash("⚠️ Order confirmed, but failed to send email. Please authorize Gmail first.")
+
     return redirect(url_for('order_confirmation'))
+
 
 
 
@@ -854,10 +894,6 @@ def order_confirmation():
     return render_template('order_confirmation.html', order=order_info)
 
   
-
-@app.route("/")
-def home():
-    return render_template('index.html', products=products)
 
 @app.route("/healthz")
 def health_check():
