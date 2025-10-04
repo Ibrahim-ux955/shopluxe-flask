@@ -728,10 +728,13 @@ def cart():
         if 0 <= index < len(products):
             product = products[index].copy()
             product['quantity'] = quantity
+            # Convert price to float
+            product['price'] = float(product.get('price', 0))
             cart_items.append(product)
 
-    total = sum(float(p['price']) * p['quantity'] for p in cart_items)
+    total = sum(p['price'] * p['quantity'] for p in cart_items)
     return render_template('cart.html', cart_items=cart_items, total=total)
+
 
 
 @app.route('/checkout', methods=['GET', 'POST'])
@@ -824,14 +827,23 @@ Check your dashboard for more details.
 
 @app.route('/confirm_order', methods=['POST'])
 def confirm_order():
+    cart = get_cart()
+    # Convert price to float just in case
+    for item in cart:
+        item['price'] = float(item.get('price', 0))
+
+    total = sum(item['price'] * item['quantity'] for item in cart)
+
     session['order_info'] = {
         'name': request.form['name'],
         'email': request.form['email'],
         'phone': request.form['phone'],
-        'items': session.get('cart', []),
-        'total': sum(item['price'] * item['quantity'] for item in session.get('cart', []))
+        'items': cart,
+        'total': total
     }
     return redirect(url_for('order_confirmation'))
+
+
 
 @app.route('/order_confirmation')
 def order_confirmation():
