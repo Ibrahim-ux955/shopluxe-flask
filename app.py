@@ -633,9 +633,19 @@ def edit_product(index):
         save_data(products)
         flash("✅ Product updated successfully")
         return redirect(url_for('admin'))
-    return render_template('edit_product.html', product=product, index=index, reviews=load_reviews())
+
+    return render_template('edit_product.html', product=product)
 
 
+@app.route('/test_email')
+def test_email():
+    try:
+        msg = Message("✅ Test Email from Flask App", recipients=[app.config['MAIL_USERNAME']])
+        msg.body = "This is a test email to verify email sending from your Flask app."
+        mail.send(msg)
+        return "✅ Test email sent successfully!"
+    except Exception as e:
+        return f"❌ Email failed: {str(e)}"
     
 @app.route('/test-logo')
 def test_logo():
