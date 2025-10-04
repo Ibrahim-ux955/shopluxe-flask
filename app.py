@@ -5,13 +5,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from itsdangerous import URLSafeTimedSerializer  # ✅ Add this
-import os, json, uuid, pickle
+import os, json
 from uuid import uuid4
 from datetime import datetime, timedelta
-from google_auth_oauthlib.flow import Flow
-from googleapiclient.discovery import build
-from email.mime.text import MIMEText
-import base64
 import smtplib
 from email.mime.text import MIMEText
 
@@ -29,80 +25,45 @@ REVIEWS_FILE = 'reviews.json'
 USERS_FILE = 'users.json'
 ADMIN_PASSWORD = 'Mohammed_@3'
 
-## Gmail API config
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # Only for testing HTTP
-
-# Path where the client secret file will be created
-CLIENT_SECRETS_FILE = "client_secret.json"
-
-# Only write if file doesn't exist
-if not os.path.exists(CLIENT_SECRETS_FILE):
-    secret_json_str = os.environ.get("GMAIL_CLIENT_SECRET")
-    if not secret_json_str:
-        raise Exception("Environment variable GMAIL_CLIENT_SECRET not set!")
-    
-    try:
-        # Validate it's proper JSON
-        secret_json = json.loads(secret_json_str)
-    except json.JSONDecodeError:
-        raise Exception("GMAIL_CLIENT_SECRET is not valid JSON!")
-    
-    # Write to file
-    with open(CLIENT_SECRETS_FILE, "w") as f:
-        json.dump(secret_json, f, indent=4)
 # ------------------------------
-# Gmail OAuth Routes
+# Email (generic SMTP) config
 # ------------------------------
-@app.route('/authorize')
-def authorize():
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE,
-        scopes=SCOPES,
-        redirect_uri=url_for('oauth2callback', _external=True)
-    )
-    auth_url, state = flow.authorization_url(
-        access_type='offline',
-        include_granted_scopes='true'
-    )
-    session['state'] = state
-    return redirect(auth_url)
+# Configure these environment variables in your deployment:
+# MAIL_SERVER (default: smtp.gmail.com), MAIL_PORT (default: 465 for SSL),
+# MAIL_USERNAME, MAIL_PASSWORD
+MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+MAIL_PORT = int(os.environ.get('MAIL_PORT', 465))
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
-@app.route('/oauth2callback')
-def oauth2callback():
-    state = session['state']
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE,
-        scopes=SCOPES,
-        state=state,
-        redirect_uri=url_for('oauth2callback', _external=True)
-    )
-    flow.fetch_token(authorization_response=request.url)
-    creds = flow.credentials
-    # Save credentials for later
-    with open('token.pickle', 'wb') as token_file:
-        pickle.dump(creds, token_file)
-    return "✅ Gmail API authorized!"
+def send_email(to_email, subject, body):
+    """
+    Generic SMTP email sender. Uses MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD.
+    If MAIL_USERNAME or MAIL_PASSWORD are not set, raises an exception.
+    """
+    if not MAIL_USERNAME or not MAIL_PASSWORD:
+        raise Exception("Mail credentials not configured (MAIL_USERNAME / MAIL_PASSWORD).")
 
-# ------------------------------
-# Gmail send function
-# ------------------------------
-def send_email_smtp(to_email, subject, body):
     msg = MIMEText(body)
     msg['Subject'] = subject
-    msg['From'] = os.environ.get('MAIL_USERNAME')
+    msg['From'] = MAIL_USERNAME
     msg['To'] = to_email
 
-    # Connect to Gmail SMTP server
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-        server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
-        server.send_message(msg)
+    # Use SSL if port 465, otherwise use starttls for common ports (587)
+    if MAIL_PORT == 465:
+        with smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT) as server:
+            server.login(MAIL_USERNAME, MAIL_PASSWORD)
+            server.send_message(msg)
+    else:
+        with smtplib.SMTP(MAIL_SERVER, MAIL_PORT) as server:
+            server.ehlo()
+            server.starttls()
+            server.login(MAIL_USERNAME, MAIL_PASSWORD)
+            server.send_message(msg)
 
 # ------------------------------
-# Example usage in checkout route
+# Helper functions for data
 # ------------------------------
-
-# Helper functions
 def load_data():
     if not os.path.exists(DATA_FILE): return []
     with open(DATA_FILE, 'r') as f: return json.load(f)
@@ -159,9 +120,8 @@ def ensure_product_ids():
         save_data(products)
 
 ensure_product_ids()  
-# Routes
-from datetime import datetime
 
+# Routes
 @app.route('/')
 def index():
     products = load_data()
@@ -190,8 +150,6 @@ def index():
         current_time=current_time,
         selected_category='all'
     )
-
-
 
 @app.route('/filtered/<category>')
 def filtered(category):
@@ -222,8 +180,6 @@ def filtered(category):
         current_time=current_time,
         selected_category=category
     )
-
-
 
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
@@ -261,7 +217,6 @@ def admin_login():
                 flash(f"❌ Incorrect password. {remaining} attempt(s) remaining.")
 
     return render_template('admin_login.html')
-
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
@@ -315,8 +270,6 @@ def admin():
         current_time=datetime.now()
     )
 
-
-  # <-- Add this
 @app.template_filter('todatetime')
 def todatetime_filter(s):
     if isinstance(s, datetime):
@@ -327,9 +280,6 @@ def todatetime_filter(s):
         except ValueError:
             return None  # or handle error
     return None
-  
-
-
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -351,7 +301,7 @@ def signup():
         users.append({'name': name, 'email': email, 'password': hashed_password})
         save_users(users)
 
-        # Send welcome email via Gmail API
+        # Send welcome email via generic SMTP
         body = f"""Hello {name},
 
 Thanks for signing up with ShopLuxe!
@@ -362,18 +312,15 @@ Best regards,
 ShopLuxe Team
 """
         try:
-            send_gmail(email, "🎉 Welcome to ShopLuxe!", body)
+            send_email(email, "🎉 Welcome to ShopLuxe!", body)
         except Exception as e:
-            flash("⚠️ Email not sent. Please authorize Gmail first.")
-            return redirect(url_for('authorize'))
+            flash("⚠️ Email not sent. Please check your email configuration.")
+            # Don't redirect to any auth route — keep user signup flow intact
 
         flash("✅ Account created. Please log in.")
         return redirect(url_for('login'))
 
     return render_template('signup.html')
-
-
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -417,7 +364,7 @@ Click the link below to reset your password:
 
 This link expires in 30 minutes.
 """
-            send_gmail(email, "🔐 Password Reset Request", body)
+            send_email(email, "🔐 Password Reset Request", body)
 
         except Exception as e:
             print("Failed to send email:", e)
@@ -428,7 +375,6 @@ This link expires in 30 minutes.
         return redirect(url_for('login'))
 
     return render_template('forgot_password.html')
-
 
 @app.route('/reset_with_token/<token>', methods=['GET', 'POST'])
 def reset_with_token(token):
@@ -456,10 +402,6 @@ def reset_with_token(token):
         return redirect(url_for('login'))
 
     return render_template('reset_with_token.html')
-
-
-
-
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
@@ -501,7 +443,6 @@ def logout():
     flash("👋 Logged out.")
     return redirect(url_for('index'))
 
-
 @app.route('/delete/<int:index>', methods=['POST'])
 def delete(index):
     if not session.get('admin_logged_in'):
@@ -523,7 +464,6 @@ def delete(index):
         flash("❌ Invalid product index.")
 
     return redirect(url_for('admin'))
-
 
 @app.route('/product/<product_id>')
 def product_detail(product_id):
@@ -564,7 +504,6 @@ def product_detail(product_id):
         reviews=product_reviews,
         product_images=product_images
     )
-
 
 @app.route('/submit_review/<int:index>', methods=['POST'])
 def submit_review(index):
@@ -633,16 +572,13 @@ def edit_product(index):
         save_data(products)
         flash("✅ Product updated successfully")
         return redirect(url_for('admin'))
-
-    return render_template('edit_product.html', product=product)
-
+    return render_template('edit_product.html', product=product, index=index, reviews=load_reviews())
 
 @app.route('/test_email')
 def test_email():
     try:
-        msg = Message("✅ Test Email from Flask App", recipients=[app.config['MAIL_USERNAME']])
-        msg.body = "This is a test email to verify email sending from your Flask app."
-        mail.send(msg)
+        target = os.environ.get('MAIL_USERNAME') or 'test@example.com'
+        send_email(target, "✅ Test Email from Flask App", "This is a test email to verify email sending from your Flask app.")
         return "✅ Test email sent successfully!"
     except Exception as e:
         return f"❌ Email failed: {str(e)}"
@@ -673,7 +609,6 @@ def shop():
         current_time=current_time
     )
 
-    
 # ------------------ CART ROUTES ------------------
 
 # Initialize cart in session if not present
@@ -698,10 +633,6 @@ def add_to_cart(index):
     flash("🛒 Product added to cart!")
     return redirect(request.referrer or url_for('index'))
 
-
-
-
-
 @app.route('/cart')
 def cart():
     cart = get_cart()
@@ -720,8 +651,6 @@ def cart():
 
     total = sum(p['price'] * p['quantity'] for p in cart_items)
     return render_template('cart.html', cart_items=cart_items, total=total)
-
-
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
@@ -793,13 +722,14 @@ Total: GH₵ {total}
 Check your dashboard for more details.
 """
 
-        # Send emails safely
+        # Send emails safely using generic SMTP
         try:
-            send_gmail(email, "🧾 Order Confirmation - ShopLuxe", customer_body)
-            send_gmail("vybezkhid7@gmail.com", "📦 New Order Received - ShopLuxe", admin_body)
+            send_email(email, "🧾 Order Confirmation - ShopLuxe", customer_body)
+            # Replace the admin email below with your admin address or keep as-is
+            send_email(os.environ.get('ADMIN_EMAIL', 'vybezkhid7@gmail.com'), "📦 New Order Received - ShopLuxe", admin_body)
         except Exception as e:
-            flash("⚠️ Emails could not be sent. Please authorize Gmail first.")
-            return redirect(url_for('authorize'))
+            flash("⚠️ Emails could not be sent. Please check email configuration.")
+            # keep flow moving; do not redirect to any removed auth routes
 
         # Clear cart and save order in session for confirmation page
         session.pop('cart', None)
@@ -808,8 +738,6 @@ Check your dashboard for more details.
         return redirect(url_for('order_confirmation'))
 
     return render_template('checkout.html', cart_items=cart_items, total=total)
-
-
 
 @app.route('/confirm_order', methods=['POST'])
 def confirm_order():
@@ -849,16 +777,13 @@ def confirm_order():
     email_body += f"\nTotal: GH₵ {total}\n\nShopluxe Team"
 
     try:
-        send_gmail(order_info['email'], "Shopluxe Order Confirmation", email_body)
+        send_email(order_info['email'], "Shopluxe Order Confirmation", email_body)
         flash("✅ Order confirmed! A confirmation email has been sent.")
     except Exception as e:
         print("❌ Failed to send email:", e)
-        flash("⚠️ Order confirmed, but failed to send email. Please authorize Gmail first.")
+        flash("⚠️ Order confirmed, but failed to send email. Please check email configuration.")
 
     return redirect(url_for('order_confirmation'))
-
-
-
 
 @app.route('/order_confirmation')
 def order_confirmation():
@@ -868,12 +793,9 @@ def order_confirmation():
         return redirect(url_for('cart'))
     return render_template('order_confirmation.html', order=order_info)
 
-  
-
 @app.route("/healthz")
 def health_check():
     return "OK", 200
 
 if __name__ == "__main__":
     app.run()
-
