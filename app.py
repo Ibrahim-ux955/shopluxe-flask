@@ -822,6 +822,17 @@ Check your dashboard for more details.
 
 
 
+@app.route('/confirm_order', methods=['POST'])
+def confirm_order():
+    session['order_info'] = {
+        'name': request.form['name'],
+        'email': request.form['email'],
+        'phone': request.form['phone'],
+        'items': session.get('cart', []),
+        'total': sum(item['price'] * item['quantity'] for item in session.get('cart', []))
+    }
+    return redirect(url_for('order_confirmation'))
+
 @app.route('/order_confirmation')
 def order_confirmation():
     order_info = session.get('order_info')
@@ -829,18 +840,7 @@ def order_confirmation():
         flash("⚠️ No order found.")
         return redirect(url_for('cart'))
     return render_template('order_confirmation.html', order=order_info)
-  
-@app.route('/confirm_order', methods=['POST'])
-def confirm_order():
-    # Save order info to session or database
-    session['order_info'] = {
-        'name': request.form['name'],
-        'email': request.form['email'],
-        'phone': request.form['phone'],
-        'items': session.get('cart', []),
-        'total': sum(item['price']*item['quantity'] for item in session.get('cart', []))
-    }
-    return redirect(url_for('order_confirmation'))
+
   
 
 @app.route("/")
