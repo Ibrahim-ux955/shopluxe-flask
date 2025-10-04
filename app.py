@@ -12,6 +12,8 @@ from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 from email.mime.text import MIMEText
 import base64
+import smtplib
+from email.mime.text import MIMEText
 
 app = Flask(__name__)
 app.jinja_env.globals['session'] = session
@@ -85,26 +87,16 @@ def oauth2callback():
 # ------------------------------
 # Gmail send function
 # ------------------------------
-def send_gmail(to_email, subject, body):
-    """Send email using Gmail API"""
-    if not os.path.exists('token.pickle'):
-        raise Exception("Gmail API not authorized. Visit /authorize first.")
+def send_email_smtp(to_email, subject, body):
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = os.environ.get('MAIL_USERNAME')
+    msg['To'] = to_email
 
-    with open('token.pickle', 'rb') as token_file:
-        creds = pickle.load(token_file)
-    
-    service = build('gmail', 'v1', credentials=creds)
-    
-    message = MIMEText(body)
-    message['to'] = to_email
-    message['subject'] = subject
-
-    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-    
-    service.users().messages().send(
-        userId='me',
-        body={'raw': raw_message}
-    ).execute()
+    # Connect to Gmail SMTP server
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+        server.login(os.environ.get('MAIL_USERNAME'), os.environ.get('MAIL_PASSWORD'))
+        server.send_message(msg)
 
 # ------------------------------
 # Example usage in checkout route
