@@ -8,6 +8,7 @@ from itsdangerous import URLSafeTimedSerializer  # ✅ Add this
 import os, json, uuid
 from uuid import uuid4
 from datetime import datetime, timedelta
+import resend
 
 
 app = Flask(__name__)
@@ -124,6 +125,40 @@ def index():
         selected_category='all'
     )
 
+
+# ✅ Set API key directly for testing (you can remove this later and use env var)
+resend.api_key = "re_hc8dC54W_99qkQMJq4UcVRErCEo6nsGDM"
+
+# ✅ Test email (you can comment this out later)
+r = resend.Emails.send({
+    "from": "onboarding@resend.dev",
+    "to": "vybezkhid7@gmail.com",
+    "subject": "Hello World",
+    "html": "<p>Congrats on sending your <strong>first email</strong>!</p>"
+})
+
+print("Test email sent:", r)
+
+# ✅ For production: use environment variable instead of hardcoding
+# (Set RESEND_API_KEY in Render environment variables)
+# resend.api_key = os.getenv("RESEND_API_KEY")
+
+def send_email(to, subject, html):
+    """Reusable function to send emails via Resend"""
+    try:
+        resend.Emails.send({
+            "from": "Shopluxe <onboarding@resend.dev>",
+            "to": [to],
+            "subject": subject,
+            "html": html
+        })
+        print("✅ Email sent successfully")
+    except Exception as e:
+        print("❌ Email sending failed:", e)
+
+
+# ✅ Example call
+send_email("vybezkhid7@gmail.com", "New Order", "<p>New order received!</p>")
 
 
 @app.route('/filtered/<category>')
