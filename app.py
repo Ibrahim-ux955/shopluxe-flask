@@ -210,6 +210,20 @@ def admin():
         description = request.form.get('description', '')
         stock = int(request.form.get('stock', 0))
 
+        # ✅ Handle "On Sale" fields
+        on_sale = 'on_sale' in request.form  # checkbox is true if present
+        sale_price = request.form.get('sale_price', '')
+
+        # ✅ Optional: ensure sale price is valid
+        if on_sale and sale_price:
+            try:
+                if float(sale_price) >= float(price):
+                    flash("⚠️ Sale price must be less than the original price.")
+                    return redirect(url_for('admin'))
+            except ValueError:
+                flash("⚠️ Invalid sale price entered.")
+                return redirect(url_for('admin'))
+
         # ✅ Handle multiple image uploads
         uploaded_files = request.files.getlist('images')
         if not uploaded_files or all(f.filename == '' for f in uploaded_files):
@@ -228,6 +242,8 @@ def admin():
             'id': str(uuid4()),  # unique ID
             'name': name,
             'price': price,
+            'sale_price': sale_price if on_sale and sale_price else None,
+            'on_sale': on_sale,
             'category': category,
             'description': description,
             'stock': stock,
@@ -554,6 +570,17 @@ def edit_product(product_id):
         product['category'] = request.form.get('category').title()
         product['description'] = request.form.get('description')
         product['stock'] = int(request.form.get('stock'))
+
+        # ✅ Handle sale price and sale toggle
+        sale_price = request.form.get('sale_price')
+        on_sale = 'on_sale' in request.form
+
+        if sale_price:
+            product['sale_price'] = sale_price
+        else:
+            product.pop('sale_price', None)
+
+        product['on_sale'] = on_sale
 
         # Handle removing images
         remove_images = request.form.getlist('remove_images')
