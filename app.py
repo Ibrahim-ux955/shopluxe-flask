@@ -26,13 +26,14 @@ USERS_FILE = 'users.json'
 ADMIN_PASSWORD = 'Mohammed_@3'
 
 # Email config
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'vybezkhid7@gmail.com'
-app.config['MAIL_PASSWORD'] = 'dpbx ahjn cinw qxxj'
-app.config['MAIL_DEFAULT_SENDER'] = 'vybezkhid7@gmail.com'
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 mail = Mail(app)
+
 
 # Helper functions
 def load_data():
@@ -798,9 +799,7 @@ def order_confirmation():
         return redirect(url_for('cart'))
     return render_template('order_confirmation.html', order=order_info)
 
-@app.route("/")
-def home():
-    return render_template('index.html', products=products)
+
 
 @app.route("/healthz")
 def health_check():
