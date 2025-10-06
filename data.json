@@ -3,6 +3,8 @@
         "id": "f3a8a18a-3acd-4fa5-9269-d7c3fa08e98b",
         "name": "Z",
         "price": "678",
+        "sale_price": "550",
+        "on_sale": true,
         "category": "Accessories",
         "description": "hjfdh",
         "stock": 998,
@@ -28,5 +30,20 @@
             "eagle-predator-flight-yl-1920x1080.jpg"
         ],
         "timestamp": "2025-10-03T22:06:20.403827"
+    },
+    {
+        "id": "31cba2b9-a19c-4b46-b186-7eabb0a2207f",
+        "name": "Kl",
+        "price": "678",
+        "on_sale": true,
+        "category": "Accessories",
+        "description": "jhgjg",
+        "stock": 998,
+        "images": [
+            "IMG-20251002-WA0004.jpg"
+        ],
+        "timestamp": "2025-10-06T22:45:01.988895",
+        "image": "IMG-20251002-WA0004.jpg",
+        "sale_price": "567"
     }
 ]

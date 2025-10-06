@@ -25,6 +25,18 @@
       <input type="text" name="price" id="price" class="form-control" value="{{ product.price }}" required>
     </div>
 
+    <!-- ✅ Sale Price -->
+    <div class="mb-3">
+      <label for="sale_price" class="form-label">Sale Price (optional)</label>
+      <input type="text" name="sale_price" id="sale_price" class="form-control" value="{{ product.sale_price if product.sale_price is defined else '' }}">
+    </div>
+
+    <!-- ✅ On Sale Checkbox -->
+    <div class="form-check mb-3">
+      <input type="checkbox" name="on_sale" id="on_sale" class="form-check-input" {% if product.on_sale %}checked{% endif %}>
+      <label for="on_sale" class="form-check-label">This product is on sale</label>
+    </div>
+
     <!-- Category -->
     <div class="mb-3">
       <label for="category" class="form-label">Category</label>

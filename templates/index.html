@@ -66,9 +66,24 @@
               {% endif %}
             {% endif %}
 
+            {% if product.on_sale %}
+              <span class="badge bg-danger position-absolute bottom-0 end-0 m-2">Sale</span>
+            {% endif %}
+
             <div class="p-2 rounded-bottom" style="background-color: #f8f9fa;">
               <p class="mb-1 fw-semibold text-dark" style="font-size:15px;">{{ product.name }}</p>
-              <p class="fw-bold mb-1 text-dark">GH₵ {{ product.price }}</p>
+              {% if product.on_sale and product.sale_price %}
+  <p class="fw-bold mb-1 text-danger">
+    GH₵ {{ product.sale_price }}
+    <span class="text-muted text-decoration-line-through ms-2" style="font-size: 14px;">
+      GH₵ {{ product.price }}
+    </span>
+  </p>
+  <span class="badge bg-danger position-absolute bottom-0 end-0 m-2">Sale</span>
+{% else %}
+  <p class="fw-bold mb-1 text-dark">GH₵ {{ product.price }}</p>
+{% endif %}
+
               {% if product.description %}
                 <p class="small mb-0 text-dark">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</p>
               {% endif %}
@@ -110,6 +125,10 @@
               {% if product_time and (current_time - product_time).days <= 7 %}
                 <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
               {% endif %}
+            {% endif %}
+
+            {% if product.on_sale %}
+              <span class="badge bg-danger position-absolute bottom-0 end-0 m-2">Sale</span>
             {% endif %}
 
             <div class="p-2 rounded-bottom" style="background-color: #f8f9fa;">

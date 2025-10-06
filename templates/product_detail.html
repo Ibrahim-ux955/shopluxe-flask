@@ -52,7 +52,17 @@
         </style>
 
         <h2>{{ product.name }}</h2>
-        <p class="text-success fw-bold fs-4">GH₵ {{ product.price }}</p>
+
+        <!-- ✅ Sale Price Display -->
+        {% if product.on_sale and product.sale_price %}
+          <p class="mb-1">
+            <span class="text-muted text-decoration-line-through fs-5">GH₵ {{ product.price }}</span>
+          </p>
+          <p class="text-danger fw-bold fs-4">GH₵ {{ product.sale_price }}</p>
+        {% else %}
+          <p class="text-success fw-bold fs-4">GH₵ {{ product.price }}</p>
+        {% endif %}
+
         <p class="text-muted">Category: {{ product.category }}</p>
 
         {% if product.description %}
@@ -102,7 +112,15 @@
                  style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 5px;">
             <div class="p-2">
               <p class="mb-1 fw-semibold" style="font-size: 15px;">{{ item.name }}</p>
-              <p class="text-success fw-bold mb-0">GH₵ {{ item.price }}</p>
+
+              {% if item.on_sale and item.sale_price %}
+                <p class="mb-0">
+                  <span class="text-muted text-decoration-line-through small">GH₵ {{ item.price }}</span><br>
+                  <span class="text-danger fw-bold">GH₵ {{ item.sale_price }}</span>
+                </p>
+              {% else %}
+                <p class="text-success fw-bold mb-0">GH₵ {{ item.price }}</p>
+              {% endif %}
             </div>
           </div>
         </a>
