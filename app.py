@@ -825,6 +825,7 @@ def checkout():
     products = load_data()
     cart_items = []
 
+    # Build cart items with quantity
     for item in cart:
         index = item.get("index")
         quantity = item.get("quantity", 1)
@@ -853,46 +854,49 @@ def checkout():
         }
 
         # Prepare order summary
-        item_lines = '\n'.join([
+        item_lines = '<br>'.join([
             f"{item['name']} x{item['quantity']} - GH₵ {item['price']}"
             for item in order['items']
         ])
 
-        # Customer email HTML
-        customer_html = f"""
-<p>Hello {name},</p>
-<p>Thank you for your order on ShopLuxe! 🎉</p>
-<p><strong>Order Summary:</strong><br>
-{item_lines.replace('\n', '<br>')}</p>
-<p>Total: GH₵ {total}</p>
-<p>We’ll contact you if needed. Thanks again!</p>
-<p>Best regards,<br>ShopLuxe Team</p>
-"""
-
-        # Admin email HTML
-        admin_html = f"""
-<p>Hello Admin,</p>
-<p>A new order has been placed on ShopLuxe.</p>
-<p><strong>Customer Info:</strong><br>
-Name: {name}<br>Email: {email}<br>Phone: {phone}</p>
-<p><strong>Order Summary:</strong><br>
-{item_lines.replace('\n', '<br>')}</p>
-<p>Total: GH₵ {total}</p>
-"""
-
+        # Send emails via Resend
         try:
-            # Send emails using Resend
-            send_email(email, "🧾 Order Confirmation - ShopLuxe", customer_html)
-            send_email("YOUR_ADMIN_EMAIL_HERE", "📦 New Order Received - ShopLuxe", admin_html)
-        except Exception as e:
-            print("❌ Failed to send email:", e)
-            flash("⚠️ Failed to send order emails. Check server logs.")
+            # 1️⃣ User confirmation
+            user_html = f"""
+            <p>Hello {name},</p>
+            <p>Thank you for your order on ShopLuxe! 🎉</p>
+            <h4>Order Summary:</h4>
+            <p>{item_lines}</p>
+            <p><strong>Total: GH₵ {total}</strong></p>
+            <p>We’ll contact you if needed. Thanks again!</p>
+            <p>Best regards,<br>ShopLuxe Team</p>
+            """
+            send_email(email, "🧾 Order Confirmation - ShopLuxe", user_html)
 
-        session.pop('cart', None)  # Clear cart
+            # 2️⃣ Admin notification
+            admin_html = f"""
+            <p>Hello Admin,</p>
+            <p>A new order has been placed on ShopLuxe.</p>
+            <h4>Customer Info:</h4>
+            <p>Name: {name}<br>Email: {email}<br>Phone: {phone}</p>
+            <h4>Order Summary:</h4>
+            <p>{item_lines}</p>
+            <p><strong>Total: GH₵ {total}</strong></p>
+            <p>Check your dashboard for more details.</p>
+            """
+            send_email("vybezkhid7@gmail.com", "📦 New Order Received - ShopLuxe", admin_html)
+
+            flash("✅ Order placed successfully! Confirmation emails sent.")
+
+        except Exception as e:
+            print("❌ Order placed but email could not be sent:", e)
+            flash("⚠️ Order placed but email could not be sent.")
+
+        # Clear cart
+        session.pop('cart', None)
         return render_template('order_confirmation.html', order=order)
 
     return render_template('checkout.html', cart_items=cart_items, total=total)
-
 
 
 
