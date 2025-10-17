@@ -96,35 +96,103 @@ ensure_product_ids()
 # Routes
 from datetime import datetime
 
+
 @app.route('/')
 def index():
+    query = request.args.get('q', '').strip().lower()
+    category = request.args.get('category', '').strip().lower()
     products = load_data()
     current_time = datetime.now()
 
-    # Convert string timestamps to datetime objects
+    # ✅ Normalize product data
     for p in products:
+        # Convert timestamps safely
         if isinstance(p.get('timestamp'), str):
-            p['timestamp'] = datetime.fromisoformat(p['timestamp'])
+            try:
+                p['timestamp'] = datetime.fromisoformat(p['timestamp'])
+            except:
+                p['timestamp'] = current_time
 
-        # ✅ Ensure both "image" and "images" exist
+        # Ensure both 'image' and 'images' exist
         if 'images' not in p and 'image' in p:
             p['images'] = [p['image']]
         elif 'images' in p and 'image' not in p:
             p['image'] = p['images'][0]
 
-    # Define featured products: added in the last 7 days
-    featured_products = [
-        p for p in products if (current_time - p['timestamp']).days <= 7
-    ]
+    # ✅ Define featured products (added in last 7 days)
+    featured_products = [p for p in products if (current_time - p['timestamp']).days <= 7]
+
+    # ✅ Apply search or category filters
+    filtered_products = []
+    for p in products:
+        name = p.get('name', '').lower()
+        description = p.get('description', '').lower()
+        cat = p.get('category', '').lower()
+
+        # Search filter
+        if query and (query in name or query in description or query in cat):
+            filtered_products.append(p)
+        # Category filter
+        elif category and cat == category:
+            filtered_products.append(p)
+
+    # If no query or category, show all
+    if not query and not category:
+        filtered_products = products
 
     return render_template(
-    'index.html',
-    products=products,
-    featured_products=featured_products,
-    current_time=current_time,
-    selected_category='all',
-    active_page='home'  # ✅ highlight "Home" icon
-)
+        'index.html',
+        products=filtered_products,
+        featured_products=featured_products,
+        query=query,
+        current_time=current_time,
+        selected_category=category or 'all',
+        active_page='home'
+    )
+
+
+@app.route('/search')
+def search():
+    query = request.args.get('q', '').strip().lower()
+    products = load_data()
+    current_time = datetime.now()
+
+    # Fix timestamps and images
+    for p in products:
+        if isinstance(p.get('timestamp'), str):
+            try:
+                p['timestamp'] = datetime.fromisoformat(p['timestamp'])
+            except:
+                p['timestamp'] = current_time
+
+        if 'images' not in p and 'image' in p:
+            p['images'] = [p['image']]
+        elif 'images' in p and 'image' not in p:
+            p['image'] = p['images'][0]
+
+    # ✅ Search by name, category, or description
+    if query:
+        filtered = [
+            p for p in products
+            if query in p.get('name', '').lower()
+            or query in p.get('category', '').lower()
+            or query in p.get('description', '').lower()
+        ]
+    else:
+        filtered = products
+
+    # Featured = recently added
+    featured_products = [p for p in filtered if (current_time - p['timestamp']).days <= 7]
+
+    return render_template(
+        'index.html',
+        products=filtered,
+        featured_products=featured_products,
+        query=query,
+        current_time=current_time,
+        selected_category='all',
+        active_page='search'
+    )
 
 
 
