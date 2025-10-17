@@ -25,6 +25,47 @@
       background: url("{{ url_for('static', filename='banner/wallpaper.jpg') }}") center/cover no-repeat fixed;
       min-height: 100vh;
     }
+
+    /* Mobile Bottom Nav Active Styles */
+    nav.navbar.fixed-bottom .container a {
+      color: #666;
+      text-align: center;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      position: relative;
+      padding: 5px 10px;
+      transition: color 0.3s;
+    }
+
+    nav.navbar.fixed-bottom .container a.active,
+    nav.navbar.fixed-bottom .container a.active i {
+      color: #0d6efd; /* Bootstrap primary blue */
+      font-weight: 600;
+    }
+
+    nav.navbar.fixed-bottom .container a small {
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* Cart count badge for mobile nav */
+    nav.navbar.fixed-bottom .container a.cart {
+      position: relative;
+    }
+    nav.navbar.fixed-bottom .container a.cart .badge {
+      position: absolute;
+      top: 0;
+      right: 12px;
+      font-size: 10px;
+      background-color: #0d6efd;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 5px;
+    }
   </style>
 </head>
 
@@ -83,8 +124,6 @@
         </a>
       </div>
 
-      <!-- Removed Admin button from here -->
-
       <!-- User login/logout -->
       {% if session.user %}
         <div class="dropdown mt-2 mt-lg-0">
@@ -122,8 +161,8 @@
     <!-- Categories -->
     <div class="dropup">
       <button class="btn btn-link text-dark text-decoration-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <div><i class="bi bi-list-ul"></i></div>
-        <small>Categories</small>
+        <div><i class="bi bi-list-ul {% if active_page == 'categories' %}active{% endif %}"></i></div>
+        <small class="{% if active_page == 'categories' %}active{% endif %}">Categories</small>
       </button>
       <ul class="dropdown-menu">
         <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">Shoes</a></li>
@@ -138,19 +177,19 @@
     </div>
 
     <!-- Search -->
-    <a href="{{ url_for('index') }}" class="text-dark text-decoration-none">
+    <a href="{{ url_for('index') }}" class="text-dark text-decoration-none {% if active_page == 'home' %}active{% endif %}">
       <div><i class="bi bi-search"></i></div>
       <small>Search</small>
     </a>
 
     <!-- Cart -->
-    <a href="{{ url_for('cart') }}" class="text-dark text-decoration-none">
+    <a href="{{ url_for('cart') }}" class="text-dark text-decoration-none cart {% if active_page == 'cart' %}active{% endif %}">
       <div><i class="bi bi-cart-fill"></i></div>
       <small>Cart ({{ session.cart|length if session.cart else 0 }})</small>
     </a>
 
-    <!-- Admin (Added here) -->
-    <a href="{{ url_for('admin_login') }}" class="text-dark text-decoration-none">
+    <!-- Admin -->
+    <a href="{{ url_for('admin_login') }}" class="text-dark text-decoration-none {% if active_page == 'admin' %}active{% endif %}">
       <div><i class="bi bi-person-gear"></i></div>
       <small>Admin</small>
     </a>

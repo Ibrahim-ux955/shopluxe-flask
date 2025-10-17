@@ -118,12 +118,14 @@ def index():
     ]
 
     return render_template(
-        'index.html',
-        products=products,
-        featured_products=featured_products,
-        current_time=current_time,
-        selected_category='all'
-    )
+    'index.html',
+    products=products,
+    featured_products=featured_products,
+    current_time=current_time,
+    selected_category='all',
+    active_page='home'  # ✅ highlight "Home" icon
+)
+
 
 
 # ✅ Set API key directly for testing (you can remove this later and use env var)
@@ -184,12 +186,14 @@ def filtered(category):
     featured_products = [p for p in filtered_products if (current_time - p['timestamp']).days <= 7]
 
     return render_template(
-        'index.html',
-        products=products,
-        featured_products=featured_products,
-        current_time=current_time,
-        selected_category=category
-    )
+    'index.html',
+    products=products,
+    featured_products=featured_products,
+    current_time=current_time,
+    selected_category=category,
+    active_page='categories'
+)
+
 
 
 
@@ -303,11 +307,13 @@ def admin():
         return redirect(url_for('admin'))
 
     return render_template(
-        'admin.html',
-        products=products,
-        reviews=reviews,
-        current_time=datetime.now()
-    )
+    'admin.html',
+    products=products,
+    reviews=reviews,
+    current_time=datetime.now(),
+    active_page='admin'
+)
+
 
 
   # <-- Add this
@@ -742,7 +748,8 @@ def cart():
             cart_items.append(product)
 
     total = sum(float(p['price']) * p['quantity'] for p in cart_items)
-    return render_template('cart.html', cart_items=cart_items, total=total)
+    return render_template('cart.html', cart_items=cart_items, total=total, active_page='cart')
+
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
