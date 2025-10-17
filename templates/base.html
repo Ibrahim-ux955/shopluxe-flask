@@ -5,6 +5,7 @@
   <title>ShopLuxe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     .category-dropdown:hover .dropdown-menu {
       display: block;
@@ -43,43 +44,47 @@
 
     <!-- Collapsible Navbar Content -->
     <div class="collapse navbar-collapse" id="navbarContent">
-      <div class="dropdown ms-lg-3 mt-2 mt-lg-0">
-        <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          🛍️ Categories
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">
-            <img src="{{ url_for('static', filename='icons/shoe.png') }}" class="category-icon">Shoes</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">
-            <img src="{{ url_for('static', filename='icons/men.png') }}" class="category-icon">Men</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">
-            <img src="{{ url_for('static', filename='icons/women.png') }}" class="category-icon">Women</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Children') }}">
-            <img src="{{ url_for('static', filename='icons/children.png') }}" class="category-icon">Children</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Watches') }}">
-            <img src="{{ url_for('static', filename='icons/watch.png') }}" class="category-icon">Watches</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Jewelry') }}">
-            <img src="{{ url_for('static', filename='icons/jewelry.png') }}" class="category-icon">Jewelry</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">
-            <img src="{{ url_for('static', filename='icons/accessories.png') }}" class="category-icon">Accessories</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">
-            <img src="{{ url_for('static', filename='icons/bag.png') }}" class="category-icon">Bags</a></li>
-        </ul>
+      <!-- Hide this section on small screens -->
+      <div class="d-none d-md-flex w-100 align-items-center">
+        <!-- Categories dropdown -->
+        <div class="dropdown ms-3">
+          <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            🛍️ Categories
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">
+              <img src="{{ url_for('static', filename='icons/shoe.png') }}" class="category-icon">Shoes</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">
+              <img src="{{ url_for('static', filename='icons/men.png') }}" class="category-icon">Men</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">
+              <img src="{{ url_for('static', filename='icons/women.png') }}" class="category-icon">Women</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Children') }}">
+              <img src="{{ url_for('static', filename='icons/children.png') }}" class="category-icon">Children</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Watches') }}">
+              <img src="{{ url_for('static', filename='icons/watch.png') }}" class="category-icon">Watches</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Jewelry') }}">
+              <img src="{{ url_for('static', filename='icons/jewelry.png') }}" class="category-icon">Jewelry</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">
+              <img src="{{ url_for('static', filename='icons/accessories.png') }}" class="category-icon">Accessories</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">
+              <img src="{{ url_for('static', filename='icons/bag.png') }}" class="category-icon">Bags</a></li>
+          </ul>
+        </div>
+
+        <!-- Search form -->
+        <form class="d-flex ms-auto me-2" method="get" action="{{ url_for('index') }}">
+          <input class="form-control me-2" type="search" name="q" placeholder="Search" value="{{ query if query else '' }}">
+          <button class="btn btn-success" type="submit">Search</button>
+        </form>
+
+        <!-- Cart -->
+        <a class="btn btn-outline-light me-2" href="{{ url_for('cart') }}">
+          🛒 Cart ({{ session.cart|length if session.cart else 0 }})
+        </a>
       </div>
 
-      <!-- Search form -->
-      <form class="d-flex flex-wrap ms-lg-auto mt-3 mt-lg-0 me-lg-2" method="get" action="{{ url_for('index') }}">
-        <input class="form-control me-2 mb-2 mb-lg-0" type="search" name="q" placeholder="Search" value="{{ query if query else '' }}">
-        <button class="btn btn-success" type="submit">Search</button>
-      </form>
-
-      <!-- Cart button -->
-      <a class="btn btn-outline-light ms-lg-2 me-2 mt-2 mt-lg-0" href="{{ url_for('cart') }}">
-        🛒 Cart ({{ session.cart|length if session.cart else 0 }})
-      </a>
-
       <!-- Admin button -->
-      <a class="btn btn-success ms-lg-2 me-2 mt-2 mt-lg-0" href="{{ url_for('admin_login') }}">Admin</a>
+      <a class="btn btn-success ms-lg-auto me-2 mt-2 mt-lg-0" href="{{ url_for('admin_login') }}">Admin</a>
 
       <!-- User login/logout -->
       {% if session.user %}
@@ -101,7 +106,7 @@
 </nav>
 
 <!-- Main content -->
-<div class="container mt-4">
+<div class="container mt-4 mb-5"> <!-- extra bottom margin for nav -->
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <div class="alert alert-info">{{ messages[0] }}</div>
@@ -110,6 +115,42 @@
 
   {% block content %}{% endblock %}
 </div>
+
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="navbar fixed-bottom bg-light d-md-none border-top shadow-sm">
+  <div class="container d-flex justify-content-around text-center py-1">
+
+    <!-- Categories -->
+    <div class="dropup">
+      <button class="btn btn-link text-dark text-decoration-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <div><i class="bi bi-list-ul"></i></div>
+        <small>Categories</small>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">Shoes</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">Men</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">Women</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Children') }}">Children</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Watches') }}">Watches</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Jewelry') }}">Jewelry</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">Accessories</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">Bags</a></li>
+      </ul>
+    </div>
+
+    <!-- Search -->
+    <a href="{{ url_for('index') }}" class="text-dark text-decoration-none">
+      <div><i class="bi bi-search"></i></div>
+      <small>Search</small>
+    </a>
+
+    <!-- Cart -->
+    <a href="{{ url_for('cart') }}" class="text-dark text-decoration-none">
+      <div><i class="bi bi-cart-fill"></i></div>
+      <small>Cart ({{ session.cart|length if session.cart else 0 }})</small>
+    </a>
+  </div>
+</nav>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
