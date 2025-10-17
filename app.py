@@ -852,62 +852,47 @@ def checkout():
             'total': total
         }
 
-        # Send confirmation and admin email
+        # Prepare order summary
+        item_lines = '\n'.join([
+            f"{item['name']} x{item['quantity']} - GH₵ {item['price']}"
+            for item in order['items']
+        ])
+
+        # Customer email HTML
+        customer_html = f"""
+<p>Hello {name},</p>
+<p>Thank you for your order on ShopLuxe! 🎉</p>
+<p><strong>Order Summary:</strong><br>
+{item_lines.replace('\n', '<br>')}</p>
+<p>Total: GH₵ {total}</p>
+<p>We’ll contact you if needed. Thanks again!</p>
+<p>Best regards,<br>ShopLuxe Team</p>
+"""
+
+        # Admin email HTML
+        admin_html = f"""
+<p>Hello Admin,</p>
+<p>A new order has been placed on ShopLuxe.</p>
+<p><strong>Customer Info:</strong><br>
+Name: {name}<br>Email: {email}<br>Phone: {phone}</p>
+<p><strong>Order Summary:</strong><br>
+{item_lines.replace('\n', '<br>')}</p>
+<p>Total: GH₵ {total}</p>
+"""
+
         try:
-            item_lines = '\n'.join([
-                f"{item['name']} x{item['quantity']} - GH₵ {item['price']}"
-                for item in order['items']
-            ])
-
-            # Customer email
-            msg = Message("🧾 Order Confirmation - ShopLuxe", recipients=[email])
-            msg.body = f"""
-Hello {name},
-
-Thank you for your order on ShopLuxe! 🎉
-
-Order Summary:
---------------
-{item_lines}
---------------
-Total: GH₵ {total}
-
-We’ll contact you if needed. Thanks again!
-
-Best regards,  
-ShopLuxe Team
-"""
-            mail.send(msg)
-
-            # Admin email
-            admin_msg = Message("📦 New Order Received - ShopLuxe", recipients=[app.config['MAIL_USERNAME']])
-            admin_msg.body = f"""Hello Admin,
-
-A new order has been placed on ShopLuxe.
-
-Customer Info:
-Name: {name}
-Email: {email}
-Phone: {phone}
-
-Order Summary:
---------------
-{item_lines}
---------------
-Total: GH₵ {total}
-
-Check your dashboard for more details.
-"""
-            mail.send(admin_msg)
-
+            # Send emails using Resend
+            send_email(email, "🧾 Order Confirmation - ShopLuxe", customer_html)
+            send_email("YOUR_ADMIN_EMAIL_HERE", "📦 New Order Received - ShopLuxe", admin_html)
         except Exception as e:
-            print("Failed to send email:", e)
-
+            print("❌ Failed to send email:", e)
+            flash("⚠️ Failed to send order emails. Check server logs.")
 
         session.pop('cart', None)  # Clear cart
         return render_template('order_confirmation.html', order=order)
 
     return render_template('checkout.html', cart_items=cart_items, total=total)
+
 
 
 
