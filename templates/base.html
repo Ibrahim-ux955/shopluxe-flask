@@ -83,8 +83,7 @@
         </a>
       </div>
 
-      <!-- Admin button -->
-      <a class="btn btn-success ms-lg-auto me-2 mt-2 mt-lg-0" href="{{ url_for('admin_login') }}">Admin</a>
+      <!-- Removed Admin button from here -->
 
       <!-- User login/logout -->
       {% if session.user %}
@@ -149,6 +148,13 @@
       <div><i class="bi bi-cart-fill"></i></div>
       <small>Cart ({{ session.cart|length if session.cart else 0 }})</small>
     </a>
+
+    <!-- Admin (Added here) -->
+    <a href="{{ url_for('admin_login') }}" class="text-dark text-decoration-none">
+      <div><i class="bi bi-person-gear"></i></div>
+      <small>Admin</small>
+    </a>
+
   </div>
 </nav>
 
