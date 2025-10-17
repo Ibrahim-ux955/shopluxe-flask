@@ -813,10 +813,21 @@ def cart():
         if 0 <= index < len(products):
             product = products[index].copy()
             product['quantity'] = quantity
+
+            # ✅ Make sure image is included
+            # Use 'image' if single image or first from 'images' list
+            if 'images' in product and product['images']:
+                product['image'] = product['images'][0]
+            elif 'image' in product:
+                product['image'] = product['image']
+            else:
+                product['image'] = 'default.png'  # fallback if no image
+
             cart_items.append(product)
 
     total = sum(float(p['price']) * p['quantity'] for p in cart_items)
     return render_template('cart.html', cart_items=cart_items, total=total, active_page='cart')
+
 
 
 @app.route('/checkout', methods=['GET', 'POST'])

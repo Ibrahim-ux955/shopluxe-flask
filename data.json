@@ -1,79 +1,13 @@
 [
     {
-        "id": "f3a8a18a-3acd-4fa5-9269-d7c3fa08e98b",
-        "name": "Z",
-        "price": "678",
-        "sale_price": "550",
-        "on_sale": true,
-        "category": "Accessories",
-        "description": "hjfdh",
-        "stock": 998,
-        "image": "8b900e48-aadf-4638-8bcf-1f464f846856.jpeg",
-        "images": [
-            "8b900e48-aadf-4638-8bcf-1f464f846856.jpeg",
-            "2018-assassins-creed-origins-5k-1j.jpg",
-            "2024-pubg-mobile-metro-royale-chapter-22-game-f2-1920x1080.jpg"
-        ],
-        "timestamp": "2025-10-03T21:57:08.984314"
-    },
-    {
-        "id": "31cba2b9-a19c-4b46-b186-7eabb0a2207f",
-        "name": "Kl",
-        "price": "678",
-        "on_sale": true,
-        "category": "Accessories",
-        "description": "jhgjg",
-        "stock": 4,
-        "images": [
-            "IMG-20251002-WA0004.jpg"
-        ],
-        "timestamp": "2025-10-06T22:45:01.988895",
-        "image": "IMG-20251002-WA0004.jpg",
-        "sale_price": "567"
-    },
-    {
-        "id": "f6d725ee-2aa9-4895-8a6e-31a9cdd953ee",
-        "name": "Mm",
-        "price": "87",
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
         "sale_price": null,
         "on_sale": false,
         "category": "Accessories",
-        "description": "rgrtyt45645645tj4tiorehtuiejgdfjg",
-        "stock": 67,
-        "colors": [
-            "Black"
-        ],
-        "images": [
-            "bald-eagle-sitting-on-branch-4k-e8-1920x1080.jpg"
-        ],
-        "timestamp": "2025-10-17T18:51:02.965860"
-    },
-    {
-        "id": "43bc0813-7a8b-4f32-a8ef-dca52c419d93",
-        "name": "Fekjdfhekj",
-        "price": "8988",
-        "sale_price": null,
-        "on_sale": false,
-        "category": "Watches",
-        "description": "wefefaf",
-        "stock": 78,
-        "colors": [
-            "Gold"
-        ],
-        "images": [
-            "2024-tomb-raider-7z.jpg"
-        ],
-        "timestamp": "2025-10-17T18:54:11.295164"
-    },
-    {
-        "id": "55550531-0cdc-4f61-8aa7-33edcea9bd13",
-        "name": "Fekjdfhekj",
-        "price": "8988",
-        "sale_price": null,
-        "on_sale": false,
-        "category": "Watches",
-        "description": "effdfg",
-        "stock": 87,
+        "description": "Very good, Brand new",
+        "stock": 7,
         "colors": [
             "Red",
             "Yellow",
@@ -86,8 +20,26 @@
             "90"
         ],
         "images": [
-            "evil-eagle-ki-1920x1080.jpg"
+            "pexels-garrettmorrow-682933.jpg"
         ],
-        "timestamp": "2025-10-17T19:01:46.920408"
+        "timestamp": "2025-10-17T22:29:01.673090"
+    },
+    {
+        "id": "3add6997-71c2-4ba5-ab00-9a23b2f84784",
+        "name": "Charger",
+        "price": "23",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "",
+        "stock": 50,
+        "colors": [
+            "white"
+        ],
+        "sizes": [],
+        "images": [
+            "pexels-inspiredimages-139038.jpg"
+        ],
+        "timestamp": "2025-10-17T22:36:19.901604"
     }
 ]
