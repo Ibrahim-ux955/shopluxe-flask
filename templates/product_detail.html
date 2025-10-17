@@ -1,134 +1,228 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
+<style>
+  .product-card {
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    padding: 20px;
+  }
+
+  .main-img {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 14px;
+    transition: opacity 0.3s ease;
+  }
+
+  .thumbs img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+
+  .thumbs img.active {
+    border-color: #198754;
+  }
+
+  .size-option,
+  .color-option {
+    display: inline-block;
+    margin: 0 5px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+
+  .size-option.active,
+  .color-option.active {
+    border-color: #198754;
+  }
+
+  .size-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  .color-option {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+  }
+
+  .add-cart-btn {
+    width: 100%;
+    background-color: #198754;
+    color: white;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 0;
+    transition: transform 0.2s ease, background 0.3s ease;
+  }
+
+  .add-cart-btn:hover {
+    background-color: #157347;
+    transform: scale(1.02);
+  }
+
+  .product-info h2 {
+    font-weight: 700;
+  }
+
+  .related-item img {
+    border-radius: 10px;
+    object-fit: cover;
+  }
+</style>
+
+<div class="container mt-5 mb-5">
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <div class="card shadow-sm p-4 text-center">
+      <div class="product-card shadow">
         <!-- ✅ Main Product Image -->
-        <img id="mainImage"
-             src="{{ url_for('static', filename='shoes/' + product.images[0]) }}"  
-             alt="{{ product.name }}" 
-             class="img-fluid mb-4" 
-             style="max-height: 400px; object-fit: cover;">
+        <img id="mainImage" src="{{ url_for('static', filename='shoes/' + product.images[0]) }}"
+          alt="{{ product.name }}" class="main-img mb-3">
 
-        <!-- ✅ Thumbnails under main image -->
-        <div class="d-flex justify-content-center gap-2 mb-4">
+        <!-- ✅ Thumbnails -->
+        <div class="thumbs d-flex justify-content-center gap-2 mb-3">
           {% for img in product.images %}
-            <img src="{{ url_for('static', filename='shoes/' + img) }}" 
-                 alt="thumb" class="thumb-img"
-                 style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+          <img src="{{ url_for('static', filename='shoes/' + img) }}" alt="thumb" class="thumb-img">
           {% endfor %}
         </div>
 
-        <!-- ✅ Script for swapping images with active highlight & fade -->
-        <script>
-          const mainImage = document.getElementById('mainImage');
-          const thumbs = document.querySelectorAll('.thumb-img');
+        <!-- ✅ Product Info -->
+        <div class="product-info text-center">
+          <h2 class="mb-1">{{ product.name }}</h2>
 
-          thumbs.forEach(thumb => {
-            thumb.addEventListener('click', function() {
-              mainImage.style.opacity = 0;
-              setTimeout(() => {
-                mainImage.src = this.src;
-                mainImage.style.opacity = 1;
-              }, 150);
-              thumbs.forEach(t => t.classList.remove('active'));
-              this.classList.add('active');
-            });
-          });
-
-          if (thumbs.length > 0) thumbs[0].classList.add('active');
-        </script>
-
-        <!-- ✅ CSS for active thumbnail -->
-        <style>
-          .thumb-img.active {
-            border: 2px solid #007bff !important;
-          }
-          #mainImage {
-            transition: opacity 0.3s ease-in-out;
-          }
-        </style>
-
-        <h2>{{ product.name }}</h2>
-
-        <!-- ✅ Sale Price Display -->
-        {% if product.on_sale and product.sale_price %}
-          <p class="mb-1">
-            <span class="text-muted text-decoration-line-through fs-5">GH₵ {{ product.price }}</span>
-          </p>
+          {% if product.on_sale and product.sale_price %}
+          <p class="mb-1 text-muted text-decoration-line-through fs-5">GH₵ {{ product.price }}</p>
           <p class="text-danger fw-bold fs-4">GH₵ {{ product.sale_price }}</p>
-        {% else %}
-          <p class="text-success fw-bold fs-4">GH₵ {{ product.price }}</p>
-        {% endif %}
-
-        <p class="text-muted">Category: {{ product.category }}</p>
-
-        {% if product.description %}
-          <p class="mt-3">{{ product.description }}</p>
-        {% endif %}
-
-        {% if product.stock is defined %}
-          {% if product.stock > 0 %}
-            <p class="text-success">In stock: {{ product.stock }}</p>
-            <form action="{{ url_for('add_to_cart', index=product.index) }}" method="POST" class="mb-3">
-              <div class="input-group mb-2">
-                <input type="number" name="quantity" value="1" min="1" class="form-control" required>
-                <button type="submit" class="btn btn-success">🛒 Add to Cart</button>
-              </div>
-            </form>
           {% else %}
-            <p class="text-danger">Out of stock</p>
-
-            <!-- Notify form -->
-            <form method="POST" action="{{ url_for('restock_notify', index=product.index) }}" class="mt-3">
-              <div class="mb-2">
-                <input type="email" name="email" placeholder="Your email" class="form-control" required>
-              </div>
-              <button type="submit" class="btn btn-warning w-100">🔔 Notify Me When Restocked</button>
-            </form>
+          <p class="text-success fw-bold fs-4">GH₵ {{ product.price }}</p>
           {% endif %}
+
+          {% if product.description %}
+          <p class="text-muted">{{ product.description }}</p>
+          {% endif %}
+        </div>
+
+        <!-- ✅ Sizes -->
+        {% if product.sizes %}
+        <div class="text-center mt-3">
+          <h6 class="fw-bold">Size</h6>
+          <div>
+            {% for size in product.sizes %}
+            <span class="size-option {% if loop.first %}active{% endif %}">{{ size }}</span>
+            {% endfor %}
+          </div>
+        </div>
         {% endif %}
 
-        <a href="https://wa.me/233551056001?text=I%20want%20to%20buy%20{{ product.name }}" class="btn btn-success w-100 mb-2">Order on WhatsApp</a>
-        <a href="tel:0551056001" class="btn btn-secondary w-100">Call Seller</a>
+        <!-- ✅ Colors -->
+        {% if product.colors %}
+        <div class="text-center mt-3">
+          <h6 class="fw-bold">Color</h6>
+          <div>
+            {% for color in product.colors %}
+            <span class="color-option {% if loop.first %}active{% endif %}" 
+                  style="background: {{ color | lower }};" 
+                  title="{{ color }}"></span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- ✅ Add to Cart -->
+        {% if product.stock is defined %}
+        {% if product.stock > 0 %}
+        <form action="{{ url_for('add_to_cart', index=product.index) }}" method="POST" class="mt-4">
+          <input type="hidden" name="quantity" value="1">
+          <button type="submit" class="add-cart-btn">
+            🛒 Add to Cart
+          </button>
+        </form>
+        {% else %}
+        <p class="text-danger text-center mt-3">Out of Stock</p>
+        {% endif %}
+        {% endif %}
       </div>
     </div>
   </div>
 
+  <!-- ✅ Related Products -->
   <hr class="my-5">
-
-  <h4 class="text-center">🛍️ Related Products</h4>
-  <div class="row mt-4 justify-content-center">
+  <h4 class="text-center mb-4">🛍️ Related Products</h4>
+  <div class="row justify-content-center">
     {% if related %}
-      {% for item in related %}
-      <div class="col-6 col-md-4 col-lg-3 mb-4">
-        <!-- ✅ Use product_id for URL instead of index -->
-        <a href="{{ url_for('product_detail', product_id=item.id) }}" class="text-decoration-none text-dark">
-          <div class="card border-0 shadow-sm h-100 text-center">
-            <img src="{{ url_for('static', filename='shoes/' + item.images[0]) }}"
-                 alt="{{ item.name }}"
-                 style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 5px;">
-            <div class="p-2">
-              <p class="mb-1 fw-semibold" style="font-size: 15px;">{{ item.name }}</p>
-
-              {% if item.on_sale and item.sale_price %}
-                <p class="mb-0">
-                  <span class="text-muted text-decoration-line-through small">GH₵ {{ item.price }}</span><br>
-                  <span class="text-danger fw-bold">GH₵ {{ item.sale_price }}</span>
-                </p>
-              {% else %}
-                <p class="text-success fw-bold mb-0">GH₵ {{ item.price }}</p>
-              {% endif %}
-            </div>
+    {% for item in related %}
+    <div class="col-6 col-md-4 col-lg-3 mb-4 text-center">
+      <a href="{{ url_for('product_detail', product_id=item.id) }}" class="text-decoration-none text-dark">
+        <div class="card border-0 shadow-sm h-100 related-item">
+          <img src="{{ url_for('static', filename='shoes/' + item.images[0]) }}" alt="{{ item.name }}"
+            style="width: 100%; aspect-ratio: 1/1;">
+          <div class="p-2">
+            <p class="fw-semibold mb-1" style="font-size: 15px;">{{ item.name }}</p>
+            {% if item.on_sale and item.sale_price %}
+            <p class="mb-0">
+              <span class="text-muted text-decoration-line-through small">GH₵ {{ item.price }}</span><br>
+              <span class="text-danger fw-bold">GH₵ {{ item.sale_price }}</span>
+            </p>
+            {% else %}
+            <p class="text-success fw-bold mb-0">GH₵ {{ item.price }}</p>
+            {% endif %}
           </div>
-        </a>
-      </div>
-      {% endfor %}
+        </div>
+      </a>
+    </div>
+    {% endfor %}
     {% else %}
-      <p class="text-center text-muted">No related products found.</p>
+    <p class="text-center text-muted">No related products found.</p>
     {% endif %}
   </div>
 </div>
+
+<!-- ✅ JS for thumbnail and selection -->
+<script>
+  const mainImage = document.getElementById('mainImage');
+  const thumbs = document.querySelectorAll('.thumb-img');
+  thumbs.forEach(thumb => {
+    thumb.addEventListener('click', function () {
+      mainImage.style.opacity = 0;
+      setTimeout(() => {
+        mainImage.src = this.src;
+        mainImage.style.opacity = 1;
+      }, 150);
+      thumbs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  if (thumbs.length > 0) thumbs[0].classList.add('active');
+
+  document.querySelectorAll('.size-option').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.size-option').forEach(e => e.classList.remove('active'));
+      el.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.color-option').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.color-option').forEach(e => e.classList.remove('active'));
+      el.classList.add('active');
+    });
+  });
+</script>
 {% endblock %}

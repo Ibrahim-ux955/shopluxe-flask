@@ -250,6 +250,14 @@ def admin():
         on_sale = 'on_sale' in request.form  # checkbox is true if present
         sale_price = request.form.get('sale_price', '')
 
+        # ✅ Handle color field
+        colors = request.form.get('colors', '')
+        colors = [c.strip() for c in colors.split(',')] if colors else []
+
+        # ✅ Handle size field
+        sizes = request.form.get('sizes', '')
+        sizes = [s.strip() for s in sizes.split(',')] if sizes else []
+
         # ✅ Optional: ensure sale price is valid
         if on_sale and sale_price:
             try:
@@ -273,7 +281,7 @@ def admin():
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 image_filenames.append(filename)
 
-        # Create new product
+        # ✅ Create new product
         new_product = {
             'id': str(uuid4()),  # unique ID
             'name': name,
@@ -283,6 +291,8 @@ def admin():
             'category': category,
             'description': description,
             'stock': stock,
+            'colors': colors,  # ✅ save color list
+            'sizes': sizes,    # ✅ save size list
             'images': image_filenames,
             'timestamp': datetime.now().isoformat()
         }
