@@ -1,5 +1,3 @@
-
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -16,28 +14,6 @@
       <p class="fs-5 mb-3 text-white">Luxury you can afford. Discover fashion, footwear & accessories.</p>
       <a href="{{ url_for('index') }}" class="btn btn-warning text-dark fw-bold px-4 py-2">Shop Now</a>
     </div>
-  </div>
-
-  <!-- Category Navigation Tabs -->
-  <div class="d-flex justify-content-center flex-wrap mb-5">
-    <a href="{{ url_for('filtered', category='All') }}" 
-       class="btn btn-outline-dark m-2 {% if selected_category == 'All' %}active{% endif %}">All</a>
-    <a href="{{ url_for('filtered', category='Shoes') }}" 
-       class="btn btn-outline-dark m-2 {% if selected_category == 'Shoes' %}active{% endif %}">Shoes</a>
-    <a href="{{ url_for('filtered', category='Men') }}" 
-       class="btn btn-outline-dark m-2 {% if selected_category == 'Men' %}active{% endif %}">Men</a>
-    <a href="{{ url_for('filtered', category='Women') }}" 
-       class="btn btn-outline-dark m-2 {% if selected_category == 'Women' %}active{% endif %}">Women</a>
-    <a href="{{ url_for('filtered', category='Children') }}" 
-       class="btn btn-outline-dark m-2 {% if selected_category == 'Children' %}active{% endif %}">Children</a>
-    <a href="{{ url_for('filtered', category='Watches') }}" 
-       class="btn btn-outline-dark m-2 {% if selected_category == 'Watches' %}active{% endif %}">Watches</a>
-    <a href="{{ url_for('filtered', category='Jewelry') }}" 
-       class="btn btn-outline-dark m-2 {% if selected_category == 'Jewelry' %}active{% endif %}">Jewelry</a>
-    <a href="{{ url_for('filtered', category='Accessories') }}" 
-       class="btn btn-outline-dark m-2 {% if selected_category == 'Accessories' %}active{% endif %}">Accessories</a>
-    <a href="{{ url_for('filtered', category='Bags') }}" 
-       class="btn btn-outline-dark m-2 {% if selected_category == 'Bags' %}active{% endif %}">Bag</a>
   </div>
 
   <!-- Featured Products -->
