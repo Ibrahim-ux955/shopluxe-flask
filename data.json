@@ -17,21 +17,6 @@
         "timestamp": "2025-10-03T21:57:08.984314"
     },
     {
-        "id": "11c0a7fd-987b-4e64-99c6-1cb0f1d4e8dd",
-        "name": "Charger",
-        "price": "80",
-        "category": "Accessories",
-        "description": "rgfgfd",
-        "stock": 50,
-        "image": "cyberpunk-chevy-camaro-4k-j6.jpg",
-        "images": [
-            "cyberpunk-chevy-camaro-4k-j6.jpg",
-            "cyberpunk-neon-retro-hacker-car-se-1920x1080.jpg",
-            "eagle-predator-flight-yl-1920x1080.jpg"
-        ],
-        "timestamp": "2025-10-03T22:06:20.403827"
-    },
-    {
         "id": "31cba2b9-a19c-4b46-b186-7eabb0a2207f",
         "name": "Kl",
         "price": "678",
