@@ -43,7 +43,7 @@
 
     nav.navbar.fixed-bottom .container a.active,
     nav.navbar.fixed-bottom .container a.active i {
-      color: #0d6efd; /* Bootstrap primary blue */
+      color: #0d6efd;
       font-weight: 600;
     }
 
@@ -52,7 +52,6 @@
       display: block;
     }
 
-    /* Cart count badge for mobile nav */
     nav.navbar.fixed-bottom .container a.cart {
       position: relative;
     }
@@ -78,14 +77,11 @@
       <span class="ms-2 fw-bold">ShopLuxe</span>
     </a>
 
-    <!-- Mobile Navbar Toggle -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Collapsible Navbar Content -->
     <div class="collapse navbar-collapse" id="navbarContent">
-      <!-- Hide this section on small screens -->
       <div class="d-none d-md-flex w-100 align-items-center">
         <!-- Categories dropdown -->
         <div class="dropdown ms-3">
@@ -122,6 +118,11 @@
         <a class="btn btn-outline-light me-2" href="{{ url_for('cart') }}">
           🛒 Cart ({{ session.cart|length if session.cart else 0 }})
         </a>
+
+        <!-- Admin button -->
+        <a class="btn btn-outline-light me-2" href="{{ url_for('admin_login') }}">
+          ⚙️ Admin
+        </a>
       </div>
 
       <!-- User login/logout -->
@@ -144,7 +145,7 @@
 </nav>
 
 <!-- Main content -->
-<div class="container mt-4 mb-5"> <!-- extra bottom margin for nav -->
+<div class="container mt-4 mb-5">
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <div class="alert alert-info">{{ messages[0] }}</div>
@@ -157,7 +158,6 @@
 <!-- Bottom Navigation (Mobile Only) -->
 <nav class="navbar fixed-bottom bg-light d-md-none border-top shadow-sm">
   <div class="container d-flex justify-content-around text-center py-1">
-
     <!-- Categories -->
     <div class="dropup">
       <button class="btn btn-link text-dark text-decoration-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -193,7 +193,6 @@
       <div><i class="bi bi-person-gear"></i></div>
       <small>Admin</small>
     </a>
-
   </div>
 </nav>
 
