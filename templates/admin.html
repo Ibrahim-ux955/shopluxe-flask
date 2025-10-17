@@ -36,21 +36,37 @@
           <label class="form-label" for="sale_price">Sale Price</label>
           <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" placeholder="Enter sale price if applicable">
         </div>
-        <!-- ✅ End Sale Fields -->
 
+        <!-- ✅ Category -->
         <div class="mb-3">
           <label class="form-label" for="category">Category</label>
           <input type="text" name="category" id="category" class="form-control">
         </div>
 
+        <!-- ✅ Description -->
         <div class="mb-3">
           <label class="form-label" for="description">Description</label>
           <textarea name="description" id="description" class="form-control" rows="3"></textarea>
         </div>
 
+        <!-- ✅ Stock -->
         <div class="mb-3">
           <label class="form-label" for="stock">Stock Count</label>
           <input type="number" name="stock" id="stock" class="form-control" min="0" required>
+        </div>
+
+        <!-- ✅ New: Sizes -->
+        <div class="mb-3">
+          <label class="form-label" for="sizes">Available Sizes</label>
+          <input type="text" name="sizes" id="sizes" class="form-control" placeholder="e.g. 39, 40, 41, 42, 43">
+          <small class="text-muted">Separate multiple sizes with commas.</small>
+        </div>
+
+        <!-- ✅ New: Colors -->
+        <div class="mb-3">
+          <label class="form-label" for="colors">Available Colors</label>
+          <input type="text" name="colors" id="colors" class="form-control" placeholder="e.g. Red, Blue, Black">
+          <small class="text-muted">Separate multiple colors with commas.</small>
         </div>
 
         <!-- ✅ Multiple Images Upload -->
@@ -94,6 +110,27 @@
 
           <p class="card-text"><small>{{ p.description }}</small></p>
           <p class="card-text"><strong>Stock:</strong> {{ p.stock }}</p>
+
+          <!-- ✅ Show sizes -->
+          {% if p.sizes %}
+            <div class="mb-2">
+              <strong>Sizes:</strong>
+              <div class="d-flex flex-wrap gap-2 mt-1">
+                {% for size in p.sizes %}
+                  <div class="border rounded px-2 py-1 bg-light">{{ size }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- ✅ Show colors -->
+          {% if p.colors %}
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              {% for color in p.colors %}
+                <div class="border rounded-circle" style="width:25px; height:25px; background-color: {{ color | lower }};" title="{{ color }}"></div>
+              {% endfor %}
+            </div>
+          {% endif %}
 
           {% set product_reviews = reviews | selectattr('product_id', 'equalto', p.id) | list %}
           {% if product_reviews %}

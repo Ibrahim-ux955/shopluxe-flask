@@ -55,13 +55,45 @@
       <input type="number" name="stock" id="stock" class="form-control" min="0" value="{{ product.stock }}" required>
     </div>
 
+    <!-- ✅ Sizes -->
+    <div class="mb-3">
+      <label for="sizes" class="form-label">Available Sizes</label>
+      <input
+        type="text"
+        name="sizes"
+        id="sizes"
+        class="form-control"
+        value="{{ product.sizes | join(', ') if product.sizes else '' }}"
+        placeholder="e.g. 39, 40, 41, 42, 43"
+      >
+      <small class="text-muted">Separate multiple sizes with commas.</small>
+    </div>
+
+    <!-- ✅ Colors -->
+    <div class="mb-3">
+      <label for="colors" class="form-label">Available Colors</label>
+      <input
+        type="text"
+        name="colors"
+        id="colors"
+        class="form-control"
+        value="{{ product.colors | join(', ') if product.colors else '' }}"
+        placeholder="e.g. Red, Blue, Black"
+      >
+      <small class="text-muted">Separate multiple colors with commas.</small>
+    </div>
+
     <!-- Existing Thumbnails with remove checkbox -->
     <div class="mb-3">
       <label class="form-label">Current Images</label>
       <div class="d-flex flex-wrap gap-2">
         {% for img in product.images %}
           <div class="text-center" style="position: relative;">
-            <img src="{{ url_for('static', filename='shoes/' + img) }}" alt="{{ product.name }}" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px;">
+            <img
+              src="{{ url_for('static', filename='shoes/' + img) }}"
+              alt="{{ product.name }}"
+              style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ddd; border-radius: 5px;"
+            >
             <div>
               <input type="checkbox" name="remove_images" value="{{ img }}" id="remove_{{ loop.index }}">
               <label for="remove_{{ loop.index }}" style="font-size: 12px;">Remove</label>
