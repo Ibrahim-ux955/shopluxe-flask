@@ -14,13 +14,18 @@
       width: 20px;
       margin-right: 8px;
     }
-    .btn-green {
-      background-color: #28a745;
+
+    /* Orange button style */
+    .btn-orange {
+      background-color: #ff6600;
+      color: white;
+      border: none;
+    }
+    .btn-orange:hover {
+      background-color: #e65c00;
       color: white;
     }
-    .btn-green:hover {
-      background-color: #218838;
-    }
+
     .bg-wallpaper {
       background: url("{{ url_for('static', filename='banner/wallpaper.jpg') }}") center/cover no-repeat fixed;
       min-height: 100vh;
@@ -43,7 +48,7 @@
 
     nav.navbar.fixed-bottom .container a.active,
     nav.navbar.fixed-bottom .container a.active i {
-      color: #0d6efd;
+      color: #ff6600;
       font-weight: 600;
     }
 
@@ -60,7 +65,7 @@
       top: 0;
       right: 12px;
       font-size: 10px;
-      background-color: #0d6efd;
+      background-color: #ff6600;
       color: white;
       border-radius: 50%;
       padding: 2px 5px;
@@ -70,20 +75,19 @@
 
 <body class="bg-wallpaper">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<!-- Top Navbar -->
+<nav class="navbar navbar-expand-lg bg-white shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand d-flex align-items-center" href="/">
+    <a class="navbar-brand d-flex align-items-center text-dark fw-bold" href="/">
       <img src="{{ url_for('static', filename='logo/shopluxe.png') }}" alt="ShopLuxe" style="height: 40px;">
-      <span class="ms-2 fw-bold">ShopLuxe</span>
+      <span class="ms-2">ShopLuxe</span>
     </a>
-
-    
 
     <div class="collapse navbar-collapse" id="navbarContent">
       <div class="d-none d-md-flex w-100 align-items-center">
         <!-- Categories dropdown -->
         <div class="dropdown ms-3">
-          <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <button class="btn btn-orange dropdown-toggle" type="button" data-bs-toggle="dropdown">
             🛍️ Categories
           </button>
           <ul class="dropdown-menu">
@@ -106,19 +110,13 @@
           </ul>
         </div>
 
-        <!-- Search form -->
-        <form class="d-flex ms-auto me-2" method="get" action="{{ url_for('search') }}">
-          <input class="form-control me-2" type="search" name="q" placeholder="Search" value="{{ query if query else '' }}">
-          <button class="btn btn-success" type="submit">Search</button>
-        </form>
-
         <!-- Cart -->
-        <a class="btn btn-outline-light me-2" href="{{ url_for('cart') }}">
+        <a class="btn btn-orange ms-auto me-2" href="{{ url_for('cart') }}">
           🛒 Cart ({{ session.cart|length if session.cart else 0 }})
         </a>
 
-        <!-- Admin button -->
-        <a class="btn btn-outline-light me-2" href="{{ url_for('admin_login') }}">
+        <!-- Admin -->
+        <a class="btn btn-orange me-2" href="{{ url_for('admin_login') }}">
           ⚙️ Admin
         </a>
       </div>
@@ -126,7 +124,7 @@
       <!-- User login/logout -->
       {% if session.user %}
         <div class="dropdown mt-2 mt-lg-0">
-          <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <button class="btn btn-orange dropdown-toggle" type="button" data-bs-toggle="dropdown">
             👤 {{ session.user.name }}
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
@@ -135,12 +133,26 @@
           </ul>
         </div>
       {% else %}
-        <a class="btn btn-outline-light me-2 mt-2 mt-lg-0" href="{{ url_for('login') }}">Login</a>
-        <a class="btn btn-outline-light mt-2 mt-lg-0" href="{{ url_for('signup') }}">Sign Up</a>
+        <a class="btn btn-orange me-2 mt-2 mt-lg-0" href="{{ url_for('login') }}">Login</a>
+        <a class="btn btn-orange mt-2 mt-lg-0" href="{{ url_for('signup') }}">Sign Up</a>
       {% endif %}
     </div>
   </div>
 </nav>
+
+<!-- Search Bar (Below Navbar) -->
+<div class="container mt-3">
+  <form class="d-flex justify-content-center" method="get" action="{{ url_for('search') }}">
+    <input 
+      class="form-control me-2 w-50" 
+      type="search" 
+      name="q" 
+      placeholder="Search products..." 
+      value="{{ query if query else '' }}"
+    >
+    <button class="btn btn-orange" type="submit">Search</button>
+  </form>
+</div>
 
 <!-- Main content -->
 <div class="container mt-4 mb-5">
@@ -149,7 +161,6 @@
       <div class="alert alert-info">{{ messages[0] }}</div>
     {% endif %}
   {% endwith %}
-
   {% block content %}{% endblock %}
 </div>
 
@@ -174,46 +185,31 @@
       </ul>
     </div>
 
-      <!-- Mobile Search Button -->
-<a href="#" class="text-dark text-decoration-none" data-bs-toggle="modal" data-bs-target="#mobileSearchModal">
-  <div><i class="bi bi-search"></i></div>
-  <small>Search</small>
-</a>
+    <!-- Mobile Search Button -->
+    <a href="#" class="text-dark text-decoration-none" data-bs-toggle="modal" data-bs-target="#mobileSearchModal">
+      <div><i class="bi bi-search"></i></div>
+      <small>Search</small>
+    </a>
 
-<!-- Mobile Search Modal -->
-<div class="modal fade" id="mobileSearchModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form method="get" action="{{ url_for('search') }}">
-        <div class="modal-header">
-          <h5 class="modal-title">Search Products</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- Mobile Search Modal -->
+    <div class="modal fade" id="mobileSearchModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="get" action="{{ url_for('search') }}">
+            <div class="modal-header">
+              <h5 class="modal-title">Search Products</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <input type="search" id="mobileSearchInput" name="q" class="form-control" placeholder="Search...">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-orange w-100">Search</button>
+            </div>
+          </form>
         </div>
-        <div class="modal-body">
-          <input type="search" id="mobileSearchInput" name="q" class="form-control" placeholder="Search...">
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-success w-100">Search</button>
-        </div>
-      </form>
+      </div>
     </div>
-  </div>
-</div>
-
-<!-- Script to focus input when modal opens -->
-<script>
-  const mobileSearchModal = document.getElementById('mobileSearchModal');
-  const mobileSearchInput = document.getElementById('mobileSearchInput');
-
-  mobileSearchModal.addEventListener('shown.bs.modal', () => {
-    // Small timeout ensures keyboard pops up on iOS
-    setTimeout(() => {
-      mobileSearchInput.focus();
-    }, 50);
-  });
-</script>
-
-
 
     <!-- Cart -->
     <a href="{{ url_for('cart') }}" class="text-dark text-decoration-none cart {% if active_page == 'cart' %}active{% endif %}">
