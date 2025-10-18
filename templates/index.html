@@ -3,18 +3,51 @@
 {% block content %}
 <div class="container mt-5">
 
-  <!-- Hero Banner -->
-  <div class="d-flex flex-column flex-md-row align-items-center justify-content-between p-5 mb-5"
-       style="background-color: #f8f9fa; border-radius: 10px; min-height: 300px;">
-    <div class="text-center text-md-start mb-4 mb-md-0">
-      <img src="{{ url_for('static', filename='logo/shopluxe.png') }}" alt="ShopLuxe Logo" style="height: 220px;">
+  <!-- Hero Carousel / Dynamic Products -->
+  <div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      {% set carousel_items = [
+        ('🔥 Most Popular', popular_products|first),
+        ('✨ New Arrival', new_products|first),
+        ('💎 Featured', featured_products|first),
+        ('💰 On Sale', sale_products|first)
+      ] %}
+      {% for idx in range(carousel_items|length) %}
+        {% if carousel_items[idx][1] %}
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ idx }}" class="{% if idx==0 %}active{% endif %}"></button>
+        {% endif %}
+      {% endfor %}
     </div>
-    <div class="text-center text-md-end p-4"
-         style="background-color: black; color: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-      <h2 class="mb-2 text-white">Welcome to <span class="text-warning">ShopLuxe</span></h2>
-      <p class="fs-5 mb-3 text-white">Luxury you can afford. Discover fashion, footwear & accessories.</p>
-      <a href="{{ url_for('index') }}" class="btn btn-warning text-dark fw-bold px-4 py-2">Shop Now</a>
+
+    <div class="carousel-inner">
+      {% for item in carousel_items %}
+        {% set label = item[0] %}
+        {% set product = item[1] %}
+        {% if product %}
+          <div class="carousel-item {% if loop.first %}active{% endif %}">
+            <img src="{{ url_for('static', filename='shoes/' + (product.image if product.get('image') else 'placeholder.jpg')) }}"
+                 class="d-block w-100" alt="{{ product.name }}" style="height: 400px; object-fit: cover;">
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+              <h5>{{ label }}</h5>
+              <p>{{ product.name }}
+                {% if product.on_sale and product.sale_price %}
+                  - GH₵ {{ product.sale_price }}
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
     </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
   </div>
 
   <!-- ✅ Search Results Header -->
@@ -24,127 +57,45 @@
     </div>
   {% endif %}
 
-  <!-- Featured Products -->
-  {% if not query %}
-    <h4 class="mb-4 text-center text-dark">🔥 Featured Products</h4>
-    <div class="row g-3">
-      {% if featured_products %}
-        {% for product in featured_products %}
-          <div class="col-6 col-md-4 col-lg-3 d-flex">
-            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="flex-fill text-decoration-none">
-              <div class="card shadow-sm flex-fill text-center position-relative d-flex flex-column" style="height:100%;">
-                <div class="flex-shrink-0 position-relative">
-                  <img 
-                    src="{{ url_for('static', filename='shoes/' + (product.image if product.get('image') else 'placeholder.jpg')) }}" 
-                    alt="{{ product.name }}" 
-                    class="img-fluid" 
-                    style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px 8px 0 0;">
-
-                  {% if product.stock is defined %}
-                    {% if product.stock == 0 %}
-                      <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
-                    {% elif product.stock <= 3 %}
-                      <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
-                    {% endif %}
-                  {% endif %}
-
-                  {% if product.timestamp is defined %}
-                    {% set product_time = product.timestamp|todatetime %}
-                    {% if product_time and (current_time - product_time).days <= 7 %}
-                      <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
-                    {% endif %}
-                  {% endif %}
-
-                  {% if product.on_sale %}
-                    <span class="badge bg-danger position-absolute bottom-0 end-0 m-2">Sale</span>
-                  {% endif %}
-                </div>
-
-                <div class="card-body flex-grow-1 d-flex flex-column justify-content-between p-2 rounded-bottom" style="background-color:#f8f9fa;">
-                  <div>
-                    <p class="mb-1 fw-semibold text-dark" style="font-size:15px;">{{ product.name }}</p>
-                    {% if product.on_sale and product.sale_price %}
-                      <p class="fw-bold mb-1 text-danger">
-                        GH₵ {{ product.sale_price }}
-                        <span class="text-muted text-decoration-line-through ms-2" style="font-size: 14px;">GH₵ {{ product.price }}</span>
-                      </p>
-                    {% else %}
-                      <p class="fw-bold mb-1 text-dark">GH₵ {{ product.price }}</p>
-                    {% endif %}
-                    {% if product.description %}
-                      <p class="small mb-0 text-dark">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</p>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="col-12 text-center mt-5">
-          <h5 class="text-dark">🚫 No featured products available right now.</h5>
-        </div>
-      {% endif %}
-    </div>
+  <!-- Most Popular -->
+  {% if popular_products %}
+  <h4 class="mb-4 text-center text-dark">🔥 Most Popular</h4>
+  <div class="row g-3">
+    {% for product in popular_products %}
+      {% include 'partials/product_card.html' %}
+    {% endfor %}
+  </div>
   {% endif %}
 
-  <!-- All Products -->
-  <h4 class="mt-5 mb-4 text-center text-dark">
-    {% if query %}🔍 Search Results{% else %}🛍️ All Products{% endif %}
-  </h4>
-
+  <!-- New Arrivals -->
+  {% if new_products %}
+  <h4 class="mb-4 mt-5 text-center text-dark">✨ New Arrivals</h4>
   <div class="row g-3">
-    {% if products %}
-      {% for product in products %}
-        <div class="col-6 col-md-4 col-lg-3 d-flex">
-          <a href="{{ url_for('product_detail', product_id=product.id) }}" class="flex-fill text-decoration-none">
-            <div class="card shadow-sm flex-fill text-center position-relative d-flex flex-column" style="height:100%;">
-              <div class="flex-shrink-0 position-relative">
-                <img 
-                  src="{{ url_for('static', filename='shoes/' + (product.image if product.get('image') else 'placeholder.jpg')) }}" 
-                  alt="{{ product.name }}" 
-                  class="img-fluid" 
-                  style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px 8px 0 0;">
-
-                {% if product.stock is defined %}
-                  {% if product.stock == 0 %}
-                    <span class="badge bg-danger position-absolute top-0 start-0 m-2">Out of Stock</span>
-                  {% elif product.stock <= 3 %}
-                    <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Low Stock</span>
-                  {% endif %}
-                {% endif %}
-
-                {% if product.timestamp is defined %}
-                  {% set product_time = product.timestamp|todatetime %}
-                  {% if product_time and (current_time - product_time).days <= 7 %}
-                    <span class="badge bg-success position-absolute top-0 end-0 m-2">New</span>
-                  {% endif %}
-                {% endif %}
-
-                {% if product.on_sale %}
-                  <span class="badge bg-danger position-absolute bottom-0 end-0 m-2">Sale</span>
-                {% endif %}
-              </div>
-
-              <div class="card-body flex-grow-1 d-flex flex-column justify-content-between p-2 rounded-bottom" style="background-color:#f8f9fa;">
-                <div>
-                  <p class="mb-1 fw-semibold text-dark" style="font-size:15px;">{{ product.name }}</p>
-                  <p class="fw-bold mb-1 text-dark">GH₵ {{ product.price }}</p>
-                  {% if product.description %}
-                    <p class="small mb-0 text-dark">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</p>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-      {% endfor %}
-    {% else %}
-      <div class="col-12 text-center mt-5">
-        <h5 class="text-dark">🚫 Sorry, no products found.</h5>
-      </div>
-    {% endif %}
+    {% for product in new_products %}
+      {% include 'partials/product_card.html' %}
+    {% endfor %}
   </div>
+  {% endif %}
+
+  <!-- Featured Products -->
+  {% if featured_products %}
+  <h4 class="mb-4 mt-5 text-center text-dark">💎 Featured Products</h4>
+  <div class="row g-3">
+    {% for product in featured_products %}
+      {% include 'partials/product_card.html' %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- On Sale Products -->
+  {% if sale_products %}
+  <h4 class="mb-4 mt-5 text-center text-dark">💰 Products On Sale</h4>
+  <div class="row g-3">
+    {% for product in sale_products %}
+      {% include 'partials/product_card.html' %}
+    {% endfor %}
+  </div>
+  {% endif %}
 
 </div>
 {% endblock %}

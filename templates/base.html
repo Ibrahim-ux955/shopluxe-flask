@@ -176,11 +176,32 @@
       </ul>
     </div>
 
-    <!-- Search -->
-    <a href="{{ url_for('index') }}" class="text-dark text-decoration-none {% if active_page == 'home' %}active{% endif %}">
-      <div><i class="bi bi-search"></i></div>
-      <small>Search</small>
-    </a>
+    <!-- Search Button -->
+<a href="#" class="text-dark text-decoration-none" data-bs-toggle="modal" data-bs-target="#mobileSearchModal">
+  <div><i class="bi bi-search"></i></div>
+  <small>Search</small>
+</a>
+
+<!-- Modal -->
+<div class="modal fade" id="mobileSearchModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="get" action="{{ url_for('search') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">Search Products</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="search" name="q" class="form-control" placeholder="Search...">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success w-100">Search</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
     <!-- Cart -->
     <a href="{{ url_for('cart') }}" class="text-dark text-decoration-none cart {% if active_page == 'cart' %}active{% endif %}">
