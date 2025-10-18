@@ -104,39 +104,42 @@ def index():
     products = load_data()
     current_time = datetime.now()
 
-    # ✅ Normalize product data
+    # Normalize product data
     for p in products:
-        # Convert timestamps safely
+        # Ensure timestamp is a datetime object
         if isinstance(p.get('timestamp'), str):
             try:
                 p['timestamp'] = datetime.fromisoformat(p['timestamp'])
-            except:
+            except Exception:
                 p['timestamp'] = current_time
 
-        # Ensure both 'image' and 'images' exist
+        # Ensure 'images' and 'image' fields exist
         if 'images' not in p and 'image' in p:
             p['images'] = [p['image']]
         elif 'images' in p and 'image' not in p:
             p['image'] = p['images'][0]
+        elif 'images' not in p and 'image' not in p:
+            p['images'] = []
+            p['image'] = None
 
-    # ✅ Define featured products (added in last 7 days)
-    featured_products = [p for p in products if (current_time - p['timestamp']).days <= 7]
+    # Carousel / Featured Sections
+    featured_products = [p for p in products if p.get('featured')]
+    popular_products = sorted(products, key=lambda x: x.get('popularity', 0), reverse=True)[:8]
+    new_products = sorted(products, key=lambda x: x['timestamp'], reverse=True)[:8]
+    sale_products = [p for p in products if p.get('on_sale')]
 
-    # ✅ Apply search or category filters
+    # Apply search or category filters
     filtered_products = []
     for p in products:
         name = p.get('name', '').lower()
         description = p.get('description', '').lower()
         cat = p.get('category', '').lower()
 
-        # Search filter
         if query and (query in name or query in description or query in cat):
             filtered_products.append(p)
-        # Category filter
         elif category and cat == category:
             filtered_products.append(p)
 
-    # If no query or category, show all
     if not query and not category:
         filtered_products = products
 
@@ -144,11 +147,18 @@ def index():
         'index.html',
         products=filtered_products,
         featured_products=featured_products,
+        popular_products=popular_products,
+        new_products=new_products,
+        sale_products=sale_products,  # added sale products
         query=query,
         current_time=current_time,
         selected_category=category or 'all',
         active_page='home'
     )
+
+
+
+
 
 
 @app.route('/search')
@@ -319,8 +329,11 @@ def admin():
         stock = int(request.form.get('stock', 0))
 
         # ✅ Handle "On Sale" fields
-        on_sale = 'on_sale' in request.form  # checkbox is true if present
+        on_sale = 'on_sale' in request.form
         sale_price = request.form.get('sale_price', '')
+
+        # ✅ Handle Featured checkbox
+        featured = 'featured' in request.form  # True if checked
 
         # ✅ Handle color field
         colors = request.form.get('colors', '')
@@ -360,11 +373,12 @@ def admin():
             'price': price,
             'sale_price': sale_price if on_sale and sale_price else None,
             'on_sale': on_sale,
+            'featured': featured,  # ✅ save featured status
             'category': category,
             'description': description,
             'stock': stock,
-            'colors': colors,  # ✅ save color list
-            'sizes': sizes,    # ✅ save size list
+            'colors': colors,
+            'sizes': sizes,
             'images': image_filenames,
             'timestamp': datetime.now().isoformat()
         }
@@ -375,12 +389,12 @@ def admin():
         return redirect(url_for('admin'))
 
     return render_template(
-    'admin.html',
-    products=products,
-    reviews=reviews,
-    current_time=datetime.now(),
-    active_page='admin'
-)
+        'admin.html',
+        products=products,
+        reviews=reviews,
+        current_time=datetime.now(),
+        active_page='admin'
+    )
 
 
 
@@ -689,18 +703,32 @@ def edit_product(product_id):
         product['price'] = request.form.get('price')
         product['category'] = request.form.get('category').title()
         product['description'] = request.form.get('description')
-        product['stock'] = int(request.form.get('stock'))
+        product['stock'] = int(request.form.get('stock', 0))
 
-        # ✅ Handle sale price and sale toggle
+        # ✅ Handle sale toggle and sale price
         sale_price = request.form.get('sale_price')
         on_sale = 'on_sale' in request.form
-
-        if sale_price:
-            product['sale_price'] = sale_price
+        product['on_sale'] = on_sale
+        if on_sale and sale_price:
+            try:
+                if float(sale_price) >= float(product['price']):
+                    flash("⚠️ Sale price must be less than the original price.")
+                    return redirect(url_for('edit_product', product_id=product_id))
+                product['sale_price'] = sale_price
+            except ValueError:
+                flash("⚠️ Invalid sale price entered.")
+                return redirect(url_for('edit_product', product_id=product_id))
         else:
             product.pop('sale_price', None)
 
-        product['on_sale'] = on_sale
+        # ✅ Handle Featured checkbox
+        product['featured'] = 'featured' in request.form
+
+        # ✅ Handle sizes and colors
+        sizes = request.form.get('sizes', '')
+        colors = request.form.get('colors', '')
+        product['sizes'] = [s.strip() for s in sizes.split(',')] if sizes else []
+        product['colors'] = [c.strip() for c in colors.split(',')] if colors else []
 
         # Handle removing images
         remove_images = request.form.getlist('remove_images')
@@ -734,6 +762,7 @@ def edit_product(product_id):
         return redirect(url_for('admin'))
 
     return render_template('edit_product.html', product=product)
+
 
 
 @app.route('/test_email')
