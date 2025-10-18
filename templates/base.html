@@ -176,13 +176,13 @@
       </ul>
     </div>
 
-    <!-- Search Button -->
+      <!-- Mobile Search Button -->
 <a href="#" class="text-dark text-decoration-none" data-bs-toggle="modal" data-bs-target="#mobileSearchModal">
   <div><i class="bi bi-search"></i></div>
   <small>Search</small>
 </a>
 
-<!-- Modal -->
+<!-- Mobile Search Modal -->
 <div class="modal fade" id="mobileSearchModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -192,7 +192,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <input type="search" name="q" class="form-control" placeholder="Search...">
+          <input type="search" id="mobileSearchInput" name="q" class="form-control" placeholder="Search...">
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-success w-100">Search</button>
@@ -201,6 +201,20 @@
     </div>
   </div>
 </div>
+
+<!-- Script to focus input when modal opens -->
+<script>
+  const mobileSearchModal = document.getElementById('mobileSearchModal');
+  const mobileSearchInput = document.getElementById('mobileSearchInput');
+
+  mobileSearchModal.addEventListener('shown.bs.modal', () => {
+    // Small timeout ensures keyboard pops up on iOS
+    setTimeout(() => {
+      mobileSearchInput.focus();
+    }, 50);
+  });
+</script>
+
 
 
     <!-- Cart -->
