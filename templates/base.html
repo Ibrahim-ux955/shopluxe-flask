@@ -250,7 +250,7 @@ nav.navbar.fixed-bottom .container a small {
   <!-- 🔴 Live Cart Count Badge -->
   <span id="cart-count"
         class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-        style="font-size: 0.65rem; transform: translate(-35%, 20%);">
+        style="font-size: 0.65rem; transform: translate(-60%, 15%);">
     {{ session.get('cart', [])|length }}
   </span>
 </a>
@@ -282,6 +282,7 @@ function updateCartCount() {
 document.addEventListener('wishlistChanged', updateWishlistCount);
 document.addEventListener('cartChanged', updateCartCount);
 </script>
+
 
 
 
