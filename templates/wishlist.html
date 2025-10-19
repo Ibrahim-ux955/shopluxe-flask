@@ -12,9 +12,10 @@
     {% for item in wishlist %}
     <div class="card mb-3 shadow-sm border-0 rounded-4">
       <div class="row g-0 align-items-center p-2">
-        <!-- Product Image -->
+        <!-- ✅ Fixed Product Image Path -->
         <div class="col-3">
-          <img src="{{ url_for('static', filename=item.image) }}" class="img-fluid rounded-3" alt="{{ item.name }}">
+          <img src="{{ url_for('static', filename='shoes/' ~ item.image) }}" 
+               class="img-fluid rounded-3" alt="{{ item.name }}">
         </div>
 
         <!-- Product Info -->
