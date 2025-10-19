@@ -1,6 +1,6 @@
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
@@ -995,6 +995,7 @@ def add_to_wishlist(product_id):
         'index': product['index'],  # ✅ added for add_to_cart
         'name': product['name'],
         'price': product['price'],
+        # ✅ fixed image path for wishlist display
         'image': product.get('image') or (
             product.get('images')[0] if product.get('images') else 'default.png'
         )
@@ -1030,6 +1031,7 @@ def toggle_wishlist_ajax(product_id):
             'index': product_with_index['index'],
             'name': product_with_index['name'],
             'price': product_with_index['price'],
+            # ✅ fixed image path for wishlist display
             'image': product_with_index.get('image') or (
                 product_with_index.get('images')[0] if product_with_index.get('images') else 'default.png'
             )
