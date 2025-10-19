@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4" style="max-width: 600px;">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0">Wishlist</h4>
+    <span class="text-muted small">{{ wishlist|length }} item{{ 's' if wishlist|length != 1 }}</span>
+  </div>
+
+  <!-- Wishlist Items -->
+  {% if wishlist %}
+    {% for item in wishlist %}
+    <div class="card mb-3 shadow-sm border-0 rounded-4">
+      <div class="row g-0 align-items-center p-2">
+        <!-- Product Image -->
+        <div class="col-3">
+          <img src="{{ url_for('static', filename=item.image) }}" class="img-fluid rounded-3" alt="{{ item.name }}">
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-9 ps-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <h6 class="mb-1 fw-semibold">{{ item.name }}</h6>
+
+            <!-- ❤️ AJAX Toggle -->
+            <button class="btn btn-light p-0 border-0 wishlist-toggle"
+                    data-product-id="{{ item.id }}"
+                    style="width: 36px; height: 36px; border-radius: 50%;">
+              <i class="bi bi-heart-fill text-danger fs-5"></i>
+            </button>
+          </div>
+
+          <!-- Price Section -->
+          <div class="mb-1">
+            <span class="fw-bold text-primary">${{ item.price }}</span>
+            {% if item.old_price %}
+              <small class="text-muted text-decoration-line-through ms-1">${{ item.old_price }}</small>
+            {% endif %}
+          </div>
+
+          <!-- Add to Cart -->
+          <button class="btn btn-primary btn-sm rounded-pill px-3">
+            <i class="bi bi-cart-plus"></i> Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <!-- Empty Wishlist -->
+    <div class="text-center text-muted mt-5">
+      <i class="bi bi-heart fs-1 d-block mb-3"></i>
+      <p>Your wishlist is empty</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- ✅ AJAX Script -->
+<script>
+document.querySelectorAll('.wishlist-toggle').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const productId = this.getAttribute('data-product-id');
+    const card = this.closest('.card');
+    const icon = this.querySelector('i');
+
+    fetch(`/toggle_wishlist_ajax/${productId}`, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        if (data.in_wishlist) {
+          icon.classList.add('bi-heart-fill', 'text-danger');
+          icon.classList.remove('bi-heart');
+        } else {
+          // Remove card smoothly
+          card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.95)';
+          setTimeout(() => card.remove(), 300);
+        }
+
+        // Floating message
+        const alert = document.createElement('div');
+        alert.className = 'position-fixed top-0 start-50 translate-middle-x alert alert-light border shadow-sm';
+        alert.style.zIndex = 2000;
+        alert.innerHTML = data.message;
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 1500);
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

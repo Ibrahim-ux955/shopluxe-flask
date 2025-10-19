@@ -92,9 +92,67 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="product-card shadow">
-        <!-- ✅ Main Product Image -->
-        <img id="mainImage" src="{{ url_for('static', filename='shoes/' + product.images[0]) }}"
-          alt="{{ product.name }}" class="main-img mb-3">
+
+        <!-- ✅ Image Container (makes heart button position correctly) -->
+            <div class="position-relative">
+  <!-- ✅ Main Product Image -->
+  <img id="mainImage"
+       src="{{ url_for('static', filename='shoes/' + product.images[0]) }}"
+       alt="{{ product.name }}"
+       class="main-img mb-3">
+
+  <!-- ❤️ Wishlist Toggle Button -->
+  <button id="wishlistBtn"
+          class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle shadow-sm"
+          style="z-index: 10; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;"
+          data-product-id="{{ product.id }}">
+    {% set in_wishlist = false %}
+{% for p in session.get('wishlist', []) %}
+  {% if p.id == product.id %}
+    {% set in_wishlist = true %}
+  {% endif %}
+{% endfor %}
+
+    <i id="wishlistIcon" class="bi bi-heart{% if in_wishlist %}-fill text-danger{% endif %} fs-5"></i>
+  </button>
+</div>
+
+<!-- ✅ AJAX Script -->
+<script>
+document.getElementById('wishlistBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  const productId = this.getAttribute('data-product-id');
+  const icon = document.getElementById('wishlistIcon');
+
+  fetch(`/toggle_wishlist_ajax/${productId}`, {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      if (data.in_wishlist) {
+        icon.classList.add('bi-heart-fill', 'text-danger');
+        icon.classList.remove('bi-heart');
+      } else {
+        icon.classList.remove('bi-heart-fill', 'text-danger');
+        icon.classList.add('bi-heart');
+      }
+
+      // Optional: small floating alert message
+      const alert = document.createElement('div');
+      alert.className = 'position-fixed top-0 start-50 translate-middle-x alert alert-light border shadow-sm';
+      alert.style.zIndex = 2000;
+      alert.innerHTML = data.message;
+      document.body.appendChild(alert);
+      setTimeout(() => alert.remove(), 1500);
+    }
+  })
+  .catch(err => console.error('Wishlist toggle error:', err));
+});
+</script>
+
+
 
         <!-- ✅ Thumbnails -->
         <div class="thumbs d-flex justify-content-center gap-2 mb-3">
