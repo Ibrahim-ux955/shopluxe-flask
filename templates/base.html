@@ -32,67 +32,77 @@
     }
 
     /* Global Navbar Link Styles (Desktop + Mobile) */
-nav.navbar .container a,
-nav.navbar .navbar-brand span,
-nav.navbar .dropdown-toggle {
-  color: #666 !important;
-  text-decoration: none;
-  transition: color 0.3s;
-}
+    nav.navbar .container a,
+    nav.navbar .navbar-brand span,
+    nav.navbar .dropdown-toggle {
+      color: #666 !important;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
 
-nav.navbar .container a:hover,
-nav.navbar .navbar-brand:hover span,
-nav.navbar .dropdown-toggle:hover {
-  color: #ff6600 !important;
-}
+    nav.navbar .container a:hover,
+    nav.navbar .navbar-brand:hover span,
+    nav.navbar .dropdown-toggle:hover {
+      color: #ff6600 !important;
+    }
 
-nav.navbar .container a.active,
-nav.navbar .container a.active i {
-  color: #000 !important;
-  font-weight: 600;
-}
+    nav.navbar .container a.active,
+    nav.navbar .container a.active i {
+      color: #000 !important;
+      font-weight: 600;
+    }
 
-/* Cart badge */
-nav.navbar .container a.cart {
-  position: relative;
-}
+    /* Cart badge */
+    nav.navbar .container a.cart {
+      position: relative;
+    }
 
-nav.navbar .container a.cart .badge {
-  position: absolute;
-  top: 0;
-  right: 12px;
-  font-size: 10px;
-  background-color: #000;
-  color: white;
-  border-radius: 50%;
-  padding: 2px 5px;
-}
+    nav.navbar .container a.cart .badge {
+      position: absolute;
+      top: 0;
+      right: 12px;
+      font-size: 10px;
+      background-color: #000;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 5px;
+    }
 
-/* Keep same bottom nav layout on mobile */
-nav.navbar.fixed-bottom .container a {
-  color: #666;
-  text-align: center;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  padding: 5px 10px;
-  transition: color 0.3s;
-}
+    /* Keep same bottom nav layout on mobile */
+    nav.navbar.fixed-bottom .container a {
+      color: #666;
+      text-align: center;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 5px 10px;
+      transition: color 0.3s;
+    }
 
-nav.navbar.fixed-bottom .container a.active,
-nav.navbar.fixed-bottom .container a.active i {
-  color: #000;
-  font-weight: 600;
-}
+    nav.navbar.fixed-bottom .container a.active,
+    nav.navbar.fixed-bottom .container a.active i {
+      color: #000;
+      font-weight: 600;
+    }
 
-nav.navbar.fixed-bottom .container a small {
-  margin-top: 2px;
-  display: block;
-}
+    nav.navbar.fixed-bottom .container a small {
+      margin-top: 2px;
+      display: block;
+    }
 
+    /* Hide search button on mobile, make search bar full width */
+    @media (max-width: 767px) {
+      .search-btn {
+        display: none !important;
+      }
+      .search-input {
+        width: 100% !important;
+        margin-right: 0 !important;
+      }
+    }
   </style>
 </head>
 
@@ -167,13 +177,13 @@ nav.navbar.fixed-bottom .container a small {
 <div class="container mt-3">
   <form class="d-flex justify-content-center" method="get" action="{{ url_for('search') }}">
     <input 
-      class="form-control me-2 w-50" 
+      class="form-control me-2 w-50 search-input" 
       type="search" 
       name="q" 
       placeholder="Search products..." 
       value="{{ query if query else '' }}"
     >
-    <button class="btn btn-custom" type="submit">Search</button>
+    <button class="btn btn-custom search-btn" type="submit">Search</button>
   </form>
 </div>
 
