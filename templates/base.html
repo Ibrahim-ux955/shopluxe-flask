@@ -15,15 +15,15 @@
       margin-right: 8px;
     }
 
-    /* Orange button style */
-    .btn-orange {
-      background-color: #ff6600;
-      color: white;
-      border: none;
+    /* Remove solid orange buttons, use clean Bootstrap */
+    .btn-custom {
+      background-color: transparent;
+      border: 1px solid #ccc;
+      color: #333;
     }
-    .btn-orange:hover {
-      background-color: #e65c00;
-      color: white;
+    .btn-custom:hover {
+      background-color: #f8f9fa;
+      color: #000;
     }
 
     .bg-wallpaper {
@@ -31,45 +31,68 @@
       min-height: 100vh;
     }
 
-    /* Mobile Bottom Nav Active Styles */
-    nav.navbar.fixed-bottom .container a {
-      color: #666;
-      text-align: center;
-      font-size: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      position: relative;
-      padding: 5px 10px;
-      transition: color 0.3s;
-    }
+    /* Global Navbar Link Styles (Desktop + Mobile) */
+nav.navbar .container a,
+nav.navbar .navbar-brand span,
+nav.navbar .dropdown-toggle {
+  color: #666 !important;
+  text-decoration: none;
+  transition: color 0.3s;
+}
 
-    nav.navbar.fixed-bottom .container a.active,
-    nav.navbar.fixed-bottom .container a.active i {
-      color: #ff6600;
-      font-weight: 600;
-    }
+nav.navbar .container a:hover,
+nav.navbar .navbar-brand:hover span,
+nav.navbar .dropdown-toggle:hover {
+  color: #ff6600 !important;
+}
 
-    nav.navbar.fixed-bottom .container a small {
-      margin-top: 2px;
-      display: block;
-    }
+nav.navbar .container a.active,
+nav.navbar .container a.active i {
+  color: #000 !important;
+  font-weight: 600;
+}
 
-    nav.navbar.fixed-bottom .container a.cart {
-      position: relative;
-    }
-    nav.navbar.fixed-bottom .container a.cart .badge {
-      position: absolute;
-      top: 0;
-      right: 12px;
-      font-size: 10px;
-      background-color: #ff6600;
-      color: white;
-      border-radius: 50%;
-      padding: 2px 5px;
-    }
+/* Cart badge */
+nav.navbar .container a.cart {
+  position: relative;
+}
+
+nav.navbar .container a.cart .badge {
+  position: absolute;
+  top: 0;
+  right: 12px;
+  font-size: 10px;
+  background-color: #000;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 5px;
+}
+
+/* Keep same bottom nav layout on mobile */
+nav.navbar.fixed-bottom .container a {
+  color: #666;
+  text-align: center;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 5px 10px;
+  transition: color 0.3s;
+}
+
+nav.navbar.fixed-bottom .container a.active,
+nav.navbar.fixed-bottom .container a.active i {
+  color: #000;
+  font-weight: 600;
+}
+
+nav.navbar.fixed-bottom .container a small {
+  margin-top: 2px;
+  display: block;
+}
+
   </style>
 </head>
 
@@ -87,7 +110,7 @@
       <div class="d-none d-md-flex w-100 align-items-center">
         <!-- Categories dropdown -->
         <div class="dropdown ms-3">
-          <button class="btn btn-orange dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
             🛍️ Categories
           </button>
           <ul class="dropdown-menu">
@@ -111,12 +134,12 @@
         </div>
 
         <!-- Cart -->
-        <a class="btn btn-orange ms-auto me-2" href="{{ url_for('cart') }}">
+        <a class="btn btn-custom ms-auto me-2" href="{{ url_for('cart') }}">
           🛒 Cart ({{ session.cart|length if session.cart else 0 }})
         </a>
 
         <!-- Admin -->
-        <a class="btn btn-orange me-2" href="{{ url_for('admin_login') }}">
+        <a class="btn btn-custom me-2" href="{{ url_for('admin_login') }}">
           ⚙️ Admin
         </a>
       </div>
@@ -124,7 +147,7 @@
       <!-- User login/logout -->
       {% if session.user %}
         <div class="dropdown mt-2 mt-lg-0">
-          <button class="btn btn-orange dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
             👤 {{ session.user.name }}
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
@@ -133,8 +156,8 @@
           </ul>
         </div>
       {% else %}
-        <a class="btn btn-orange me-2 mt-2 mt-lg-0" href="{{ url_for('login') }}">Login</a>
-        <a class="btn btn-orange mt-2 mt-lg-0" href="{{ url_for('signup') }}">Sign Up</a>
+        <a class="btn btn-custom me-2 mt-2 mt-lg-0" href="{{ url_for('login') }}">Login</a>
+        <a class="btn btn-custom mt-2 mt-lg-0" href="{{ url_for('signup') }}">Sign Up</a>
       {% endif %}
     </div>
   </div>
@@ -150,7 +173,7 @@
       placeholder="Search products..." 
       value="{{ query if query else '' }}"
     >
-    <button class="btn btn-orange" type="submit">Search</button>
+    <button class="btn btn-custom" type="submit">Search</button>
   </form>
 </div>
 
@@ -183,32 +206,6 @@
         <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">Accessories</a></li>
         <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">Bags</a></li>
       </ul>
-    </div>
-
-    <!-- Mobile Search Button -->
-    <a href="#" class="text-dark text-decoration-none" data-bs-toggle="modal" data-bs-target="#mobileSearchModal">
-      <div><i class="bi bi-search"></i></div>
-      <small>Search</small>
-    </a>
-
-    <!-- Mobile Search Modal -->
-    <div class="modal fade" id="mobileSearchModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form method="get" action="{{ url_for('search') }}">
-            <div class="modal-header">
-              <h5 class="modal-title">Search Products</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <input type="search" id="mobileSearchInput" name="q" class="form-control" placeholder="Search...">
-            </div>
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-orange w-100">Search</button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
 
     <!-- Cart -->
