@@ -236,10 +236,11 @@ nav.navbar.fixed-bottom .container a small {
       <small>Home</small>
     </a>
 
-    <a href="{{ url_for('categories') }}" class="{% if active_page == 'categories' %}active{% endif %}">
-      <i class="bi bi-grid-3x3-gap-fill fs-5"></i>
-      <small>Categories</small>
-    </a>
+    <a href="{{ url_for('filtered', category='all') }}" class="{% if active_page == 'categories' %}active{% endif %}">
+  <i class="bi bi-grid-3x3-gap-fill fs-5"></i>
+  <small>Categories</small>
+</a>
+
 
     <a href="{{ url_for('cart') }}" class="position-relative {% if active_page == 'cart' %}active{% endif %}">
       <i class="bi bi-bag-fill fs-5"></i>

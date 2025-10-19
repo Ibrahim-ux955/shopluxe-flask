@@ -98,7 +98,7 @@ ensure_product_ids()
 from datetime import datetime
 
 
-@app.route('/')
+@app.route('/', endpoint='home')  # Explicitly set endpoint to 'home'
 def index():
     query = request.args.get('q', '').strip().lower()
     category = request.args.get('category', '').strip().lower()
@@ -150,12 +150,13 @@ def index():
         featured_products=featured_products,
         popular_products=popular_products,
         new_products=new_products,
-        sale_products=sale_products,  # added sale products
+        sale_products=sale_products,
         query=query,
         current_time=current_time,
         selected_category=category or 'all',
         active_page='home'
     )
+
 
 
 
@@ -957,66 +958,50 @@ def health_check():
   
 # ------------------ WISHLIST ROUTES ------------------
 
+# Helper: fetch product by ID
+def get_product_by_id(product_id):
+    products = load_data()
+    return next((p for p in products if p.get('id') == product_id), None)
+
 # Initialize wishlist in session if not present
 def get_wishlist():
     if 'wishlist' not in session:
         session['wishlist'] = []
     return session['wishlist']
 
-
+# Add product to wishlist
 @app.route('/add_to_wishlist/<product_id>')
 def add_to_wishlist(product_id):
     wishlist = get_wishlist()
-    products = load_data()
-    product = next((p for p in products if p.get('id') == product_id), None)
+    product = get_product_by_id(product_id)
 
     if not product:
         flash("❌ Product not found.")
         return redirect(request.referrer or url_for('index'))
 
-    # Add product if not already in wishlist
-    if not any(p['id'] == product_id for p in wishlist):
-        wishlist.append(product)
-        session['wishlist'] = wishlist
-        flash("💖 Added to your wishlist!")
-    else:
-        flash("⚠️ Already in wishlist.")
+    # Avoid duplicates
+    if any(p['id'] == product_id for p in wishlist):
+        flash("❤️ Already in your wishlist.")
+        return redirect(request.referrer or url_for('wishlist'))
 
-    return redirect(request.referrer or url_for('index'))
-
-@app.route('/add_to_wishlist/<product_id>')
-def add_to_wishlist(product_id):
-    wishlist = get_wishlist()
-
-    # Check if product is already in wishlist
-    for item in wishlist:
-        if item.get('id') == product_id:
-            flash("❤️ Already in your wishlist.")
-            return redirect(request.referrer or url_for('wishlist'))
-
-    # Example: Fetch product details (adjust based on your DB structure)
-    product = get_product_by_id(product_id)  # You likely already have this helper
-    if product:
-        wishlist.append({
-            'id': product_id,
-            'name': product['name'],
-            'price': product['price'],
-            'image': product['image']
-        })
-        session['wishlist'] = wishlist
-        flash("💖 Added to wishlist!")
-    else:
-        flash("⚠️ Product not found.")
-
+    # Store minimal product info
+    wishlist.append({
+        'id': product['id'],
+        'name': product['name'],
+        'price': product['price'],
+        'image': product.get('image') or (product.get('images')[0] if product.get('images') else 'default.png')
+    })
+    session['wishlist'] = wishlist
+    flash("💖 Added to your wishlist!")
     return redirect(request.referrer or url_for('wishlist'))
 
-
+# View wishlist
 @app.route('/wishlist')
 def wishlist():
     wishlist = get_wishlist()
     return render_template('wishlist.html', wishlist=wishlist, active_page='wishlist')
 
-
+# Remove product from wishlist
 @app.route('/remove_from_wishlist/<product_id>')
 def remove_from_wishlist(product_id):
     wishlist = get_wishlist()
