@@ -806,17 +806,20 @@ def shop():
     
 # ------------------ CART ROUTES ------------------
 
-# Initialize cart in session if not present
+# ✅ Initialize cart in session if not present
 def get_cart():
     if 'cart' not in session:
         session['cart'] = []
     return session['cart']
 
+
+# ✅ Add to Cart (AJAX + fallback)
 @app.route('/add_to_cart/<int:index>', methods=['POST'])
 def add_to_cart(index):
     quantity = int(request.form.get("quantity", 1))
     cart = get_cart()
 
+    # Check if product exists already
     for item in cart:
         if item['index'] == index:
             item['quantity'] += quantity
@@ -825,8 +828,47 @@ def add_to_cart(index):
         cart.append({'index': index, 'quantity': quantity})
 
     session['cart'] = cart
+
+    # ✅ AJAX response for live updates
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+            'success': True,
+            'message': '🛒 Added to cart!',
+            'count': len(cart)
+        })
+
+    # Normal request fallback
     flash("🛒 Product added to cart!")
     return redirect(request.referrer or url_for('index'))
+
+
+# ✅ Cart count API (for navbar live badge)
+@app.route('/cart_count')
+def cart_count():
+    return jsonify({'count': len(session.get('cart', []))})
+  
+  # 🛒 AJAX Add to Cart (Live)
+@app.route('/add_to_cart_ajax/<int:index>', methods=['POST'])
+def add_to_cart_ajax(index):
+    cart = session.get('cart', [])
+    found = next((item for item in cart if item['index'] == index), None)
+
+    if found:
+        found['quantity'] += 1
+        message = "➕ Increased quantity in cart!"
+    else:
+        cart.append({'index': index, 'quantity': 1})
+        message = "🛒 Added to cart!"
+
+    session['cart'] = cart
+
+    return jsonify({
+        'success': True,
+        'message': message,
+        'count': len(cart)
+    })
+
+
 
 
 

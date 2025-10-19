@@ -242,10 +242,48 @@ nav.navbar.fixed-bottom .container a small {
 </a>
 
 
-    <a href="{{ url_for('cart') }}" class="position-relative {% if active_page == 'cart' %}active{% endif %}">
-      <i class="bi bi-bag-fill fs-5"></i>
-      <small>Cart</small>
-    </a>
+       <!-- 🛒 Cart Button (with live count) -->
+<a href="{{ url_for('cart') }}" class="position-relative {% if active_page == 'cart' %}active{% endif %}">
+  <i class="bi bi-bag-fill fs-5"></i>
+  <small>Cart</small>
+
+  <!-- 🔴 Live Cart Count Badge -->
+  <span id="cart-count"
+        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+        style="font-size: 0.65rem; transform: translate(-35%, 20%);">
+    {{ session.get('cart', [])|length }}
+  </span>
+</a>
+
+<script>
+function updateWishlistCount() {
+  fetch('/wishlist_count')
+    .then(res => res.json())
+    .then(data => {
+      const countBadge = document.getElementById('wishlist-count');
+      if (countBadge) {
+        countBadge.textContent = data.count > 0 ? data.count : '';
+      }
+    });
+}
+
+function updateCartCount() {
+  fetch('/cart_count')
+    .then(res => res.json())
+    .then(data => {
+      const cartBadge = document.getElementById('cart-count');
+      if (cartBadge) {
+        cartBadge.textContent = data.count > 0 ? data.count : '';
+      }
+    });
+}
+
+// 🔄 Listen for global live update events
+document.addEventListener('wishlistChanged', updateWishlistCount);
+document.addEventListener('cartChanged', updateCartCount);
+</script>
+
+
 
     <a href="{{ url_for('wishlist') }}" 
    class="{% if active_page == 'wishlist' %}active{% endif %} position-relative d-flex flex-column align-items-center text-decoration-none text-dark">
