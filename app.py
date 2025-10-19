@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 import resend
 
 
+
 app = Flask(__name__)
 app.jinja_env.globals['session'] = session
 app.secret_key = 'secret123'
@@ -982,6 +983,32 @@ def add_to_wishlist(product_id):
         flash("⚠️ Already in wishlist.")
 
     return redirect(request.referrer or url_for('index'))
+
+@app.route('/add_to_wishlist/<product_id>')
+def add_to_wishlist(product_id):
+    wishlist = get_wishlist()
+
+    # Check if product is already in wishlist
+    for item in wishlist:
+        if item.get('id') == product_id:
+            flash("❤️ Already in your wishlist.")
+            return redirect(request.referrer or url_for('wishlist'))
+
+    # Example: Fetch product details (adjust based on your DB structure)
+    product = get_product_by_id(product_id)  # You likely already have this helper
+    if product:
+        wishlist.append({
+            'id': product_id,
+            'name': product['name'],
+            'price': product['price'],
+            'image': product['image']
+        })
+        session['wishlist'] = wishlist
+        flash("💖 Added to wishlist!")
+    else:
+        flash("⚠️ Product not found.")
+
+    return redirect(request.referrer or url_for('wishlist'))
 
 
 @app.route('/wishlist')

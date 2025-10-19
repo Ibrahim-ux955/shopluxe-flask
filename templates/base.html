@@ -32,84 +32,86 @@
     }
 
     /* Navbar Links */
-    nav.navbar .container a,
-    nav.navbar .navbar-brand span,
-    nav.navbar .dropdown-toggle {
-      color: #666 !important;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
+nav.navbar .container a,
+nav.navbar .navbar-brand span,
+nav.navbar .dropdown-toggle {
+  color: #666 !important;
+  text-decoration: none;
+  transition: color 0.3s;
+}
 
-    nav.navbar .container a:hover,
-    nav.navbar .navbar-brand:hover span,
-    nav.navbar .dropdown-toggle:hover {
-      color: #ff6600 !important;
-    }
+nav.navbar .container a:hover,
+nav.navbar .navbar-brand:hover span,
+nav.navbar .dropdown-toggle:hover {
+  color: #ff6600 !important;
+}
 
-    nav.navbar .container a.active,
-    nav.navbar .container a.active i {
-      color: #ff6600 !important;
-      font-weight: 600;
-    }
+nav.navbar .container a.active,
+nav.navbar .container a.active i {
+  color: #ff6600 !important;
+  font-weight: 600;
+}
 
-    /* Cart badge */
-    nav.navbar .container a.cart {
-      position: relative;
-    }
+/* Cart badge */
+nav.navbar .container a.cart {
+  position: relative;
+}
 
-    nav.navbar .container a.cart .badge {
-      position: absolute;
-      top: 0;
-      right: 12px;
-      font-size: 10px;
-      background-color: #000;
-      color: white;
-      border-radius: 50%;
-      padding: 2px 5px;
-    }
+nav.navbar .container a.cart .badge {
+  position: absolute;
+  top: 0;
+  right: 12px;
+  font-size: 10px;
+  background-color: #000;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 5px;
+}
 
-    /* Bottom nav */
-    nav.navbar.fixed-bottom {
-      position: fixed !important;
-      bottom: 0;
-      width: 100%;
-      z-index: 1030;
-    }
+/* Bottom nav */
+nav.navbar.fixed-bottom {
+  position: fixed !important;
+  bottom: 0;
+  width: 100%;
+  z-index: 1030;
+}
 
-    nav.navbar.fixed-bottom .container a {
-      color: #666;
-      text-align: center;
-      font-size: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      padding: 5px 10px;
-      transition: color 0.3s;
-    }
+nav.navbar.fixed-bottom .container a {
+  color: #666;
+  text-align: center;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1; /* Ensures all 4 links take equal space */
+  text-decoration: none;
+  transition: color 0.3s;
+}
 
-    nav.navbar.fixed-bottom .container a.active,
-    nav.navbar.fixed-bottom .container a.active i {
-      color: #ff6600 !important;
-      font-weight: 600;
-    }
+nav.navbar.fixed-bottom .container a.active,
+nav.navbar.fixed-bottom .container a.active i {
+  color: #ff6600 !important;
+  font-weight: 600;
+}
 
-    nav.navbar.fixed-bottom .container a small {
-      margin-top: 2px;
-      display: block;
-    }
+nav.navbar.fixed-bottom .container a small {
+  margin-top: 2px;
+  display: block;
+  font-size: 11px;
+}
 
-    /* Mobile search full width */
-    @media (max-width: 767px) {
-      .search-btn {
-        display: none !important;
-      }
-      .search-input {
-        width: 100% !important;
-        margin-right: 0 !important;
-      }
-    }
+/* Mobile search full width */
+@media (max-width: 767px) {
+  .search-btn {
+    display: none !important;
+  }
+  .search-input {
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+}
+
   </style>
 </head>
 
@@ -225,23 +227,30 @@
       </ul>
     </div>
 
-    <!-- Cart -->
-    <a href="{{ url_for('cart') }}" class="text-dark text-decoration-none cart {% if active_page == 'cart' %}active{% endif %}">
-      <div><i class="bi bi-cart-fill"></i></div>
-      <small>Cart ({{ session.cart|length if session.cart else 0 }})</small>
+      <!-- Bottom Navigation -->
+<nav class="navbar fixed-bottom bg-white d-md-none border-top shadow-sm">
+  <div class="container d-flex justify-content-around text-center py-1">
+
+    <a href="{{ url_for('home') }}" class="{% if active_page == 'home' %}active{% endif %}">
+      <i class="bi bi-house-fill fs-5"></i>
+      <small>Home</small>
     </a>
 
-    <!-- Wishlist -->
-    <a href="{{ url_for('wishlist') }}" class="text-dark text-decoration-none {% if active_page == 'wishlist' %}active{% endif %}">
-      <div><i class="bi bi-heart-fill"></i></div>
+    <a href="{{ url_for('categories') }}" class="{% if active_page == 'categories' %}active{% endif %}">
+      <i class="bi bi-grid-3x3-gap-fill fs-5"></i>
+      <small>Categories</small>
+    </a>
+
+    <a href="{{ url_for('cart') }}" class="position-relative {% if active_page == 'cart' %}active{% endif %}">
+      <i class="bi bi-bag-fill fs-5"></i>
+      <small>Cart</small>
+    </a>
+
+    <a href="{{ url_for('wishlist') }}" class="{% if active_page == 'wishlist' %}active{% endif %}">
+      <i class="bi bi-heart-fill fs-5"></i>
       <small>Wishlist</small>
     </a>
 
-    <!-- Admin -->
-    <a href="{{ url_for('admin_login') }}" class="text-dark text-decoration-none {% if active_page == 'admin' %}active{% endif %}">
-      <div><i class="bi bi-person-gear"></i></div>
-      <small>Admin</small>
-    </a>
   </div>
 </nav>
 
