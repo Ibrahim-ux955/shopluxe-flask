@@ -1032,15 +1032,19 @@ def add_to_wishlist(product_id):
         flash("❤️ Already in your wishlist.")
         return redirect(request.referrer or url_for('wishlist'))
 
+    # ✅ Clean image path (prevent duplicate 'static/')
+    image_path = product.get('image') or (
+        product.get('images')[0] if product.get('images') else 'default.png'
+    )
+    if image_path.startswith('static/'):
+        image_path = image_path.replace('static/', '')
+
     wishlist.append({
         'id': product['id'],
         'index': product['index'],  # ✅ added for add_to_cart
         'name': product['name'],
         'price': product['price'],
-        # ✅ fixed image path for wishlist display
-        'image': product.get('image') or (
-            product.get('images')[0] if product.get('images') else 'default.png'
-        )
+        'image': image_path
     })
     session['wishlist'] = wishlist
     flash("💖 Added to your wishlist!")
@@ -1068,15 +1072,20 @@ def toggle_wishlist_ajax(product_id):
     else:
         # Add product
         product_with_index = get_product_by_id(product_id)
+
+        # ✅ Clean image path (prevent duplicate 'static/')
+        image_path = product_with_index.get('image') or (
+            product_with_index.get('images')[0] if product_with_index.get('images') else 'default.png'
+        )
+        if image_path.startswith('static/'):
+            image_path = image_path.replace('static/', '')
+
         wishlist.append({
             'id': product_with_index['id'],
             'index': product_with_index['index'],
             'name': product_with_index['name'],
             'price': product_with_index['price'],
-            # ✅ fixed image path for wishlist display
-            'image': product_with_index.get('image') or (
-                product_with_index.get('images')[0] if product_with_index.get('images') else 'default.png'
-            )
+            'image': image_path
         })
         session['wishlist'] = wishlist
         message = "💖 Added to wishlist!"
