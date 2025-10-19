@@ -953,6 +953,51 @@ def order_confirmation():
 @app.route("/healthz")
 def health_check():
     return "OK", 200
+  
+# ------------------ WISHLIST ROUTES ------------------
+
+# Initialize wishlist in session if not present
+def get_wishlist():
+    if 'wishlist' not in session:
+        session['wishlist'] = []
+    return session['wishlist']
+
+
+@app.route('/add_to_wishlist/<product_id>')
+def add_to_wishlist(product_id):
+    wishlist = get_wishlist()
+    products = load_data()
+    product = next((p for p in products if p.get('id') == product_id), None)
+
+    if not product:
+        flash("❌ Product not found.")
+        return redirect(request.referrer or url_for('index'))
+
+    # Add product if not already in wishlist
+    if not any(p['id'] == product_id for p in wishlist):
+        wishlist.append(product)
+        session['wishlist'] = wishlist
+        flash("💖 Added to your wishlist!")
+    else:
+        flash("⚠️ Already in wishlist.")
+
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/wishlist')
+def wishlist():
+    wishlist = get_wishlist()
+    return render_template('wishlist.html', wishlist=wishlist, active_page='wishlist')
+
+
+@app.route('/remove_from_wishlist/<product_id>')
+def remove_from_wishlist(product_id):
+    wishlist = get_wishlist()
+    updated_wishlist = [p for p in wishlist if p.get('id') != product_id]
+    session['wishlist'] = updated_wishlist
+    flash("❌ Removed from wishlist.")
+    return redirect(url_for('wishlist'))
+
 
 if __name__ == "__main__":
     app.run()
