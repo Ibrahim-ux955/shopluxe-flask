@@ -15,7 +15,7 @@
       margin-right: 8px;
     }
 
-    /* Remove solid orange buttons, use clean Bootstrap */
+    /* Clean buttons */
     .btn-custom {
       background-color: transparent;
       border: 1px solid #ccc;
@@ -31,7 +31,7 @@
       min-height: 100vh;
     }
 
-    /* Global Navbar Link Styles (Desktop + Mobile) */
+    /* Navbar Links */
     nav.navbar .container a,
     nav.navbar .navbar-brand span,
     nav.navbar .dropdown-toggle {
@@ -48,7 +48,7 @@
 
     nav.navbar .container a.active,
     nav.navbar .container a.active i {
-      color: #000 !important;
+      color: #ff6600 !important;
       font-weight: 600;
     }
 
@@ -68,7 +68,14 @@
       padding: 2px 5px;
     }
 
-    /* Keep same bottom nav layout on mobile */
+    /* Bottom nav */
+    nav.navbar.fixed-bottom {
+      position: fixed !important;
+      bottom: 0;
+      width: 100%;
+      z-index: 1030;
+    }
+
     nav.navbar.fixed-bottom .container a {
       color: #666;
       text-align: center;
@@ -84,7 +91,7 @@
 
     nav.navbar.fixed-bottom .container a.active,
     nav.navbar.fixed-bottom .container a.active i {
-      color: #000;
+      color: #ff6600 !important;
       font-weight: 600;
     }
 
@@ -93,7 +100,7 @@
       display: block;
     }
 
-    /* Hide search button on mobile, make search bar full width */
+    /* Mobile search full width */
     @media (max-width: 767px) {
       .search-btn {
         display: none !important;
@@ -173,14 +180,14 @@
   </div>
 </nav>
 
-<!-- Search Bar (Below Navbar) -->
+<!-- Search Bar -->
 <div class="container mt-3">
   <form class="d-flex justify-content-center" method="get" action="{{ url_for('search') }}">
     <input 
       class="form-control me-2 w-50 search-input" 
       type="search" 
       name="q" 
-      placeholder="Search products..." 
+      placeholder="Search categories..." 
       value="{{ query if query else '' }}"
     >
     <button class="btn btn-custom search-btn" type="submit">Search</button>
@@ -202,9 +209,9 @@
   <div class="container d-flex justify-content-around text-center py-1">
     <!-- Categories -->
     <div class="dropup">
-      <button class="btn btn-link text-dark text-decoration-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <div><i class="bi bi-list-ul {% if active_page == 'categories' %}active{% endif %}"></i></div>
-        <small class="{% if active_page == 'categories' %}active{% endif %}">Categories</small>
+      <button class="btn btn-link text-dark text-decoration-none dropdown-toggle {% if active_page == 'categories' %}active{% endif %}" type="button" data-bs-toggle="dropdown">
+        <div><i class="bi bi-list-ul"></i></div>
+        <small>Categories</small>
       </button>
       <ul class="dropdown-menu">
         <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">Shoes</a></li>
@@ -222,6 +229,12 @@
     <a href="{{ url_for('cart') }}" class="text-dark text-decoration-none cart {% if active_page == 'cart' %}active{% endif %}">
       <div><i class="bi bi-cart-fill"></i></div>
       <small>Cart ({{ session.cart|length if session.cart else 0 }})</small>
+    </a>
+
+    <!-- Wishlist -->
+    <a href="{{ url_for('wishlist') }}" class="text-dark text-decoration-none {% if active_page == 'wishlist' %}active{% endif %}">
+      <div><i class="bi bi-heart-fill"></i></div>
+      <small>Wishlist</small>
     </a>
 
     <!-- Admin -->
