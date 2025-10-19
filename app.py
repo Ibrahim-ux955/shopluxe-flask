@@ -958,10 +958,15 @@ def health_check():
   
 # ------------------ WISHLIST ROUTES ------------------
 
-# Helper: fetch product by ID
+# Helper: fetch product by ID + index
 def get_product_by_id(product_id):
     products = load_data()
-    return next((p for p in products if p.get('id') == product_id), None)
+    for i, product in enumerate(products):
+        if str(product.get('id')) == str(product_id):
+            product['index'] = i  # ✅ store index for add_to_cart
+            return product
+    return None
+
 
 # Initialize wishlist in session if not present
 def get_wishlist():
@@ -969,7 +974,8 @@ def get_wishlist():
         session['wishlist'] = []
     return session['wishlist']
 
-# Add product to wishlist
+
+# Add product to wishlist (non-AJAX fallback)
 @app.route('/add_to_wishlist/<product_id>')
 def add_to_wishlist(product_id):
     wishlist = get_wishlist()
@@ -980,35 +986,89 @@ def add_to_wishlist(product_id):
         return redirect(request.referrer or url_for('index'))
 
     # Avoid duplicates
-    if any(p['id'] == product_id for p in wishlist):
+    if any(str(p['id']) == str(product_id) for p in wishlist):
         flash("❤️ Already in your wishlist.")
         return redirect(request.referrer or url_for('wishlist'))
 
-    # Store minimal product info
     wishlist.append({
         'id': product['id'],
+        'index': product['index'],  # ✅ added for add_to_cart
         'name': product['name'],
         'price': product['price'],
-        'image': product.get('image') or (product.get('images')[0] if product.get('images') else 'default.png')
+        'image': product.get('image') or (
+            product.get('images')[0] if product.get('images') else 'default.png'
+        )
     })
     session['wishlist'] = wishlist
     flash("💖 Added to your wishlist!")
     return redirect(request.referrer or url_for('wishlist'))
 
-# View wishlist
+
+# ✅ AJAX Toggle Wishlist
+@app.route('/toggle_wishlist_ajax/<product_id>', methods=['POST'])
+def toggle_wishlist_ajax(product_id):
+    wishlist = session.get('wishlist', [])
+    products = load_data()
+    product = next((p for p in products if str(p.get('id')) == str(product_id)), None)
+
+    if not product:
+        return jsonify({'success': False, 'message': '❌ Product not found.'})
+
+    in_wishlist = any(str(p['id']) == str(product_id) for p in wishlist)
+
+    if in_wishlist:
+        # Remove product
+        wishlist = [p for p in wishlist if str(p['id']) != str(product_id)]
+        session['wishlist'] = wishlist
+        message = "💔 Removed from wishlist."
+        in_wishlist = False
+    else:
+        # Add product
+        product_with_index = get_product_by_id(product_id)
+        wishlist.append({
+            'id': product_with_index['id'],
+            'index': product_with_index['index'],
+            'name': product_with_index['name'],
+            'price': product_with_index['price'],
+            'image': product_with_index.get('image') or (
+                product_with_index.get('images')[0] if product_with_index.get('images') else 'default.png'
+            )
+        })
+        session['wishlist'] = wishlist
+        message = "💖 Added to wishlist!"
+        in_wishlist = True
+
+    return jsonify({
+        'success': True,
+        'in_wishlist': in_wishlist,
+        'message': message,
+        'count': len(wishlist)
+    })
+
+
+# ✅ View wishlist page
 @app.route('/wishlist')
 def wishlist():
     wishlist = get_wishlist()
     return render_template('wishlist.html', wishlist=wishlist, active_page='wishlist')
 
-# Remove product from wishlist
+
+# ✅ Remove product from wishlist (non-AJAX)
 @app.route('/remove_from_wishlist/<product_id>')
 def remove_from_wishlist(product_id):
     wishlist = get_wishlist()
-    updated_wishlist = [p for p in wishlist if p.get('id') != product_id]
+    updated_wishlist = [p for p in wishlist if str(p.get('id')) != str(product_id)]
     session['wishlist'] = updated_wishlist
     flash("❌ Removed from wishlist.")
     return redirect(url_for('wishlist'))
+
+
+# ✅ Wishlist count API (for navbar live badge)
+@app.route('/wishlist_count')
+def wishlist_count():
+    return jsonify({'count': len(session.get('wishlist', []))})
+
+
 
 
 if __name__ == "__main__":
