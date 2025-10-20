@@ -14,7 +14,10 @@
       <div class="row g-0 align-items-center p-2">
         <!-- Product Image -->
         <div class="col-3">
-          <img src="{{ url_for('static', filename=item.image) }}" class="img-fluid rounded-3" alt="{{ item.name }}">
+          <img src="{{ url_for('static', filename='shoe/' ~ item.image) }}" 
+     class="img-fluid rounded-3" 
+     alt="{{ item.name }}">
+
         </div>
 
         <!-- Product Info -->
