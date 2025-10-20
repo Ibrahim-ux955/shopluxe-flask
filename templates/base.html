@@ -186,7 +186,8 @@ nav.navbar.fixed-bottom .container a small {
 </nav>
 
 
-<!-- Search Bar -->
+<!-- Search Bar (only on homepage) -->
+{% if active_page == 'home' %}
 <div class="container mt-3">
   <form class="d-flex justify-content-center" method="get" action="{{ url_for('search') }}">
     <input 
@@ -199,6 +200,8 @@ nav.navbar.fixed-bottom .container a small {
     <button class="btn btn-custom search-btn" type="submit">Search</button>
   </form>
 </div>
+{% endif %}
+
 
 <!-- Main content -->
 <div class="container mt-4 mb-5">
@@ -313,6 +316,17 @@ document.addEventListener('cartChanged', updateCartCount);
     {{ session.get('wishlist', [])|length }}
   </span>
 </a>
+   {% if session.user %}
+      <a href="{{ url_for('profile') }}" class="{% if active_page == 'profile' %}active{% endif %}">
+        <i class="bi bi-person-fill fs-5"></i>
+        <small>Profile</small>
+      </a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="{% if active_page == 'login' %}active{% endif %}">
+        <i class="bi bi-box-arrow-in-right fs-5"></i>
+        <small>Login</small>
+      </a>
+    {% endif %}
 
 </div>
 </nav>
