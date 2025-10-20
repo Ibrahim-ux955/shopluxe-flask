@@ -157,30 +157,40 @@ nav.navbar.fixed-bottom .container a small {
           🛒 Cart ({{ session.cart|length if session.cart else 0 }})
         </a>
 
-        <!-- Admin -->
-        <a class="btn btn-custom me-2" href="{{ url_for('admin_login') }}">
-          ⚙️ Admin
-        </a>
-      </div>
-    </div>
+        <!-- Admin (Desktop only) -->
+<div class="d-none d-md-block">
+  <a class="btn btn-custom me-2" href="{{ url_for('admin_login') }}">
+    ⚙️ Admin
+  </a>
+</div>
 
-    <!-- User login/logout (always visible on all screens) -->
-    <div class="d-flex ms-auto">
-      {% if session.user %}
-        <div class="dropdown mt-2 mt-lg-0">
-          <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
-            👤 {{ session.user.name }}
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="{{ url_for('profile') }}">My Profile</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
-          </ul>
-        </div>
-      {% else %}
-        <a class="btn btn-custom me-2 mt-2 mt-lg-0" href="{{ url_for('login') }}">Login</a>
-        <a class="btn btn-custom mt-2 mt-lg-0" href="{{ url_for('signup') }}">Sign Up</a>
-      {% endif %}
+<!-- Admin (Mobile only, top) -->
+{% if session.user %}
+<div class="d-flex d-md-none justify-content-center mt-2">
+  <a class="btn btn-custom" href="{{ url_for('admin_login') }}">
+    ⚙️ Admin
+  </a>
+</div>
+{% endif %}
+
+
+<!-- User login/logout (Desktop only) -->
+<div class="ms-3">
+  {% if session.user %}
+    <div class="dropdown mt-2 mt-lg-0">
+      <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        👤 {{ session.user.name }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" href="{{ url_for('profile') }}">My Profile</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
     </div>
+  {% else %}
+    <a class="btn btn-custom me-2 mt-2 mt-lg-0" href="{{ url_for('login') }}">Login</a>
+    <a class="btn btn-custom mt-2 mt-lg-0" href="{{ url_for('signup') }}">Sign Up</a>
+  {% endif %}
+</div>
 
   </div>
 </nav>
@@ -315,18 +325,19 @@ document.addEventListener('cartChanged', updateCartCount);
         ">
     {{ session.get('wishlist', [])|length }}
   </span>
-</a>
-   {% if session.user %}
-      <a href="{{ url_for('profile') }}" class="{% if active_page == 'profile' %}active{% endif %}">
-        <i class="bi bi-person-fill fs-5"></i>
-        <small>Profile</small>
-      </a>
-    {% else %}
-      <a href="{{ url_for('login') }}" class="{% if active_page == 'login' %}active{% endif %}">
-        <i class="bi bi-box-arrow-in-right fs-5"></i>
-        <small>Login</small>
-      </a>
-    {% endif %}
+<!-- Profile/Login for mobile -->
+{% if session.user %}
+  <a href="{{ url_for('profile') }}" class="{% if active_page == 'profile' %}active{% endif %}">
+    <i class="bi bi-person-fill fs-5"></i>
+    <small>Profile</small>
+  </a>
+{% else %}
+  <a href="{{ url_for('login') }}" class="{% if active_page == 'login' %}active{% endif %}">
+    <i class="bi bi-box-arrow-in-right fs-5"></i>
+    <small>Login</small>
+  </a>
+{% endif %}
+
 
 </div>
 </nav>
