@@ -1,7 +1,50 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+  /* Make container full width with side padding */
+  .container {
+    max-width: 100% !important;
+    padding: 1rem 1.5rem;
+  }
+
+  /* Limit the main cart wrapper width and center */
+  .cart-wrapper {
+    max-width: 700px;
+    width: 100%;
+    margin-top: 2rem;
+  }
+
+  /* Smaller font for pricing summary */
+  .pricing-summary {
+    font-size: 14px;
+  }
+
+  /* Responsive adjustments for small screens */
+  @media (max-width: 576px) {
+    .cart-wrapper {
+      padding: 1rem 0.5rem;
+      max-width: 100%;
+    }
+
+    .card img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .pricing-summary {
+      font-size: 13px;
+    }
+
+    /* Smaller buttons on mobile */
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+</style>
+
 <div class="container d-flex justify-content-center">
-  <div class="p-4 mt-5" style="max-width: 600px; width: 100%;">
+  <div class="cart-wrapper p-4">
 
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -38,7 +81,7 @@
       </div>
 
       <!-- Pricing Summary -->
-      <div class="mb-3" style="font-size: 14px;">
+      <div class="mb-3 pricing-summary">
         <div class="d-flex justify-content-between">
           <span>Subtotal</span>
           <span>GHS {{ subtotal }}</span>
