@@ -870,10 +870,6 @@ def add_to_cart_ajax(index):
 
 
 
-
-
-
-
 @app.route('/cart')
 def cart():
     cart = get_cart()
@@ -886,9 +882,9 @@ def cart():
         if 0 <= index < len(products):
             product = products[index].copy()
             product['quantity'] = quantity
+            product['index'] = index  # ✅ Needed for template links (increase, decrease, remove)
 
             # ✅ Make sure image is included
-            # Use 'image' if single image or first from 'images' list
             if 'images' in product and product['images']:
                 product['image'] = product['images'][0]
             elif 'image' in product:
@@ -898,9 +894,54 @@ def cart():
 
             cart_items.append(product)
 
-    total = sum(float(p['price']) * p['quantity'] for p in cart_items)
-    return render_template('cart.html', cart_items=cart_items, total=total, active_page='cart')
+    subtotal = sum(float(p['price']) * p['quantity'] for p in cart_items)
+    tax = round(subtotal * 0.10, 2)  # 💡 10% tax
+    total = round(subtotal + tax, 2)
 
+    return render_template(
+        'cart.html',
+        cart_items=cart_items,
+        subtotal=subtotal,
+        tax=tax,
+        total=total,
+        active_page='cart'
+    )
+
+@app.route('/clear-cart')
+def clear_cart():
+    session['cart'] = []  # ✅ correct: cart is a list of dicts
+    return redirect(url_for('cart'))
+
+@app.route('/cart/increase/<int:index>')
+def increase_quantity(index):
+    cart = get_cart()
+    for item in cart:
+        if item['index'] == index:
+            item['quantity'] += 1
+            break
+    session['cart'] = cart
+    return redirect(url_for('cart'))
+
+
+@app.route('/cart/decrease/<int:index>')
+def decrease_quantity(index):
+    cart = get_cart()
+    for item in cart:
+        if item['index'] == index:
+            item['quantity'] -= 1
+            if item['quantity'] < 1:
+                cart.remove(item)
+            break
+    session['cart'] = cart
+    return redirect(url_for('cart'))
+
+
+@app.route('/cart/remove/<int:index>')
+def remove_from_cart(index):
+    cart = get_cart()
+    cart = [item for item in cart if item['index'] != index]
+    session['cart'] = cart
+    return redirect(url_for('cart'))
 
 
 @app.route('/checkout', methods=['GET', 'POST'])
