@@ -162,8 +162,10 @@ nav.navbar.fixed-bottom .container a small {
           ⚙️ Admin
         </a>
       </div>
+    </div>
 
-      <!-- User login/logout -->
+    <!-- User login/logout (always visible on all screens) -->
+    <div class="d-flex ms-auto">
       {% if session.user %}
         <div class="dropdown mt-2 mt-lg-0">
           <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -179,8 +181,10 @@ nav.navbar.fixed-bottom .container a small {
         <a class="btn btn-custom mt-2 mt-lg-0" href="{{ url_for('signup') }}">Sign Up</a>
       {% endif %}
     </div>
+
   </div>
 </nav>
+
 
 <!-- Search Bar -->
 <div class="container mt-3">
@@ -247,12 +251,16 @@ nav.navbar.fixed-bottom .container a small {
   <i class="bi bi-bag-fill fs-5"></i>
   <small>Cart</small>
 
-  <!-- 🔴 Live Cart Count Badge -->
-  <span id="cart-count"
-        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-        style="font-size: 0.65rem; transform: translate(-60%, 15%);">
-    {{ session.get('cart', [])|length }}
-  </span>
+   <span id="cart-count"
+      class="position-absolute badge rounded-pill bg-danger text-white"
+      style="
+        font-size: 0.65rem;
+        top: 3px;
+        right: 12px;
+        transform: translate(25%, -25%);
+      ">
+  {{ session.get('cart', [])|length }}
+</span>
 </a>
 
 <script>
@@ -282,6 +290,7 @@ function updateCartCount() {
 document.addEventListener('wishlistChanged', updateWishlistCount);
 document.addEventListener('cartChanged', updateCartCount);
 </script>
+
 
 
 
