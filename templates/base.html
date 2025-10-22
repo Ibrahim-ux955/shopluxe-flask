@@ -156,21 +156,24 @@ nav.navbar.fixed-bottom .container a small {
         <a class="btn btn-custom ms-auto me-2" href="{{ url_for('cart') }}">
           🛒 Cart ({{ session.cart|length if session.cart else 0 }})
         </a>
-<!-- Admin (Desktop only, inside navbar collapse) -->
-<div class="d-none d-md-block ms-2">
-  <a class="btn btn-custom me-2" href="{{ url_for('admin_login') }}">
-    ⚙️ Admin
-  </a>
-</div>
+{% if session.user %}
+  <!-- Admin (Desktop only, inside navbar collapse) -->
+  <div class="d-none d-md-block ms-2">
+    <a class="btn btn-custom me-2" href="{{ url_for('admin_login') }}">
+      ⚙️ Admin
+    </a>
+  </div>
+{% endif %}
+</div> <!-- ✅ close collapse div here -->
 
-<!-- Admin (Mobile only, always on top, if logged in) -->
-    {% if session.user %}
-    <div class="d-flex d-md-none justify-content-center mt-2">
-      <a class="btn btn-custom" href="{{ url_for('admin_login') }}">
-        ⚙️ Admin
-      </a>
-    </div>
-    {% endif %}
+{% if session.user %}
+  <!-- Admin (Mobile only, always visible on top) -->
+  <div class="d-flex d-md-none justify-content-center mt-2">
+    <a class="btn btn-custom" href="{{ url_for('admin_login') }}">
+      ⚙️ Admin
+    </a>
+  </div>
+{% endif %}
 
 
 <!-- User login/logout (Desktop only) -->
