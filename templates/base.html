@@ -118,84 +118,68 @@ nav.navbar.fixed-bottom .container a small {
 <body class="bg-wallpaper">
 
 <!-- Top Navbar -->
-<nav class="navbar navbar-expand-lg bg-white shadow-sm">
-  <div class="container-fluid">
+<nav class="navbar bg-white shadow-sm">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
+    <!-- Brand -->
     <a class="navbar-brand d-flex align-items-center text-dark fw-bold" href="/">
       <img src="{{ url_for('static', filename='logo/shopluxe.png') }}" alt="ShopLuxe" style="height: 40px;">
       <span class="ms-2">ShopLuxe</span>
     </a>
 
-    <div class="collapse navbar-collapse" id="navbarContent">
-      <div class="d-none d-md-flex w-100 align-items-center">
-        <!-- Categories dropdown -->
-        <div class="dropdown ms-3">
-          <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
-            🛍️ Categories
-          </button>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">
-              <img src="{{ url_for('static', filename='icons/shoe.png') }}" class="category-icon">Shoes</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">
-              <img src="{{ url_for('static', filename='icons/men.png') }}" class="category-icon">Men</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">
-              <img src="{{ url_for('static', filename='icons/women.png') }}" class="category-icon">Women</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Children') }}">
-              <img src="{{ url_for('static', filename='icons/children.png') }}" class="category-icon">Children</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Watches') }}">
-              <img src="{{ url_for('static', filename='icons/watch.png') }}" class="category-icon">Watches</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Jewelry') }}">
-              <img src="{{ url_for('static', filename='icons/jewelry.png') }}" class="category-icon">Jewelry</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">
-              <img src="{{ url_for('static', filename='icons/accessories.png') }}" class="category-icon">Accessories</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">
-              <img src="{{ url_for('static', filename='icons/bag.png') }}" class="category-icon">Bags</a></li>
-          </ul>
-        </div>
-
-        <!-- Cart -->
-        <a class="btn btn-custom ms-auto me-2" href="{{ url_for('cart') }}">
-          🛒 Cart ({{ session.cart|length if session.cart else 0 }})
-        </a>
-{% if session.user %}
-  <!-- Admin (Desktop only, inside navbar collapse) -->
-  <div class="d-none d-md-block ms-2">
-    <a class="btn btn-custom me-2" href="{{ url_for('admin_login') }}">
-      ⚙️ Admin
-    </a>
-  </div>
-{% endif %}
-</div> <!-- ✅ close collapse div here -->
-
-{% if session.user %}
-  <!-- Admin (Mobile only, always visible on top) -->
-  <div class="d-flex d-md-none justify-content-center mt-2">
-    <a class="btn btn-custom" href="{{ url_for('admin_login') }}">
-      ⚙️ Admin
-    </a>
-  </div>
-{% endif %}
-
-
-<!-- User login/logout (Desktop only) -->
-<div class="ms-3">
-  {% if session.user %}
-    <div class="dropdown mt-2 mt-lg-0">
+    <!-- Categories dropdown -->
+    <div class="dropdown d-none d-md-block">
       <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
-        👤 {{ session.user.name }}
+        🛍️ Categories
       </button>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" href="{{ url_for('profile') }}">My Profile</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">Shoes</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">Men</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">Women</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Children') }}">Children</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Watches') }}">Watches</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Jewelry') }}">Jewelry</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">Accessories</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">Bags</a></li>
       </ul>
     </div>
-  {% else %}
-    <a class="btn btn-custom me-2 mt-2 mt-lg-0" href="{{ url_for('login') }}">Login</a>
-    <a class="btn btn-custom mt-2 mt-lg-0" href="{{ url_for('signup') }}">Sign Up</a>
-  {% endif %}
-</div>
 
+    <!-- Right Side: Cart, Admin, Login/Profile -->
+    <div class="d-flex align-items-center">
+      <!-- Cart -->
+      <a class="btn btn-custom me-2" href="{{ url_for('cart') }}">
+        🛒 Cart ({{ session.cart|length if session.cart else 0 }})
+      </a>
+
+      <!-- Admin (only if logged in) -->
+      {% if session.user %}
+        <a class="btn btn-custom me-2" href="{{ url_for('admin_login') }}">
+          ⚙️ Admin
+        </a>
+      {% endif %}
+
+      <!-- Login/Profile -->
+      {% if session.user %}
+        <div class="dropdown">
+          <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            👤 {{ session.user.name }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{{ url_for('profile') }}">My Profile</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+          </ul>
+        </div>
+      {% else %}
+        <a class="btn btn-custom me-2" href="{{ url_for('login') }}">Login</a>
+        <a class="btn btn-custom" href="{{ url_for('signup') }}">Sign Up</a>
+      {% endif %}
+    </div>
   </div>
 </nav>
+
+
+
+
+
 
 
 <!-- Search Bar (only on homepage) -->
