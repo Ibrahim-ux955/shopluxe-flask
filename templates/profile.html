@@ -1,51 +1,122 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 600px;">
-  <div class="card shadow-lg border-0">
-    <div class="card-body">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
-      <h3 class="card-title text-center mb-4">👤 My Profile</h3>
+<style>
+  body {
+    background-color: #f8f9fa;
+  }
+  .profile-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  }
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .profile-name {
+    font-weight: 600;
+    font-size: 1.3rem;
+  }
+  .profile-email {
+    color: #6c757d;
+  }
+  .stat-item h6 {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  .list-group-item {
+    border: none;
+    padding: 15px 20px;
+    font-weight: 500;
+  }
+  .list-group-item i {
+    font-size: 1.1rem;
+    color: #6c757d;
+  }
+  .list-group-item:hover {
+    background-color: #f1f3f5;
+    cursor: pointer;
+  }
+  .logout-btn {
+    border-radius: 10px;
+  }
+</style>
 
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-info text-center">{{ message }}</div>
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
+<div class="container mt-5" style="max-width: 500px;">
+  <div class="card profile-card">
+    <div class="card-body text-center p-4">
 
-      <form method="POST">
-        <div class="mb-3">
-          <label for="name" class="form-label">Full Name</label>
-          <input type="text" name="name" id="name" class="form-control" value="{{ user.name }}" required>
+      <!-- Profile Header -->
+      <img src="{{ user.profile_image or url_for('static', filename='images/default-avatar.png') }}"
+           alt="Avatar"
+           class="profile-avatar mb-3">
+      <h5 class="profile-name">{{ user.name }}</h5>
+      <p class="profile-email">{{ user.email }}</p>
+
+      <!-- Dynamic Stats -->
+      <div class="row text-center my-4">
+        <div class="col stat-item">
+          <h6>{{ stats.orders }}</h6>
+          <p class="text-muted mb-0">Orders</p>
         </div>
-
-        <div class="mb-3">
-          <label for="email" class="form-label">Email Address</label>
-          <input type="email" class="form-control" value="{{ user.email }}" disabled>
+        <div class="col stat-item">
+          <h6>{{ stats.reviews }}</h6>
+          <p class="text-muted mb-0">Reviews</p>
         </div>
-
-        <div class="mb-3">
-          <label for="current_password" class="form-label">Current Password</label>
-          <input type="password" name="current_password" id="current_password" class="form-control" required>
+        <div class="col stat-item">
+          <h6>${{ "%.2f"|format(stats.spent) }}</h6>
+          <p class="text-muted mb-0">Spent</p>
         </div>
+      </div>
 
-        <div class="mb-3">
-          <label for="password" class="form-label">New Password</label>
-          <input type="password" name="password" id="password" class="form-control" placeholder="Leave blank to keep current password">
-        </div>
+      <hr>
 
-        <button type="submit" class="btn btn-success w-100">Update Profile</button>
-      </form>
+      <!-- Profile Menu -->
+<div class="list-group text-start">
+  <a href="{{ url_for('order_confirmation') }}" class="list-group-item d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-bag me-2"></i>Product Management</span>
+    <i class="bi bi-chevron-right"></i>
+  </a>
 
-      <div class="text-center mt-4">
-        <a href="{{ url_for('logout') }}"
-           class="btn btn-outline-danger"
+  <a href="{{ url_for('order_confirmation') }}" class="list-group-item d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-box-seam me-2"></i>My Orders</span>
+    <i class="bi bi-chevron-right"></i>
+  </a>
+
+  <a href="#" class="list-group-item d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-person-gear me-2"></i>Account Settings</span>
+    <i class="bi bi-chevron-right"></i>
+  </a>
+
+  <a href="#" class="list-group-item d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-geo-alt me-2"></i>Shipping Address</span>
+    <i class="bi bi-chevron-right"></i>
+  </a>
+
+  <a href="#" class="list-group-item d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-credit-card me-2"></i>Payment Methods</span>
+    <i class="bi bi-chevron-right"></i>
+  </a>
+
+  <a href="#" class="list-group-item d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-question-circle me-2"></i>Help & Support</span>
+    <i class="bi bi-chevron-right"></i>
+  </a>
+</div>
+
+      <!-- Logout -->
+      <div class="mt-4">
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger w-100 logout-btn py-2 fw-semibold"
            onclick="return confirm('Are you sure you want to logout?')">
-         🚪 Logout
-       </a>
-
+          🚪 Logout
+        </a>
       </div>
 
     </div>

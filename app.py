@@ -537,8 +537,12 @@ def reset_with_token(token):
     return render_template('reset_with_token.html')
 
 
-
-
+def load_json(filename):
+    try:
+        with open(filename, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
@@ -548,31 +552,51 @@ def profile():
 
     users = load_users()
     user = next((u for u in users if u['email'] == session['user']['email']), None)
+    if not user:
+        flash("⚠️ User not found.")
+        return redirect(url_for('login'))
 
+    # ✅ Load all orders and reviews
+    orders = load_json('data/orders.json')
+    reviews = load_json('data/reviews.json')
+
+    # ✅ Filter for this specific user
+    user_orders = [o for o in orders if o.get('user_email') == user['email']]
+    user_reviews = [r for r in reviews if r.get('user_email') == user['email']]
+
+    # ✅ Compute totals
+    total_spent = sum(o.get('total', 0) for o in user_orders)
+    order_count = len(user_orders)
+    review_count = len(user_reviews)
+
+    user_stats = {
+        "orders": order_count,
+        "reviews": review_count,
+        "spent": total_spent
+    }
+
+    # ✅ Handle profile update
     if request.method == 'POST':
         current_password = request.form.get('current_password')
         new_name = request.form.get('name')
         new_password = request.form.get('password')
 
         if not check_password_hash(user['password'], current_password):
-           flash("❌ Incorrect current password.")
-           return redirect(url_for('profile'))
-
-
-        if user['password'] != current_password:
             flash("❌ Incorrect current password.")
             return redirect(url_for('profile'))
 
-        # If password is correct, update profile
         user['name'] = new_name or user['name']
         if new_password:
             user['password'] = generate_password_hash(new_password)
-        save_users(users)
 
+        save_users(users)
         flash("✅ Profile updated successfully.")
         return redirect(url_for('profile'))
 
-    return render_template('profile.html', user=user)
+    # ✅ Pass everything to the template
+    return render_template('profile.html', user=user, stats=user_stats)
+
+
 
 @app.route('/logout')
 def logout():
@@ -1032,6 +1056,18 @@ def order_confirmation():
         flash("⚠️ No order found.")
         return redirect(url_for('cart'))
     return render_template('order_confirmation.html', order=order_info)
+  
+@app.route('/settings')
+def settings():
+    # You can later replace this with user settings logic
+    return render_template('settings.html')
+
+
+@app.route('/support')
+def support():
+    # You can later replace this with real support/help info
+    return render_template('support.html')
+
 
 
 
