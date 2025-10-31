@@ -8,7 +8,6 @@ from itsdangerous import URLSafeTimedSerializer  # ✅ Add this
 import os, json, uuid
 from uuid import uuid4
 from datetime import datetime,timezone, timedelta 
-import pytz
 import resend
 
 
@@ -1005,16 +1004,15 @@ def checkout():
             flash("❌ All fields are required.")
             return redirect(url_for('checkout'))
 
-        # 🕒 Store UTC timestamp
+        # 🕒 Convert UTC to user’s local timezone
         utc_now = datetime.now(timezone.utc)
-
-        # 🕒 Convert UTC to user’s local timezone if provided
         try:
             user_zone = ZoneInfo(timezone_str)
         except Exception:
-            user_zone = timezone.utc
+            user_zone = ZoneInfo("UTC")
+
         local_time = utc_now.astimezone(user_zone)
-        formatted_local = local_time.strftime("%b %d, %Y, %I:%M %p")
+        formatted_local = local_time.strftime("%b %d, %Y, %I:%M %p (%Z)")
 
         order = {
             'name': name,
