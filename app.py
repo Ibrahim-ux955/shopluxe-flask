@@ -7,7 +7,8 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer  # ✅ Add this
 import os, json, uuid
 from uuid import uuid4
-from datetime import datetime, timedelta
+from datetime import datetime,timezone, timedelta 
+import pytz
 import resend
 
 
@@ -95,7 +96,9 @@ def ensure_product_ids():
 
 ensure_product_ids()  
 # Routes
-from datetime import datetime
+
+
+
 
 
 @app.route('/', endpoint='home')  # Explicitly set endpoint to 'home'
@@ -103,7 +106,7 @@ def index():
     query = request.args.get('q', '').strip().lower()
     category = request.args.get('category', '').strip().lower()
     products = load_data()
-    current_time = datetime.now()
+    current_time = datetime.now(timezone.utc)
 
     # Normalize product data
     for p in products:
@@ -167,7 +170,7 @@ def index():
 def search():
     query = request.args.get('q', '').strip().lower()
     products = load_data()
-    current_time = datetime.now()
+    current_time = datetime.now(timezone.utc)
 
     # Fix timestamps and images
     for p in products:
@@ -245,7 +248,7 @@ send_email("vybezkhid7@gmail.com", "New Order", "<p>New order received!</p>")
 
 @app.route('/filtered/<category>')
 def filtered(category):
-    current_time = datetime.now()
+    current_time = datetime.now(timezone.utc)
     all_products = load_data()
 
     # Convert string timestamps to datetime objects
@@ -279,7 +282,7 @@ def filtered(category):
 
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     attempts = session.get('admin_attempts', 0)
     locked_until = session.get('admin_locked_until')
 
@@ -382,7 +385,7 @@ def admin():
             'colors': colors,
             'sizes': sizes,
             'images': image_filenames,
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }
 
         products.append(new_product)
@@ -394,7 +397,7 @@ def admin():
         'admin.html',
         products=products,
         reviews=reviews,
-        current_time=datetime.now(),
+        current_time=datetime.now(timezone.utc),
         active_page='admin'
     )
 
@@ -404,13 +407,17 @@ def admin():
 @app.template_filter('todatetime')
 def todatetime_filter(s):
     if isinstance(s, datetime):
-        return s
+        return s.astimezone(timezone.utc)
     if isinstance(s, str):
         try:
-            return datetime.fromisoformat(s)
+            dt = datetime.fromisoformat(s)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt
         except ValueError:
-            return None  # or handle error
+            return None
     return None
+
   
 
 
@@ -674,7 +681,7 @@ def submit_review(index):
     name = request.form.get('name')
     comment = request.form.get('comment')
     rating = int(request.form.get('rating'))
-    timestamp = datetime.now().isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat()
 
     if not name or not comment or rating not in range(1, 6):
         flash("❌ Please provide a name, comment, and rating (1-5).")
@@ -686,7 +693,7 @@ def submit_review(index):
         'name': name,
         'comment': comment,
         'rating': rating,
-        'timestamp': timestamp
+        'timestamp':  datetime.now(timezone.utc).isoformat()
     })
     save_reviews(reviews)
 
@@ -706,7 +713,7 @@ def restock_notify(index):
         'email': email,
         'product_name': product['name'],
         'product_index': index,
-        'timestamp': datetime.now().isoformat()
+        'timestamp': datetime.now(timezone.utc).isoformat()
     })
     save_restock_requests(requests)
     flash("✅ You’ll be notified when it's back in stock!")
@@ -817,7 +824,7 @@ def shop():
         products = get_products_by_category(category)
 
     featured_products = get_featured_products()
-    current_time = datetime.now()
+    current_time = datetime.now(timezone.utc)
 
     return render_template(
         'shop.html',
@@ -968,6 +975,9 @@ def remove_from_cart(index):
     return redirect(url_for('cart'))
 
 
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo  # Python 3.9+
+
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     cart = get_cart()
@@ -989,17 +999,32 @@ def checkout():
         name = request.form.get('name')
         email = request.form.get('email')
         phone = request.form.get('phone')
+        timezone_str = request.form.get('timezone', 'UTC')  # 👈 added
 
         if not name or not email or not phone:
             flash("❌ All fields are required.")
             return redirect(url_for('checkout'))
+
+        # 🕒 Store UTC timestamp
+        utc_now = datetime.now(timezone.utc)
+
+        # 🕒 Convert UTC to user’s local timezone if provided
+        try:
+            user_zone = ZoneInfo(timezone_str)
+        except Exception:
+            user_zone = timezone.utc
+        local_time = utc_now.astimezone(user_zone)
+        formatted_local = local_time.strftime("%b %d, %Y, %I:%M %p")
 
         order = {
             'name': name,
             'email': email,
             'phone': phone,
             'items': cart_items,
-            'total': total
+            'total': total,
+            'timestamp': utc_now.isoformat(),
+            'local_time': formatted_local,
+            'timezone': timezone_str
         }
 
         # Prepare order summary
@@ -1017,6 +1042,7 @@ def checkout():
             <h4>Order Summary:</h4>
             <p>{item_lines}</p>
             <p><strong>Total: GH₵ {total}</strong></p>
+            <p><strong>Order placed at:</strong> {formatted_local} ({timezone_str})</p>
             <p>We’ll contact you if needed. Thanks again!</p>
             <p>Best regards,<br>ShopLuxe Team</p>
             """
@@ -1031,12 +1057,12 @@ def checkout():
             <h4>Order Summary:</h4>
             <p>{item_lines}</p>
             <p><strong>Total: GH₵ {total}</strong></p>
+            <p><strong>Order time:</strong> {formatted_local} ({timezone_str})</p>
             <p>Check your dashboard for more details.</p>
             """
             send_email("vybezkhid7@gmail.com", "📦 New Order Received - ShopLuxe", admin_html)
 
             flash("✅ Order placed successfully! Confirmation emails sent.")
-
         except Exception as e:
             print("❌ Order placed but email could not be sent:", e)
             flash("⚠️ Order placed but email could not be sent.")
@@ -1046,6 +1072,7 @@ def checkout():
         return render_template('order_confirmation.html', order=order)
 
     return render_template('checkout.html', cart_items=cart_items, total=total)
+
 
 
 
