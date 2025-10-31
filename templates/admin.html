@@ -2,166 +2,153 @@
 
 {% block content %}
 <div class="container mt-5">
-  <!-- Add New Product Card -->
-  <div class="card shadow-lg border-0 mb-5" style="max-width: 700px; margin: 0 auto;">
-    <div class="card-body">
-      <h3 class="card-title text-center mb-4">Add New Product</h3>
 
-      {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-warning text-center">{{ message }}</div>
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
-
-      <form method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-          <label class="form-label" for="name">Product Name</label>
-          <input type="text" name="name" id="name" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="price">Price</label>
-          <input type="text" name="price" id="price" class="form-control" required>
-        </div>
-
-        <!-- Sale Fields -->
-        <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" id="on_sale" name="on_sale">
-          <label class="form-check-label" for="on_sale">On Sale?</label>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="sale_price">Sale Price</label>
-          <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" placeholder="Enter sale price if applicable">
-        </div>
-
-        <!-- Featured Product -->
-        <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" id="featured" name="featured">
-          <label class="form-check-label" for="featured">Feature this product on homepage carousel?</label>
-        </div>
-
-        <!-- Category -->
-        <div class="mb-3">
-          <label class="form-label" for="category">Category</label>
-          <input type="text" name="category" id="category" class="form-control">
-        </div>
-
-        <!-- Description -->
-        <div class="mb-3">
-          <label class="form-label" for="description">Description</label>
-          <textarea name="description" id="description" class="form-control" rows="3"></textarea>
-        </div>
-
-        <!-- Stock -->
-        <div class="mb-3">
-          <label class="form-label" for="stock">Stock Count</label>
-          <input type="number" name="stock" id="stock" class="form-control" min="0" required>
-        </div>
-
-        <!-- Sizes -->
-        <div class="mb-3">
-          <label class="form-label" for="sizes">Available Sizes</label>
-          <input type="text" name="sizes" id="sizes" class="form-control" placeholder="e.g. 39, 40, 41, 42, 43">
-          <small class="text-muted">Separate multiple sizes with commas.</small>
-        </div>
-
-        <!-- Colors -->
-        <div class="mb-3">
-          <label class="form-label" for="colors">Available Colors</label>
-          <input type="text" name="colors" id="colors" class="form-control" placeholder="e.g. Red, Blue, Black">
-          <small class="text-muted">Separate multiple colors with commas.</small>
-        </div>
-
-        <!-- Images -->
-        <div class="mb-3">
-          <label class="form-label" for="images">Upload Images</label>
-          <input type="file" name="images" id="images" class="form-control" multiple required>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100">Add Product</button>
-      </form>
-    </div>
+  <!-- Admin Navigation Buttons -->
+  <div class="d-flex justify-content-center gap-2 mb-4">
+    <button class="btn btn-primary" id="btn-add">➕ Add New Product</button>
+    <button class="btn btn-secondary" id="btn-all">📦 All Products</button>
   </div>
 
-  <!-- Product List -->
-  <h4 class="mb-3">All Products</h4>
-  <div class="row">
-    {% for p in products %}
-    <div class="col-md-4 mb-4">
-      <div class="card h-100 shadow-sm">
+  <!-- Add New Product Section -->
+  <div id="section-add" class="admin-section">
+    <!-- Add New Product Card -->
+    <div class="card shadow-lg border-0 mb-5" style="max-width: 700px; margin: 0 auto;">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4">Add New Product</h3>
 
-        {% if p.images %}
-          <img src="{{ url_for('static', filename='shoes/' + p.images[0]) }}" class="card-img-top" alt="{{ p.name }}">
-        {% elif p.image %}
-          <img src="{{ url_for('static', filename='shoes/' + p.image) }}" class="card-img-top" alt="{{ p.name }}">
-        {% else %}
-          <img src="{{ url_for('static', filename='shoes/placeholder.jpg') }}" class="card-img-top" alt="No image">
-        {% endif %}
-
-        <div class="card-body">
-          <h5 class="card-title">{{ p.name }}</h5>
-
-          {% if p.on_sale %}
-            <p class="card-text">
-              <span class="text-muted text-decoration-line-through">GH₵ {{ p.price }}</span>
-              <span class="fw-bold text-danger ms-2">GH₵ {{ p.sale_price }}</span>
-            </p>
-            <span class="badge bg-danger mb-2">SALE</span>
-          {% else %}
-            <p class="card-text">GH₵ {{ p.price }}</p>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-warning text-center">{{ message }}</div>
+            {% endfor %}
           {% endif %}
+        {% endwith %}
 
-          {% if p.featured %}
-            <span class="badge bg-success mb-2">FEATURED</span>
-          {% endif %}
+        <form method="POST" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label" for="name">Product Name</label>
+            <input type="text" name="name" id="name" class="form-control" required>
+          </div>
 
-          <p class="card-text"><small>{{ p.description }}</small></p>
-          <p class="card-text"><strong>Stock:</strong> {{ p.stock }}</p>
+          <div class="mb-3">
+            <label class="form-label" for="price">Price</label>
+            <input type="text" name="price" id="price" class="form-control" required>
+          </div>
 
-          {% if p.sizes %}
-            <div class="mb-2">
-              <strong>Sizes:</strong>
-              <div class="d-flex flex-wrap gap-2 mt-1">
-                {% for size in p.sizes %}
-                  <div class="border rounded px-2 py-1 bg-light">{{ size }}</div>
-                {% endfor %}
-              </div>
-            </div>
-          {% endif %}
+          <!-- Sale Fields -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="on_sale" name="on_sale">
+            <label class="form-check-label" for="on_sale">On Sale?</label>
+          </div>
 
-          {% if p.colors %}
-            <div class="d-flex flex-wrap gap-2 mb-2">
-              {% for color in p.colors %}
-                <div class="border rounded-circle" style="width:25px; height:25px; background-color: {{ color | lower }};" title="{{ color }}"></div>
-              {% endfor %}
-            </div>
-          {% endif %}
+          <div class="mb-3">
+            <label class="form-label" for="sale_price">Sale Price</label>
+            <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" placeholder="Enter sale price if applicable">
+          </div>
 
-          {% set product_reviews = reviews | selectattr('product_id', 'equalto', p.id) | list %}
-          {% if product_reviews %}
-            {% set avg_rating = (product_reviews | map(attribute='rating') | sum) / product_reviews|length %}
-            <p class="card-text text-warning">
-              {% for i in range(1, 6) %}
-                {% if i <= avg_rating %}★{% else %}☆{% endif %}
-              {% endfor %}
-              <small>({{ "%.1f"|format(avg_rating) }}/5 from {{ product_reviews|length }} reviews)</small>
-            </p>
-          {% else %}
-            <p class="text-muted">No reviews yet</p>
-          {% endif %}
+          <!-- Featured Product -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="featured" name="featured">
+            <label class="form-check-label" for="featured">Feature this product on homepage carousel?</label>
+          </div>
 
-          <a href="{{ url_for('edit_product', product_id=p.id) }}" class="btn btn-warning btn-sm mb-2 w-100">✏️ Edit</a>
+          <!-- Category -->
+          <div class="mb-3">
+            <label class="form-label" for="category">Category</label>
+            <input type="text" name="category" id="category" class="form-control">
+          </div>
 
-          <form method="POST" action="{{ url_for('delete', index=loop.index0) }}">
-            <button type="submit" class="btn btn-danger w-100">🗑 Delete</button>
-          </form>
-        </div>
+          <!-- Description -->
+          <div class="mb-3">
+            <label class="form-label" for="description">Description</label>
+            <textarea name="description" id="description" class="form-control" rows="3"></textarea>
+          </div>
+
+          <!-- Stock -->
+          <div class="mb-3">
+            <label class="form-label" for="stock">Stock Count</label>
+            <input type="number" name="stock" id="stock" class="form-control" min="0" required>
+          </div>
+
+          <!-- Sizes -->
+          <div class="mb-3">
+            <label class="form-label" for="sizes">Available Sizes</label>
+            <input type="text" name="sizes" id="sizes" class="form-control" placeholder="e.g. 39, 40, 41, 42, 43">
+            <small class="text-muted">Separate multiple sizes with commas.</small>
+          </div>
+
+          <!-- Colors -->
+          <div class="mb-3">
+            <label class="form-label" for="colors">Available Colors</label>
+            <input type="text" name="colors" id="colors" class="form-control" placeholder="e.g. Red, Blue, Black">
+            <small class="text-muted">Separate multiple colors with commas.</small>
+          </div>
+
+          <!-- Images -->
+          <div class="mb-3">
+            <label class="form-label" for="images">Upload Images</label>
+            <input type="file" name="images" id="images" class="form-control" multiple required>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Add Product</button>
+        </form>
       </div>
     </div>
-    {% endfor %}
+  </div>
+
+  <!-- All Products Section -->
+  <div id="section-all" class="admin-section" style="display:none;">
+    <h4 class="mb-3">All Products</h4>
+    <div class="row">
+      {% for p in products %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          {% if p.images %}
+            <img src="{{ url_for('static', filename='shoes/' + p.images[0]) }}" class="card-img-top" alt="{{ p.name }}">
+          {% elif p.image %}
+            <img src="{{ url_for('static', filename='shoes/' + p.image) }}" class="card-img-top" alt="{{ p.name }}">
+          {% else %}
+            <img src="{{ url_for('static', filename='shoes/placeholder.jpg') }}" class="card-img-top" alt="No image">
+          {% endif %}
+
+          <div class="card-body">
+            <h5 class="card-title">{{ p.name }}</h5>
+            <p class="card-text">
+              {% if p.on_sale %}
+                <span class="text-muted text-decoration-line-through">GH₵ {{ p.price }}</span>
+                <span class="fw-bold text-danger ms-2">GH₵ {{ p.sale_price }}</span>
+              {% else %}
+                GH₵ {{ p.price }}
+              {% endif %}
+            </p>
+
+            <a href="{{ url_for('edit_product', product_id=p.id) }}" class="btn btn-warning btn-sm mb-2 w-100">✏️ Edit</a>
+            <form method="POST" action="{{ url_for('delete', index=loop.index0) }}">
+              <button type="submit" class="btn btn-danger w-100">🗑 Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
 </div>
+
+<!-- JS to toggle sections -->
+<script>
+  const btnAdd = document.getElementById('btn-add');
+  const btnAll = document.getElementById('btn-all');
+  const sectionAdd = document.getElementById('section-add');
+  const sectionAll = document.getElementById('section-all');
+
+  btnAdd.addEventListener('click', () => {
+    sectionAdd.style.display = 'block';
+    sectionAll.style.display = 'none';
+  });
+
+  btnAll.addEventListener('click', () => {
+    sectionAdd.style.display = 'none';
+    sectionAll.style.display = 'block';
+  });
+</script>
 {% endblock %}

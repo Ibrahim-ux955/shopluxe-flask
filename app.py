@@ -977,6 +977,9 @@ def remove_from_cart(index):
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo  # Python 3.9+
 
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     cart = get_cart()
@@ -998,13 +1001,13 @@ def checkout():
         name = request.form.get('name')
         email = request.form.get('email')
         phone = request.form.get('phone')
-        timezone_str = request.form.get('timezone', 'UTC')  # 👈 added
+        timezone_str = request.form.get('timezone', 'UTC')
 
         if not name or not email or not phone:
             flash("❌ All fields are required.")
             return redirect(url_for('checkout'))
 
-        # 🕒 Convert UTC to user’s local timezone
+        # 🕒 Handle timezones safely
         utc_now = datetime.now(timezone.utc)
         try:
             user_zone = ZoneInfo(timezone_str)
@@ -1012,8 +1015,9 @@ def checkout():
             user_zone = ZoneInfo("UTC")
 
         local_time = utc_now.astimezone(user_zone)
-        formatted_local = local_time.strftime("%b %d, %Y, %I:%M %p (%Z)")
+        formatted_time = local_time.strftime("%b %d, %Y, %I:%M %p (%Z)")
 
+        # 🕒 Order object
         order = {
             'name': name,
             'email': email,
@@ -1021,32 +1025,32 @@ def checkout():
             'items': cart_items,
             'total': total,
             'timestamp': utc_now.isoformat(),
-            'local_time': formatted_local,
+            'local_time': formatted_time,
             'timezone': timezone_str
         }
 
-        # Prepare order summary
+        # 📦 Order summary
         item_lines = '<br>'.join([
             f"{item['name']} x{item['quantity']} - GH₵ {item['price']}"
             for item in order['items']
         ])
 
-        # Send emails via Resend
+        # 📧 Send emails
         try:
-            # 1️⃣ User confirmation
+            # 🧾 User confirmation email
             user_html = f"""
             <p>Hello {name},</p>
             <p>Thank you for your order on ShopLuxe! 🎉</p>
             <h4>Order Summary:</h4>
             <p>{item_lines}</p>
             <p><strong>Total: GH₵ {total}</strong></p>
-            <p><strong>Order placed at:</strong> {formatted_local} ({timezone_str})</p>
+            <p><strong>Order placed at:</strong> {formatted_time} ({timezone_str})</p>
             <p>We’ll contact you if needed. Thanks again!</p>
             <p>Best regards,<br>ShopLuxe Team</p>
             """
             send_email(email, "🧾 Order Confirmation - ShopLuxe", user_html)
 
-            # 2️⃣ Admin notification
+            # 📦 Admin notification email
             admin_html = f"""
             <p>Hello Admin,</p>
             <p>A new order has been placed on ShopLuxe.</p>
@@ -1055,7 +1059,7 @@ def checkout():
             <h4>Order Summary:</h4>
             <p>{item_lines}</p>
             <p><strong>Total: GH₵ {total}</strong></p>
-            <p><strong>Order time:</strong> {formatted_local} ({timezone_str})</p>
+            <p><strong>Order time:</strong> {formatted_time} ({timezone_str})</p>
             <p>Check your dashboard for more details.</p>
             """
             send_email("vybezkhid7@gmail.com", "📦 New Order Received - ShopLuxe", admin_html)
@@ -1065,7 +1069,6 @@ def checkout():
             print("❌ Order placed but email could not be sent:", e)
             flash("⚠️ Order placed but email could not be sent.")
 
-        # Clear cart
         session.pop('cart', None)
         return render_template('order_confirmation.html', order=order)
 
