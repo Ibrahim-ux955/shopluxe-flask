@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmation - ShopLuxe</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 600px;
+    background: #ffffff;
+    margin: 30px auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .header {
+    background-color: #007bff;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 22px;
+  }
+  .content {
+    padding: 25px;
+    line-height: 1.6;
+  }
+  .summary {
+    background-color: #f2f6ff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+  }
+  .summary p {
+    margin: 8px 0;
+  }
+  .total {
+    font-weight: bold;
+    font-size: 18px;
+    color: #007bff;
+    margin-top: 10px;
+  }
+  .footer {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    padding: 15px;
+    border-top: 1px solid #eee;
+  }
+  @media (max-width: 600px) {
+    .container {
+      margin: 10px;
+    }
+    .content {
+      padding: 15px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🛍️ Thank You for Your Order, {{ name }}!</h1>
+    </div>
+    <div class="content">
+      <p>Hi {{ name }},</p>
+      <p>We’re excited to let you know that we’ve received your order on <strong>ShopLuxe</strong> 🎉.</p>
+
+      <div class="summary">
+        <h3>🧾 Order Summary</h3>
+        {{ product_name|safe }}
+        <p class="total">Total: GH₵ {{ total }}</p>
+      </div>
+
+      <p><strong>🕒 Order placed:</strong> {{ order_time }} ({{ timezone }})</p>
+      <p>We’ll contact you soon regarding delivery. Thank you for shopping with us!</p>
+      <p>— The <strong>ShopLuxe Team</strong></p>
+    </div>
+    <div class="footer">
+      <p>ShopLuxe • Accra, Ghana</p>
+      <p>© 2025 ShopLuxe. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

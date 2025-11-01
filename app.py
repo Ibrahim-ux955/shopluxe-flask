@@ -993,6 +993,10 @@ def checkout():
         if 0 <= index < len(products):
             product = products[index].copy()
             product['quantity'] = quantity
+
+            # ✅ Include product ID for admin reference
+            product['id'] = products[index].get('id', index)
+
             cart_items.append(product)
 
     total = sum(float(p['price']) * p['quantity'] for p in cart_items)
@@ -1015,9 +1019,9 @@ def checkout():
             user_zone = ZoneInfo("UTC")
 
         local_time = utc_now.astimezone(user_zone)
-        formatted_time = local_time.strftime("%b %d, %Y, %I:%M %p (%Z)")
+        formatted_time = local_time.strftime("%b %d, %Y, %I:%M %p")
 
-        # 🕒 Order object
+        # 🧾 Order object
         order = {
             'name': name,
             'email': email,
@@ -1029,39 +1033,51 @@ def checkout():
             'timezone': timezone_str
         }
 
-        # 📦 Order summary
-        item_lines = '<br>'.join([
-            f"{item['name']} x{item['quantity']} - GH₵ {item['price']}"
-            for item in order['items']
-        ])
+        # ✅ Base URL for images
+        base_url = request.url_root.rstrip('/')
 
-        # 📧 Send emails
-        try:
-            # 🧾 User confirmation email
-            user_html = f"""
-            <p>Hello {name},</p>
-            <p>Thank you for your order on ShopLuxe! 🎉</p>
-            <h4>Order Summary:</h4>
-            <p>{item_lines}</p>
-            <p><strong>Total: GH₵ {total}</strong></p>
-            <p><strong>Order placed at:</strong> {formatted_time} ({timezone_str})</p>
-            <p>We’ll contact you if needed. Thanks again!</p>
-            <p>Best regards,<br>ShopLuxe Team</p>
+        # 📦 Order summary for HTML (with product images + IDs)
+        item_lines = [
+            f"""
+            <div style='display:flex;align-items:center;margin-bottom:10px;border:1px solid #eee;padding:8px;border-radius:10px;'>
+                <img src='{base_url}/static/shoes/{item['images'][0]}' 
+                     alt='{item['name']}' 
+                     style='width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:10px;'>
+                <div>
+                    <strong>{item['name']}</strong> (ID: {item['id']})<br>
+                    Qty: {item['quantity']} | GH₵ {item['price']}
+                </div>
+            </div>
             """
+            for item in order['items']
+        ]
+
+        try:
+            # ✉️ User confirmation email
+            user_html = render_template(
+                'emails/user_order_email.html',
+                name=name,
+                product_name=item_lines[0] if item_lines else '',
+                quantity=len(cart_items),
+                total=total,
+                order_time=formatted_time,
+                timezone=timezone_str
+            )
             send_email(email, "🧾 Order Confirmation - ShopLuxe", user_html)
 
-            # 📦 Admin notification email
-            admin_html = f"""
-            <p>Hello Admin,</p>
-            <p>A new order has been placed on ShopLuxe.</p>
-            <h4>Customer Info:</h4>
-            <p>Name: {name}<br>Email: {email}<br>Phone: {phone}</p>
-            <h4>Order Summary:</h4>
-            <p>{item_lines}</p>
-            <p><strong>Total: GH₵ {total}</strong></p>
-            <p><strong>Order time:</strong> {formatted_time} ({timezone_str})</p>
-            <p>Check your dashboard for more details.</p>
-            """
+            # ✉️ Admin notification email (includes product images)
+            admin_html = render_template(
+                'emails/admin_order_email.html',
+                name=name,
+                email=email,
+                phone=phone,
+                product_name=''.join(item_lines),
+                quantity=len(cart_items),
+                total=total,
+                order_time=formatted_time,
+                timezone=timezone_str,
+                base_url=base_url
+            )
             send_email("vybezkhid7@gmail.com", "📦 New Order Received - ShopLuxe", admin_html)
 
             flash("✅ Order placed successfully! Confirmation emails sent.")
@@ -1073,6 +1089,8 @@ def checkout():
         return render_template('order_confirmation.html', order=order)
 
     return render_template('checkout.html', cart_items=cart_items, total=total)
+
+
 
 
 
