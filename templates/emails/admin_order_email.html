@@ -71,6 +71,16 @@
     color: #dc3545;
     margin-top: 10px;
   }
+  .track-button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 18px;
+    background-color: #dc3545;
+    color: #fff !important;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+  }
   .footer {
     text-align: center;
     font-size: 13px;
@@ -106,18 +116,19 @@
 
       <div class="summary">
         <h3>🧾 Order Summary</h3>
-
-        <!-- ✅ Product list (includes image + product id + details) -->
         <div>
           {{ product_name|safe }}
         </div>
-
         <p class="total">Total: GH₵ {{ total }}</p>
       </div>
 
       <p><strong>Order time:</strong> {{ order_time }} ({{ timezone }})</p>
       <p>Check your admin dashboard for more details.</p>
+
+      <!-- ✅ Added track order button -->
+      <a href="{{ track_order_url }}" class="track-button">Track Order</a>
     </div>
+
     <div class="footer">
       <p>ShopLuxe Admin Dashboard</p>
       <p>© 2025 ShopLuxe. All rights reserved.</p>
