@@ -1,1 +1,40 @@
-[]
+[
+  {
+    "id": "f8783698-8f83-460a-aa69-8907be58155b",
+    "name": "Ibrahim Mohammed",
+    "email": "vybezkhid7@gmail.com",
+    "phone": "0551056001",
+    "items": [
+      {
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "Very good, Brand new",
+        "stock": 7,
+        "colors": [
+          "Red",
+          "Yellow",
+          "Green",
+          "Gold"
+        ],
+        "sizes": [
+          "34",
+          "56",
+          "90"
+        ],
+        "images": [
+          "pexels-garrettmorrow-682933.jpg"
+        ],
+        "timestamp": "2025-10-17T22:29:01.673090",
+        "quantity": 1
+      }
+    ],
+    "total": 40000.0,
+    "timestamp": "2025-11-01T19:03:34.861386+00:00",
+    "local_time": "Nov 01, 2025, 07:03 PM",
+    "timezone": "Atlantic/Reykjavik"
+  }
+]
