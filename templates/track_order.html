@@ -1,60 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Track Order - ShopLuxe</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f8f9fa;
-      color: #333;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      background: #fff;
-      margin: 40px auto;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 25px;
-    }
-    h1 {
-      color: #007bff;
-      text-align: center;
-    }
-    .summary {
-      margin-top: 20px;
-      background: #f2f6ff;
-      padding: 15px;
-      border-radius: 10px;
-    }
-    .total {
-      font-weight: bold;
-      font-size: 18px;
-      color: #007bff;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Your Order - ShopLuxe</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f9fafb;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 600px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  h1 {
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  .order-info p {
+    margin: 8px 0;
+  }
+  .product {
+    display: flex;
+    align-items: center;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  .product img {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+    margin-right: 10px;
+  }
+  .total {
+    font-weight: bold;
+    color: #007bff;
+    margin-top: 10px;
+  }
+</style>
 </head>
 <body>
   <div class="container">
-    <h1>📦 Order Tracking</h1>
-    <p><strong>Order ID:</strong> {{ order.id }}</p>
-    <p><strong>Name:</strong> {{ order.name }}</p>
-    <p><strong>Email:</strong> {{ order.email }}</p>
-    <p><strong>Phone:</strong> {{ order.phone }}</p>
-    <p><strong>Placed on:</strong> {{ order.local_time }} ({{ order.timezone }})</p>
-
-    <div class="summary">
-      <h3>🧾 Items</h3>
-      <ul>
-        {% for item in order.items %}
-          <li>{{ item.name }} (Qty: {{ item.quantity }}) — GH₵ {{ item.price }}</li>
-        {% endfor %}
-      </ul>
-      <p class="total">Total: GH₵ {{ order.total }}</p>
+    <h1>📦 Track Your Order</h1>
+    <div class="order-info">
+      <p><strong>Order ID:</strong> {{ order.id }}</p>
+      <p><strong>Name:</strong> {{ order.name }}</p>
+      <p><strong>Email:</strong> {{ order.email }}</p>
+      <p><strong>Phone:</strong> {{ order.phone }}</p>
+      <p><strong>Order Time:</strong> {{ order.local_time }} ({{ order.timezone }})</p>
     </div>
 
-    <p style="text-align:center;margin-top:20px;">🚚 Status: <strong>Processing</strong></p>
+    <h3>🛍️ Ordered Items</h3>
+    {% for item in order.items %}
+    <div class="product">
+      <img src="{{ url_for('static', filename='shoes/' + item.images[0]) }}" alt="{{ item.name }}">
+      <div>
+        <strong>{{ item.name }}</strong><br>
+        Qty: {{ item.quantity }} | GH₵ {{ item.price }}
+      </div>
+    </div>
+    {% endfor %}
+
+    <p class="total">Total: GH₵ {{ order.total }}</p>
   </div>
 </body>
 </html>
