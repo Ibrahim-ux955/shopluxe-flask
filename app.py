@@ -1020,9 +1020,13 @@ def checkout():
 
         local_time = utc_now.astimezone(user_zone)
         formatted_time = local_time.strftime("%b %d, %Y, %I:%M %p")
+        
+        order_id = str(uuid.uuid4())
+
 
         # 🧾 Order object
         order = {
+            'id': order_id,  # ✅ unique ID
             'name': name,
             'email': email,
             'phone': phone,
@@ -1076,6 +1080,7 @@ def checkout():
                 total=total,
                 order_time=formatted_time,
                 timezone=timezone_str,
+                order_id=order_id,
                 base_url=base_url
             )
             send_email("vybezkhid7@gmail.com", "📦 New Order Received - ShopLuxe", admin_html)
@@ -1091,6 +1096,22 @@ def checkout():
     return render_template('checkout.html', cart_items=cart_items, total=total)
 
 
+@app.route('/track-order/<order_id>')
+def track_order(order_id):
+    import json, os
+
+    orders_file = "orders.json"
+    if not os.path.exists(orders_file):
+        return render_template('order_not_found.html')
+
+    with open(orders_file, "r") as f:
+        orders = json.load(f)
+
+    order = next((o for o in orders if o["id"] == order_id), None)
+    if not order:
+        return render_template('order_not_found.html')
+
+    return render_template('track_order.html', order=order)
 
 
 

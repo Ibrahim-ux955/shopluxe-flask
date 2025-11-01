@@ -7,32 +7,36 @@
 <style>
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: #f8f9fa;
+    background-color: #f5f6f8;
     color: #333;
     margin: 0;
     padding: 0;
   }
   .container {
-    max-width: 600px;
+    max-width: 650px;
     background: #ffffff;
     margin: 30px auto;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   }
   .header {
     background-color: #007bff;
     color: #ffffff;
     text-align: center;
-    padding: 20px;
+    padding: 25px;
   }
   .header h1 {
     margin: 0;
     font-size: 22px;
+    font-weight: 600;
   }
   .content {
-    padding: 25px;
+    padding: 25px 30px;
     line-height: 1.6;
+  }
+  .thankyou {
+    font-size: 16px;
   }
   .summary {
     background-color: #f2f6ff;
@@ -43,16 +47,47 @@
   .summary p {
     margin: 8px 0;
   }
+  .product-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+  }
+  .product-item img {
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 1px solid #ddd;
+  }
+  .product-item div {
+    line-height: 1.4;
+  }
   .total {
     font-weight: bold;
     font-size: 18px;
     color: #007bff;
     margin-top: 10px;
   }
+  .button {
+    display: inline-block;
+    background-color: #007bff;
+    color: #ffffff !important;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 20px;
+  }
+  .button:hover {
+    background-color: #0056b3;
+  }
   .footer {
     text-align: center;
     font-size: 13px;
-    color: #888;
+    color: #777;
     padding: 15px;
     border-top: 1px solid #eee;
   }
@@ -69,22 +104,33 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>🛍️ Thank You for Your Order, {{ name }}!</h1>
+      <h1>🛍️ Order Confirmation</h1>
+      <p style="margin-top:5px;">Thank you for shopping with ShopLuxe!</p>
     </div>
     <div class="content">
-      <p>Hi {{ name }},</p>
-      <p>We’re excited to let you know that we’ve received your order on <strong>ShopLuxe</strong> 🎉.</p>
+      <p class="thankyou">Hi <strong>{{ name }}</strong>,</p>
+      <p>We’re happy to let you know that we’ve received your order <strong>successfully</strong>. You’ll receive another email once your items are shipped.</p>
 
       <div class="summary">
         <h3>🧾 Order Summary</h3>
-        {{ product_name|safe }}
+
+        <!-- ✅ Product list -->
+        <div>
+          {{ product_name|safe }}
+        </div>
+
         <p class="total">Total: GH₵ {{ total }}</p>
       </div>
 
       <p><strong>🕒 Order placed:</strong> {{ order_time }} ({{ timezone }})</p>
-      <p>We’ll contact you soon regarding delivery. Thank you for shopping with us!</p>
+      <p><strong>🚚 Estimated delivery:</strong> 3–5 business days</p>
+
+      <a href="{{ base_url }}/track-order" class="button">Track Your Order</a>
+
+      <p style="margin-top:25px;">If you have any questions, reply to this email or contact our support team anytime.</p>
       <p>— The <strong>ShopLuxe Team</strong></p>
     </div>
+
     <div class="footer">
       <p>ShopLuxe • Accra, Ghana</p>
       <p>© 2025 ShopLuxe. All rights reserved.</p>
