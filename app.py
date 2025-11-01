@@ -1023,7 +1023,6 @@ def checkout():
         
         order_id = str(uuid.uuid4())
 
-
         # 🧾 Order object
         order = {
             'id': order_id,  # ✅ unique ID
@@ -1055,6 +1054,26 @@ def checkout():
             """
             for item in order['items']
         ]
+
+        # 💾 Save order to data/orders.json
+        orders_file = os.path.join('data', 'orders.json')
+
+        # Load existing orders if file exists
+        if os.path.exists(orders_file):
+            with open(orders_file, 'r', encoding='utf-8') as f:
+                try:
+                    existing_orders = json.load(f)
+                except json.JSONDecodeError:
+                    existing_orders = []
+        else:
+            existing_orders = []
+
+        # Add the new order
+        existing_orders.append(order)
+
+        # Save all orders back to file
+        with open(orders_file, 'w', encoding='utf-8') as f:
+            json.dump(existing_orders, f, indent=2)
 
         try:
             # ✉️ User confirmation email
@@ -1100,7 +1119,7 @@ def checkout():
 def track_order(order_id):
     import json, os
 
-    orders_file = "orders.json"
+    orders_file = "data/orders.json"
     if not os.path.exists(orders_file):
         return render_template('order_not_found.html')
 
@@ -1112,6 +1131,7 @@ def track_order(order_id):
         return render_template('order_not_found.html')
 
     return render_template('track_order.html', order=order)
+
 
 
 
