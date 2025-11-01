@@ -99,32 +99,42 @@
   <!-- All Products Section -->
 <div id="section-all" class="admin-section" style="display:none;">
   <h4 class="mb-3">All Products</h4>
-  <div class="row row-cols-2 row-cols-md-4 g-3">
+  <div class="row g-3">
     {% for p in products %}
-    <div class="col">
-      <div class="card h-100 shadow-sm">
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card h-100 shadow-sm border-0">
         {% if p.images %}
-          <img src="{{ url_for('static', filename='shoes/' + p.images[0]) }}" class="card-img-top" alt="{{ p.name }}" style="object-fit: cover; height: 250px;">
+          <img src="{{ url_for('static', filename='shoes/' + p.images[0]) }}" 
+               class="card-img-top" 
+               alt="{{ p.name }}" 
+               style="object-fit: cover; height: 180px;">
         {% elif p.image %}
-          <img src="{{ url_for('static', filename='shoes/' + p.image) }}" class="card-img-top" alt="{{ p.name }}" style="object-fit: cover; height: 250px;">
+          <img src="{{ url_for('static', filename='shoes/' + p.image) }}" 
+               class="card-img-top" 
+               alt="{{ p.name }}" 
+               style="object-fit: cover; height: 180px;">
         {% else %}
-          <img src="{{ url_for('static', filename='shoes/placeholder.jpg') }}" class="card-img-top" alt="No image" style="object-fit: cover; height: 250px;">
+          <img src="{{ url_for('static', filename='shoes/placeholder.jpg') }}" 
+               class="card-img-top" 
+               alt="No image" 
+               style="object-fit: cover; height: 180px;">
         {% endif %}
 
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">{{ p.name }}</h5>
-          <p class="card-text mb-3">
+        <div class="card-body p-2 d-flex flex-column">
+          <h6 class="card-title text-truncate mb-1">{{ p.name }}</h6>
+          <p class="card-text mb-2 small">
             {% if p.on_sale %}
               <span class="text-muted text-decoration-line-through">GH₵ {{ p.price }}</span>
-              <span class="fw-bold text-danger ms-2">GH₵ {{ p.sale_price }}</span>
+              <span class="fw-bold text-danger ms-1">GH₵ {{ p.sale_price }}</span>
             {% else %}
               GH₵ {{ p.price }}
             {% endif %}
           </p>
 
-          <a href="{{ url_for('edit_product', product_id=p.id) }}" class="btn btn-warning btn-sm mb-2 w-100">✏️ Edit</a>
+          <a href="{{ url_for('edit_product', product_id=p.id) }}" 
+             class="btn btn-warning btn-sm mb-1 w-100">✏️ Edit</a>
           <form method="POST" action="{{ url_for('delete', index=loop.index0) }}">
-            <button type="submit" class="btn btn-danger w-100">🗑 Delete</button>
+            <button type="submit" class="btn btn-danger btn-sm w-100">🗑 Delete</button>
           </form>
         </div>
       </div>
