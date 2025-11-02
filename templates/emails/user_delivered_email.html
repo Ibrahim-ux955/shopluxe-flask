@@ -1,0 +1,16 @@
+<h2>Hi {{ name }},</h2>
+<p>Good news! Your order has been <strong>delivered</strong>.</p>
+
+<p><strong>Order Details:</strong></p>
+<ul>
+{% for item in items %}
+    <li>{{ item['name'] }} - Qty: {{ item['quantity'] }} - GH₵ {{ item['price'] }}</li>
+{% endfor %}
+</ul>
+
+<p>Total: GH₵ {{ total }}</p>
+<p>Delivered at: {{ delivered_time }}</p>
+
+<p>You can track your order here: <a href="{{ track_order_url }}">Track Order</a></p>
+
+<p>Thank you for shopping with ShopLuxe! 🛍️</p>

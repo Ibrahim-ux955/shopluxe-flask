@@ -7,11 +7,12 @@
   <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
     <button class="btn btn-primary" id="btn-add">➕ Add New Product</button>
     <button class="btn btn-secondary" id="btn-all">📦 All Products</button>
+    <button class="btn btn-success" id="btn-orders">🧾 All Orders</button>
+    <button class="btn btn-info" id="btn-history">📜 Order History</button>
   </div>
 
   <!-- Add New Product Section -->
   <div id="section-add" class="admin-section">
-    <!-- Add New Product Card -->
     <div class="card shadow-lg border-0 mb-5" style="max-width: 700px; margin: 0 auto;">
       <div class="card-body">
         <h3 class="card-title text-center mb-4">Add New Product</h3>
@@ -35,7 +36,6 @@
             <input type="text" name="price" id="price" class="form-control" required>
           </div>
 
-          <!-- Sale Fields -->
           <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" id="on_sale" name="on_sale">
             <label class="form-check-label" for="on_sale">On Sale?</label>
@@ -46,45 +46,38 @@
             <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" placeholder="Enter sale price if applicable">
           </div>
 
-          <!-- Featured Product -->
           <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" id="featured" name="featured">
             <label class="form-check-label" for="featured">Feature this product on homepage carousel?</label>
           </div>
 
-          <!-- Category -->
           <div class="mb-3">
             <label class="form-label" for="category">Category</label>
             <input type="text" name="category" id="category" class="form-control">
           </div>
 
-          <!-- Description -->
           <div class="mb-3">
             <label class="form-label" for="description">Description</label>
             <textarea name="description" id="description" class="form-control" rows="3"></textarea>
           </div>
 
-          <!-- Stock -->
           <div class="mb-3">
             <label class="form-label" for="stock">Stock Count</label>
             <input type="number" name="stock" id="stock" class="form-control" min="0" required>
           </div>
 
-          <!-- Sizes -->
           <div class="mb-3">
             <label class="form-label" for="sizes">Available Sizes</label>
             <input type="text" name="sizes" id="sizes" class="form-control" placeholder="e.g. 39, 40, 41, 42, 43">
             <small class="text-muted">Separate multiple sizes with commas.</small>
           </div>
 
-          <!-- Colors -->
           <div class="mb-3">
             <label class="form-label" for="colors">Available Colors</label>
             <input type="text" name="colors" id="colors" class="form-control" placeholder="e.g. Red, Blue, Black">
             <small class="text-muted">Separate multiple colors with commas.</small>
           </div>
 
-          <!-- Images -->
           <div class="mb-3">
             <label class="form-label" for="images">Upload Images</label>
             <input type="file" name="images" id="images" class="form-control" multiple required>
@@ -97,68 +90,213 @@
   </div>
 
   <!-- All Products Section -->
-<div id="section-all" class="admin-section" style="display:none;">
-  <h4 class="mb-3">All Products</h4>
-  <div class="row g-3">
-    {% for p in products %}
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="card h-100 shadow-sm border-0">
-        {% if p.images %}
-          <img src="{{ url_for('static', filename='shoes/' + p.images[0]) }}" 
-               class="card-img-top" 
-               alt="{{ p.name }}" 
-               style="object-fit: cover; height: 180px;">
-        {% elif p.image %}
-          <img src="{{ url_for('static', filename='shoes/' + p.image) }}" 
-               class="card-img-top" 
-               alt="{{ p.name }}" 
-               style="object-fit: cover; height: 180px;">
-        {% else %}
-          <img src="{{ url_for('static', filename='shoes/placeholder.jpg') }}" 
-               class="card-img-top" 
-               alt="No image" 
-               style="object-fit: cover; height: 180px;">
-        {% endif %}
+  <div id="section-all" class="admin-section" style="display:none;">
+    <h4 class="mb-3">All Products</h4>
+    <div class="row g-3">
+      {% for p in products %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm border-0">
+          {% if p.images %}
+            <img src="{{ url_for('static', filename='shoes/' + p.images[0]) }}" class="card-img-top" alt="{{ p.name }}" style="object-fit: cover; height: 180px;">
+          {% elif p.image %}
+            <img src="{{ url_for('static', filename='shoes/' + p.image) }}" class="card-img-top" alt="{{ p.name }}" style="object-fit: cover; height: 180px;">
+          {% else %}
+            <img src="{{ url_for('static', filename='shoes/placeholder.jpg') }}" class="card-img-top" alt="No image" style="object-fit: cover; height: 180px;">
+          {% endif %}
 
-        <div class="card-body p-2 d-flex flex-column">
-          <h6 class="card-title text-truncate mb-1">{{ p.name }}</h6>
-          <p class="card-text mb-2 small">
-            {% if p.on_sale %}
-              <span class="text-muted text-decoration-line-through">GH₵ {{ p.price }}</span>
-              <span class="fw-bold text-danger ms-1">GH₵ {{ p.sale_price }}</span>
-            {% else %}
-              GH₵ {{ p.price }}
-            {% endif %}
-          </p>
+          <div class="card-body p-2 d-flex flex-column">
+            <h6 class="card-title text-truncate mb-1">{{ p.name }}</h6>
+            <p class="card-text mb-2 small">
+              {% if p.on_sale %}
+                <span class="text-muted text-decoration-line-through">GH₵ {{ p.price }}</span>
+                <span class="fw-bold text-danger ms-1">GH₵ {{ p.sale_price }}</span>
+              {% else %}
+                GH₵ {{ p.price }}
+              {% endif %}
+            </p>
 
-          <a href="{{ url_for('edit_product', product_id=p.id) }}" 
-             class="btn btn-warning btn-sm mb-1 w-100">✏️ Edit</a>
-          <form method="POST" action="{{ url_for('delete', index=loop.index0) }}">
-            <button type="submit" class="btn btn-danger btn-sm w-100">🗑 Delete</button>
-          </form>
+            <a href="{{ url_for('edit_product', product_id=p.id) }}" class="btn btn-warning btn-sm mb-1 w-100">✏️ Edit</a>
+            <form method="POST" action="{{ url_for('delete', index=loop.index0) }}">
+              <button type="submit" class="btn btn-danger btn-sm w-100">🗑 Delete</button>
+            </form>
+          </div>
         </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
+  </div>
+
+    <!-- 🧾 Orders Section -->
+<div id="section-orders" class="admin-section" style="display:none;">
+  <h4 class="mb-3">All Orders</h4>
+
+  <!-- 🔍 Search Bar -->
+  <div class="mb-3">
+    <input
+      type="text"
+      id="search-orders"
+      class="form-control"
+      placeholder="Search by Order ID..."
+    />
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle" id="orders-table">
+      <thead class="table-light">
+        <tr>
+          <th>Order ID</th>
+          <th>Name</th>
+          <th>Total (GH₵)</th>
+          <th>Status</th>
+          <th>Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders 
+          | selectattr("status", "in", ["Pending", "Processing"]) 
+          | sort(attribute="local_time", reverse=True) %}
+        <tr>
+          <td>{{ o.id }}</td>
+          <td>{{ o.name }}</td>
+          <td>{{ o.total }}</td>
+          <td>
+            {% if o.status == "Pending" %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% elif o.status == "Processing" %}
+              <span class="badge bg-info text-dark">Processing</span>
+            {% endif %}
+          </td>
+          <td>{{ o.local_time }}</td>
+          <td>
+            <div class="d-flex gap-2">
+              <!-- ✅ Mark Delivered -->
+              <form method="POST" action="{{ url_for('mark_delivered', order_id=o.id) }}">
+                <button type="submit" class="btn btn-sm btn-success">Delivered ✅</button>
+              </form>
+
+              <!-- ❌ Cancel Order -->
+              <form method="POST" action="{{ url_for('cancel_order', order_id=o.id) }}">
+                <button type="submit" class="btn btn-sm btn-danger">Cancel ❌</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 
+<!-- 📜 Order History Section -->
+<div id="section-history" class="admin-section" style="display:none;">
+  <h4 class="mb-3">Order History (Delivered / Cancelled)</h4>
 
-<!-- JS to toggle sections -->
+  <!-- 🔍 Search Bar -->
+  <div class="mb-3">
+    <input
+      type="text"
+      id="search-history"
+      class="form-control"
+      placeholder="Search by Order ID..."
+    />
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle" id="history-table">
+      <thead class="table-light">
+        <tr>
+          <th>Order ID</th>
+          <th>Name</th>
+          <th>Total (GH₵)</th>
+          <th>Status</th>
+          <th>Ordered Time</th>
+          <th>Completed/Cancelled Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders 
+          | selectattr("status", "in", ["Delivered", "Cancelled"]) 
+          | sort(attribute="delivered_time", reverse=True) %}
+        <tr>
+          <td>{{ o.id }}</td>
+          <td>{{ o.name }}</td>
+          <td>{{ o.total }}</td>
+          <td>
+            {% if o.status == "Delivered" %}
+              <span class="badge bg-success">Delivered</span>
+            {% elif o.status == "Cancelled" %}
+              <span class="badge bg-danger">Cancelled</span>
+            {% endif %}
+          </td>
+          <td>{{ o.local_time }}</td>
+          <td>
+            {% if o.delivered_time %}
+              {{ o.delivered_time | replace('T', ' ') | replace('Z', '') }}
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 🧠 JS: Toggle + Search (same as before) -->
 <script>
   const btnAdd = document.getElementById('btn-add');
   const btnAll = document.getElementById('btn-all');
+  const btnOrders = document.getElementById('btn-orders');
+  const btnHistory = document.getElementById('btn-history');
   const sectionAdd = document.getElementById('section-add');
   const sectionAll = document.getElementById('section-all');
+  const sectionOrders = document.getElementById('section-orders');
+  const sectionHistory = document.getElementById('section-history');
 
+  // Section Toggle
   btnAdd.addEventListener('click', () => {
     sectionAdd.style.display = 'block';
     sectionAll.style.display = 'none';
+    sectionOrders.style.display = 'none';
+    sectionHistory.style.display = 'none';
   });
-
   btnAll.addEventListener('click', () => {
     sectionAdd.style.display = 'none';
     sectionAll.style.display = 'block';
+    sectionOrders.style.display = 'none';
+    sectionHistory.style.display = 'none';
   });
+  btnOrders.addEventListener('click', () => {
+    sectionAdd.style.display = 'none';
+    sectionAll.style.display = 'none';
+    sectionOrders.style.display = 'block';
+    sectionHistory.style.display = 'none';
+  });
+  btnHistory.addEventListener('click', () => {
+    sectionAdd.style.display = 'none';
+    sectionAll.style.display = 'none';
+    sectionOrders.style.display = 'none';
+    sectionHistory.style.display = 'block';
+  });
+
+  // 🔍 Live Search (shared logic)
+  function setupSearch(inputId, tableId) {
+    const input = document.getElementById(inputId);
+    const table = document.getElementById(tableId);
+    input.addEventListener('keyup', () => {
+      const filter = input.value.toLowerCase();
+      const rows = table.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const orderId = row.cells[0].textContent.toLowerCase();
+        row.style.display = orderId.includes(filter) ? '' : 'none';
+      });
+    });
+  }
+  setupSearch('search-orders', 'orders-table');
+  setupSearch('search-history', 'history-table');
 </script>
+</body>
+</html>
 {% endblock %}

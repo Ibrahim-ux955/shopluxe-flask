@@ -90,17 +90,23 @@ def get_featured_products():
     products_sorted = sorted(products, key=lambda x: x.get('timestamp', ''), reverse=True)
     return products_sorted[:4]  # Returns top 4 newest products
   
-def ensure_product_ids():
-    products = load_data()
-    updated = False
-    for p in products:
-        if 'id' not in p:
-            p['id'] = str(uuid4())
-            updated = True
-    if updated:
-        save_data(products)
+# ✅ Define orders file path (consistent with your setup)
+ORDERS_FILE = os.path.join(os.path.dirname(__file__), "data/orders.json")
 
-ensure_product_ids()  
+# ✅ Load all orders safely
+def load_orders():
+    try:
+        with open(ORDERS_FILE, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+# ✅ Save orders back to file
+def save_orders(data):
+    with open(ORDERS_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+
+
 # Routes
 
 
@@ -331,6 +337,7 @@ def admin():
 
     products = load_data()
     reviews = load_reviews()  # optional, if you want to display reviews in admin
+    orders = load_orders()    # ✅ Added to show user orders in admin
 
     if request.method == 'POST':
         name = request.form.get('name', '').title()
@@ -399,13 +406,26 @@ def admin():
         flash("✅ Product added successfully!")
         return redirect(url_for('admin'))
 
+    # ✅ Ensure every order has required fields before sending to template
+    for order in orders:
+        if 'id' not in order:
+            order['id'] = str(uuid4())
+        if 'status' not in order:
+            order['status'] = 'Pending'
+        if 'local_time' not in order:
+            order['local_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if 'delivered_time' not in order or order['delivered_time'] is None:  # ✅ fix
+            order['delivered_time'] = ''  # empty string instead of None
+
     return render_template(
         'admin.html',
         products=products,
         reviews=reviews,
+        orders=orders,  # ✅ ensures orders display in the “All Orders” section
         current_time=datetime.now(timezone.utc),
         active_page='admin'
     )
+
 
 
 
@@ -1131,6 +1151,102 @@ def track_order(order_id):
     return render_template("track_order.html", order=order)
 
 
+# ✅ Mark an order as delivered
+@app.route('/mark_delivered/<order_id>', methods=['POST'])
+def mark_delivered(order_id):
+    orders = load_orders()  # Load from JSON file
+    order_found = False
+
+    for o in orders:
+        if str(o['id']) == str(order_id):
+            o['status'] = 'Delivered'
+            o['delivered_time'] = datetime.utcnow().isoformat()
+            order_found = True
+            user_email = o.get('email')
+            name = o.get('name')
+            items = o.get('items', [])
+            total = o.get('total', 0)
+            timezone_str = o.get('timezone', 'UTC')
+            formatted_time = o.get('local_time', '')
+            break
+
+    if not order_found:
+        flash("⚠️ Order not found.")
+        return redirect(url_for('admin'))
+
+    save_orders(orders)
+
+    # Try sending delivery email to user
+    try:
+        base_url = request.url_root.rstrip('/')
+        item_lines = [
+            f"""
+            <div style='display:flex;align-items:center;margin-bottom:10px;border:1px solid #eee;padding:8px;border-radius:10px;'>
+                <img src='{base_url}/static/shoes/{item.get('images',[None])[0]}' 
+                     alt='{item.get('name')}' 
+                     style='width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:10px;'>
+                <div>
+                    <strong>{item.get('name')}</strong><br>
+                    Qty: {item.get('quantity')} | GH₵ {item.get('price')}
+                </div>
+            </div>
+            """
+            for item in items
+        ]
+
+        user_html = render_template(
+            'emails/user_delivered_email.html',  # You can create this template
+            name=name,
+            product_name=''.join(item_lines),
+            quantity=len(items),
+            total=total,
+            order_time=formatted_time,
+            timezone=timezone_str
+        )
+        send_email(user_email, "✅ Your Order Has Been Delivered - ShopLuxe", user_html)
+        flash("✅ Order marked delivered and email sent to user.")
+    except Exception as e:
+        print("❌ Email sending failed:", e)
+        flash("⚠️ Order marked delivered but email could not be sent.")
+
+    return redirect(url_for('admin'))
+
+
+@app.route('/cancel_order/<order_id>', methods=['POST'])
+def cancel_order(order_id):
+    orders = load_orders()  # Load orders from JSON
+    order_found = False
+    for o in orders:
+        if str(o['id']) == str(order_id):
+            o['status'] = 'Cancelled'
+            o['cancelled_time'] = datetime.utcnow().isoformat()
+            order_found = True
+            user_email = o.get('email')
+            user_name = o.get('name')
+            break
+
+    if order_found:
+        save_orders(orders)
+
+        # ✅ Send cancelled email to user
+        try:
+            base_url = request.url_root.rstrip('/')
+            track_order_url = url_for('track_order', order_id=quote(order_id), _external=True)
+            cancelled_html = render_template(
+                'emails/order_cancelled_email.html',
+                name=user_name,
+                order_id=order_id,
+                track_order_url=track_order_url
+            )
+            send_email(user_email, "❌ Your ShopLuxe Order Has Been Cancelled", cancelled_html)
+            flash("✅ Order cancelled and email sent to user.")
+        except Exception as e:
+            print("❌ Order cancelled but email could not be sent:", e)
+            flash("⚠️ Order cancelled but email could not be sent.")
+    else:
+        flash("❌ Order not found.")
+
+    return redirect(url_for('admin'))
 
 
 

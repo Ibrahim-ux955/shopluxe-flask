@@ -35,7 +35,9 @@
     "total": 40000.0,
     "timestamp": "2025-11-01T19:03:34.861386+00:00",
     "local_time": "Nov 01, 2025, 07:03 PM",
-    "timezone": "Atlantic/Reykjavik"
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Delivered",
+    "delivered_time": "2025-11-02T16:48:36.573054+00:00"
   },
   {
     "id": "219c2dfe-9550-4c79-a5f2-11c8a851fdc7",
@@ -73,7 +75,9 @@
     "total": 40000.0,
     "timestamp": "2025-11-02T14:00:32.256323+00:00",
     "local_time": "Nov 02, 2025, 02:00 PM",
-    "timezone": "Atlantic/Reykjavik"
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Delivered",
+    "delivered_time": "2025-11-02T16:53:24.549703+00:00"
   },
   {
     "id": "2b14d59b-66ed-43ac-ae98-c261adad8deb",
@@ -84,7 +88,9 @@
     "total": 0,
     "timestamp": "2025-11-02T14:22:26.928838+00:00",
     "local_time": "Nov 02, 2025, 02:22 PM",
-    "timezone": "Atlantic/Reykjavik"
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Cancelled",
+    "delivered_time": "2025-11-02T17:33:11.332229"
   },
   {
     "id": "aee5d95a-d2b9-4d2d-b6e1-cd2f224692f7",
@@ -95,7 +101,9 @@
     "total": 0,
     "timestamp": "2025-11-02T14:29:46.663721+00:00",
     "local_time": "Nov 02, 2025, 02:29 PM",
-    "timezone": "Atlantic/Reykjavik"
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Cancelled",
+    "delivered_time": "2025-11-02T17:33:07.042534"
   },
   {
     "id": "7ba3a74f-184e-455d-8c53-6f13dfef3211",
@@ -133,7 +141,9 @@
     "total": 40000.0,
     "timestamp": "2025-11-02T14:40:29.655032+00:00",
     "local_time": "Nov 02, 2025, 02:40 PM",
-    "timezone": "Atlantic/Reykjavik"
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Cancelled",
+    "cancelled_time": "2025-11-02T17:51:01.904053"
   },
   {
     "id": "021ceef7-6801-404b-afd9-c778b702de4d",
@@ -164,6 +174,326 @@
     "total": 23.0,
     "timestamp": "2025-11-02T14:45:16.854939+00:00",
     "local_time": "Nov 02, 2025, 02:45 PM",
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Delivered",
+    "delivered_time": "2025-11-02T17:06:39.194614+00:00"
+  },
+  {
+    "id": "6262d2ae-2d72-400a-a3e2-9674843598e0",
+    "name": "Ibrahim Mohammed",
+    "email": "vybezkhid7@gmail.com",
+    "phone": "0551056001",
+    "items": [
+      {
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "Very good, Brand new",
+        "stock": 7,
+        "colors": [
+          "Red",
+          "Yellow",
+          "Green",
+          "Gold"
+        ],
+        "sizes": [
+          "34",
+          "56",
+          "90"
+        ],
+        "images": [
+          "pexels-garrettmorrow-682933.jpg"
+        ],
+        "timestamp": "2025-10-17T22:29:01.673090",
+        "quantity": 1
+      }
+    ],
+    "total": 40000.0,
+    "timestamp": "2025-11-02T16:18:38.804271+00:00",
+    "local_time": "Nov 02, 2025, 04:18 PM",
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Delivered",
+    "delivered_time": "2025-11-02T17:47:34.594454"
+  },
+  {
+    "id": "30bcf50c-90e7-46d6-ac62-bc656b41a012",
+    "name": "Ibrahim Mohammed",
+    "email": "vybezkhid7@gmail.com",
+    "phone": "0551056001",
+    "items": [
+      {
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "Very good, Brand new",
+        "stock": 7,
+        "colors": [
+          "Red",
+          "Yellow",
+          "Green",
+          "Gold"
+        ],
+        "sizes": [
+          "34",
+          "56",
+          "90"
+        ],
+        "images": [
+          "pexels-garrettmorrow-682933.jpg"
+        ],
+        "timestamp": "2025-10-17T22:29:01.673090",
+        "quantity": 1
+      }
+    ],
+    "total": 40000.0,
+    "timestamp": "2025-11-02T16:20:42.275990+00:00",
+    "local_time": "Nov 02, 2025, 04:20 PM",
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Delivered",
+    "delivered_time": "2025-11-02T17:45:18.868948"
+  },
+  {
+    "id": "be42755e-e1a0-40fa-b642-7826b779743e",
+    "name": "Ibrahim Mohammed",
+    "email": "vybezkhid7@gmail.com",
+    "phone": "0551056001",
+    "items": [
+      {
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "Very good, Brand new",
+        "stock": 7,
+        "colors": [
+          "Red",
+          "Yellow",
+          "Green",
+          "Gold"
+        ],
+        "sizes": [
+          "34",
+          "56",
+          "90"
+        ],
+        "images": [
+          "pexels-garrettmorrow-682933.jpg"
+        ],
+        "timestamp": "2025-10-17T22:29:01.673090",
+        "quantity": 1
+      }
+    ],
+    "total": 40000.0,
+    "timestamp": "2025-11-02T16:31:13.790789+00:00",
+    "local_time": "Nov 02, 2025, 04:31 PM",
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Delivered",
+    "delivered_time": "2025-11-02T17:41:21.749599"
+  },
+  {
+    "id": "d5d5472e-bc2a-44fc-ae32-3f0f84807c2b",
+    "name": "Ibrahim Mohammed",
+    "email": "vybezkhid7@gmail.com",
+    "phone": "0551056001",
+    "items": [
+      {
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "Very good, Brand new",
+        "stock": 7,
+        "colors": [
+          "Red",
+          "Yellow",
+          "Green",
+          "Gold"
+        ],
+        "sizes": [
+          "34",
+          "56",
+          "90"
+        ],
+        "images": [
+          "pexels-garrettmorrow-682933.jpg"
+        ],
+        "timestamp": "2025-10-17T22:29:01.673090",
+        "quantity": 1
+      }
+    ],
+    "total": 40000.0,
+    "timestamp": "2025-11-02T16:35:11.874983+00:00",
+    "local_time": "Nov 02, 2025, 04:35 PM",
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Delivered",
+    "delivered_time": "2025-11-02T17:06:31.772691+00:00"
+  },
+  {
+    "id": "5f98e282-c4af-4e6f-baef-227c86ea8788",
+    "name": "Ibrahim Mohammed",
+    "email": "vybezkhid7@gmail.com",
+    "phone": "0551056001",
+    "items": [
+      {
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "Very good, Brand new",
+        "stock": 7,
+        "colors": [
+          "Red",
+          "Yellow",
+          "Green",
+          "Gold"
+        ],
+        "sizes": [
+          "34",
+          "56",
+          "90"
+        ],
+        "images": [
+          "pexels-garrettmorrow-682933.jpg"
+        ],
+        "timestamp": "2025-10-17T22:29:01.673090",
+        "quantity": 1
+      }
+    ],
+    "total": 40000.0,
+    "timestamp": "2025-11-02T18:01:47.184932+00:00",
+    "local_time": "Nov 02, 2025, 06:01 PM",
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Delivered",
+    "delivered_time": "2025-11-02T18:34:15.443015"
+  },
+  {
+    "id": "b853ae15-62e4-4b18-8a02-56aaaf0525dd",
+    "name": "Ibrahim Mohammed",
+    "email": "vybezkhid7@gmail.com",
+    "phone": "0551056001",
+    "items": [
+      {
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "Very good, Brand new",
+        "stock": 7,
+        "colors": [
+          "Red",
+          "Yellow",
+          "Green",
+          "Gold"
+        ],
+        "sizes": [
+          "34",
+          "56",
+          "90"
+        ],
+        "images": [
+          "pexels-garrettmorrow-682933.jpg"
+        ],
+        "timestamp": "2025-10-17T22:29:01.673090",
+        "quantity": 1
+      }
+    ],
+    "total": 40000.0,
+    "timestamp": "2025-11-02T18:25:51.083343+00:00",
+    "local_time": "Nov 02, 2025, 06:25 PM",
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Cancelled",
+    "cancelled_time": "2025-11-02T18:33:13.968287"
+  },
+  {
+    "id": "10d4a69a-8c4f-4729-bd33-3ab679f33e0f",
+    "name": "bbbb",
+    "email": "vybezkhid7@gmail.com",
+    "phone": "0551056001",
+    "items": [
+      {
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "Very good, Brand new",
+        "stock": 7,
+        "colors": [
+          "Red",
+          "Yellow",
+          "Green",
+          "Gold"
+        ],
+        "sizes": [
+          "34",
+          "56",
+          "90"
+        ],
+        "images": [
+          "pexels-garrettmorrow-682933.jpg"
+        ],
+        "timestamp": "2025-10-17T22:29:01.673090",
+        "quantity": 1
+      }
+    ],
+    "total": 40000.0,
+    "timestamp": "2025-11-02T18:37:19.444727+00:00",
+    "local_time": "Nov 02, 2025, 06:37 PM",
+    "timezone": "Atlantic/Reykjavik",
+    "status": "Cancelled",
+    "cancelled_time": "2025-11-02T18:37:45.872881"
+  },
+  {
+    "id": "76410cd2-852a-4e42-9b90-eadc84e2772c",
+    "name": "Ibrahim Mohammed",
+    "email": "vybezkhid7@gmail.com",
+    "phone": "0551056001",
+    "items": [
+      {
+        "id": "3e9c9c52-88ff-45de-8425-548a0cd575c8",
+        "name": "Gamepad",
+        "price": "40000",
+        "sale_price": null,
+        "on_sale": false,
+        "category": "Accessories",
+        "description": "Very good, Brand new",
+        "stock": 7,
+        "colors": [
+          "Red",
+          "Yellow",
+          "Green",
+          "Gold"
+        ],
+        "sizes": [
+          "34",
+          "56",
+          "90"
+        ],
+        "images": [
+          "pexels-garrettmorrow-682933.jpg"
+        ],
+        "timestamp": "2025-10-17T22:29:01.673090",
+        "quantity": 1
+      }
+    ],
+    "total": 40000.0,
+    "timestamp": "2025-11-02T18:40:44.234149+00:00",
+    "local_time": "Nov 02, 2025, 06:40 PM",
     "timezone": "Atlantic/Reykjavik"
   }
 ]
