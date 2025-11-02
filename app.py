@@ -9,6 +9,12 @@ import os, json, uuid
 from uuid import uuid4
 from datetime import datetime,timezone, timedelta 
 import resend
+from flask import Flask
+
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+from urllib.parse import quote
+from flask import url_for
 
 
 
@@ -16,6 +22,7 @@ app = Flask(__name__)
 app.jinja_env.globals['session'] = session
 app.secret_key = 'secret123'
 app.config['UPLOAD_FOLDER'] = 'static/shoes'
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # ✅ Add this line below secret key
 serializer = URLSafeTimedSerializer(app.secret_key)
@@ -980,6 +987,7 @@ from zoneinfo import ZoneInfo  # Python 3.9+
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
+# -------- Checkout Route --------
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     cart = get_cart()
@@ -993,10 +1001,7 @@ def checkout():
         if 0 <= index < len(products):
             product = products[index].copy()
             product['quantity'] = quantity
-
-            # ✅ Include product ID for admin reference
             product['id'] = products[index].get('id', index)
-
             cart_items.append(product)
 
     total = sum(float(p['price']) * p['quantity'] for p in cart_items)
@@ -1011,21 +1016,19 @@ def checkout():
             flash("❌ All fields are required.")
             return redirect(url_for('checkout'))
 
-        # 🕒 Handle timezones safely
         utc_now = datetime.now(timezone.utc)
         try:
             user_zone = ZoneInfo(timezone_str)
         except Exception:
             user_zone = ZoneInfo("UTC")
-
         local_time = utc_now.astimezone(user_zone)
         formatted_time = local_time.strftime("%b %d, %Y, %I:%M %p")
         
         order_id = str(uuid.uuid4())
+        base_url = request.url_root.rstrip('/')
 
-        # 🧾 Order object
         order = {
-            'id': order_id,  # ✅ unique ID
+            'id': order_id,
             'name': name,
             'email': email,
             'phone': phone,
@@ -1036,10 +1039,7 @@ def checkout():
             'timezone': timezone_str
         }
 
-        # ✅ Base URL for images
-        base_url = request.url_root.rstrip('/')
-
-        # 📦 Order summary for HTML (with product images + IDs)
+        # Order summary HTML
         item_lines = [
             f"""
             <div style='display:flex;align-items:center;margin-bottom:10px;border:1px solid #eee;padding:8px;border-radius:10px;'>
@@ -1052,13 +1052,11 @@ def checkout():
                 </div>
             </div>
             """
-            for item in order['items']
+            for item in cart_items
         ]
 
-        # 💾 Save order to data/orders.json
-        orders_file = os.path.join('data', 'orders.json')
-
-        # Load existing orders if file exists
+        # Save order
+        orders_file = os.path.join(os.path.dirname(__file__), "data/orders.json")  # lowercase
         if os.path.exists(orders_file):
             with open(orders_file, 'r', encoding='utf-8') as f:
                 try:
@@ -1068,15 +1066,15 @@ def checkout():
         else:
             existing_orders = []
 
-        # Add the new order
         existing_orders.append(order)
-
-        # Save all orders back to file
         with open(orders_file, 'w', encoding='utf-8') as f:
             json.dump(existing_orders, f, indent=2)
 
         try:
-            # ✉️ User confirmation email
+            # Track Order URL
+            track_order_url = url_for('track_order', order_id=quote(order_id), _external=True)
+
+            # User email
             user_html = render_template(
                 'emails/user_order_email.html',
                 name=name,
@@ -1084,11 +1082,12 @@ def checkout():
                 quantity=len(cart_items),
                 total=total,
                 order_time=formatted_time,
-                timezone=timezone_str
+                timezone=timezone_str,
+                track_order_url=track_order_url
             )
             send_email(email, "🧾 Order Confirmation - ShopLuxe", user_html)
 
-            # ✉️ Admin notification email (includes product images)
+            # Admin email
             admin_html = render_template(
                 'emails/admin_order_email.html',
                 name=name,
@@ -1100,6 +1099,7 @@ def checkout():
                 order_time=formatted_time,
                 timezone=timezone_str,
                 order_id=order_id,
+                track_order_url=track_order_url,
                 base_url=base_url
             )
             send_email("vybezkhid7@gmail.com", "📦 New Order Received - ShopLuxe", admin_html)
@@ -1114,23 +1114,21 @@ def checkout():
 
     return render_template('checkout.html', cart_items=cart_items, total=total)
 
-
 @app.route('/track-order/<order_id>')
 def track_order(order_id):
-    import json, os
-
-    orders_file = "data/orders.json"
+    order_id = unquote(order_id)
+    orders_file = "data/orders.json"  # or persistent path on Render
     if not os.path.exists(orders_file):
-        return render_template('order_not_found.html')
+        return "No orders found.", 404
 
     with open(orders_file, "r") as f:
         orders = json.load(f)
 
     order = next((o for o in orders if o["id"] == order_id), None)
     if not order:
-        return render_template('order_not_found.html')
+        return "Order not found.", 404
 
-    return render_template('track_order.html', order=order)
+    return render_template("track_order.html", order=order)
 
 
 
