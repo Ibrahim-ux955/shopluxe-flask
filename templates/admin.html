@@ -132,12 +132,7 @@
 
   <!-- 🔍 Search Bar -->
   <div class="mb-3">
-    <input
-      type="text"
-      id="search-orders"
-      class="form-control"
-      placeholder="Search by Order ID..."
-    />
+    <input type="text" id="search-orders" class="form-control" placeholder="Search by Order ID..." />
   </div>
 
   <div class="table-responsive">
@@ -145,43 +140,40 @@
       <thead class="table-light">
         <tr>
           <th>Order ID</th>
-          <th>Name</th>
-          <th>Total (GH₵)</th>
+          <th>Product Name</th>
+          <th>Price (GH₵)</th>
           <th>Status</th>
           <th>Time</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {% for o in orders 
-          | selectattr("status", "in", ["Pending", "Processing"]) 
-          | sort(attribute="local_time", reverse=True) %}
-        <tr>
-          <td>{{ o.id }}</td>
-          <td>{{ o.name }}</td>
-          <td>{{ o.total }}</td>
-          <td>
-            {% if o.status == "Pending" %}
-              <span class="badge bg-warning text-dark">Pending</span>
-            {% elif o.status == "Processing" %}
-              <span class="badge bg-info text-dark">Processing</span>
-            {% endif %}
-          </td>
-          <td>{{ o.local_time }}</td>
-          <td>
-            <div class="d-flex gap-2">
-              <!-- ✅ Mark Delivered -->
-              <form method="POST" action="{{ url_for('mark_delivered', order_id=o.id) }}">
-                <button type="submit" class="btn btn-sm btn-success">Delivered ✅</button>
-              </form>
-
-              <!-- ❌ Cancel Order -->
-              <form method="POST" action="{{ url_for('cancel_order', order_id=o.id) }}">
-                <button type="submit" class="btn btn-sm btn-danger">Cancel ❌</button>
-              </form>
-            </div>
-          </td>
-        </tr>
+        {% for o in orders | selectattr("status", "in", ["Pending", "Processing"]) | sort(attribute="local_time", reverse=True) %}
+          {% for item in o.products %}
+          <tr>
+            <td>{{ o.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.price }}</td>
+            <td>
+              {% if o.status == "Pending" %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% elif o.status == "Processing" %}
+                <span class="badge bg-info text-dark">Processing</span>
+              {% endif %}
+            </td>
+            <td>{{ o.local_time }}</td>
+            <td>
+              <div class="d-flex gap-2">
+                <form method="POST" action="{{ url_for('mark_delivered', order_id=o.id) }}">
+                  <button type="submit" class="btn btn-sm btn-success">Delivered ✅</button>
+                </form>
+                <form method="POST" action="{{ url_for('cancel_order', order_id=o.id) }}">
+                  <button type="submit" class="btn btn-sm btn-danger">Cancel ❌</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
         {% endfor %}
       </tbody>
     </table>
@@ -194,12 +186,7 @@
 
   <!-- 🔍 Search Bar -->
   <div class="mb-3">
-    <input
-      type="text"
-      id="search-history"
-      class="form-control"
-      placeholder="Search by Order ID..."
-    />
+    <input type="text" id="search-history" class="form-control" placeholder="Search by Order ID..." />
   </div>
 
   <div class="table-responsive">
@@ -207,42 +194,43 @@
       <thead class="table-light">
         <tr>
           <th>Order ID</th>
-          <th>Name</th>
-          <th>Total (GH₵)</th>
+          <th>Product Name</th>
+          <th>Price (GH₵)</th>
           <th>Status</th>
           <th>Ordered Time</th>
           <th>Completed/Cancelled Time</th>
         </tr>
       </thead>
       <tbody>
-        {% for o in orders 
-          | selectattr("status", "in", ["Delivered", "Cancelled"]) 
-          | sort(attribute="delivered_time", reverse=True) %}
-        <tr>
-          <td>{{ o.id }}</td>
-          <td>{{ o.name }}</td>
-          <td>{{ o.total }}</td>
-          <td>
-            {% if o.status == "Delivered" %}
-              <span class="badge bg-success">Delivered</span>
-            {% elif o.status == "Cancelled" %}
-              <span class="badge bg-danger">Cancelled</span>
-            {% endif %}
-          </td>
-          <td>{{ o.local_time }}</td>
-          <td>
-            {% if o.delivered_time %}
-              {{ o.delivered_time | replace('T', ' ') | replace('Z', '') }}
-            {% else %}
-              <span class="text-muted">—</span>
-            {% endif %}
-          </td>
-        </tr>
+        {% for o in orders | selectattr("status", "in", ["Delivered", "Cancelled"]) | sort(attribute="completed_time", reverse=True) %}
+          {% for item in o.products %}
+          <tr>
+            <td>{{ o.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.price }}</td>
+            <td>
+              {% if o.status == "Delivered" %}
+                <span class="badge bg-success">Delivered</span>
+              {% elif o.status == "Cancelled" %}
+                <span class="badge bg-danger">Cancelled</span>
+              {% endif %}
+            </td>
+            <td>{{ o.local_time }}</td>
+            <td>
+              {% if o.completed_time %}
+                {{ o.completed_time | replace('T', ' ') | replace('Z', '') }}
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+
 
 <!-- 🧠 JS: Toggle + Search (same as before) -->
 <script>

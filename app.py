@@ -113,7 +113,7 @@ def save_orders(data):
 
 
 
-@app.route('/', endpoint='home')  # Explicitly set endpoint to 'home'
+@app.route('/', endpoint='home')
 def index():
     query = request.args.get('q', '').strip().lower()
     category = request.args.get('category', '').strip().lower()
@@ -122,12 +122,20 @@ def index():
 
     # Normalize product data
     for p in products:
-        # Ensure timestamp is a datetime object
+        # Ensure timestamp is a datetime object and offset-aware
         if isinstance(p.get('timestamp'), str):
             try:
-                p['timestamp'] = datetime.fromisoformat(p['timestamp'])
+                dt = datetime.fromisoformat(p['timestamp'])
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                p['timestamp'] = dt
             except Exception:
                 p['timestamp'] = current_time
+        elif isinstance(p.get('timestamp'), datetime):
+            if p['timestamp'].tzinfo is None:
+                p['timestamp'] = p['timestamp'].replace(tzinfo=timezone.utc)
+        else:
+            p['timestamp'] = current_time
 
         # Ensure 'images' and 'image' fields exist
         if 'images' not in p and 'image' in p:
@@ -336,8 +344,8 @@ def admin():
         return redirect(url_for('admin_login'))
 
     products = load_data()
-    reviews = load_reviews()  # optional, if you want to display reviews in admin
-    orders = load_orders()    # ✅ Added to show user orders in admin
+    reviews = load_reviews()
+    orders = load_orders()
 
     if request.method == 'POST':
         name = request.form.get('name', '').title()
@@ -346,22 +354,16 @@ def admin():
         description = request.form.get('description', '')
         stock = int(request.form.get('stock', 0))
 
-        # ✅ Handle "On Sale" fields
+        # Sale & Featured
         on_sale = 'on_sale' in request.form
         sale_price = request.form.get('sale_price', '')
+        featured = 'featured' in request.form
 
-        # ✅ Handle Featured checkbox
-        featured = 'featured' in request.form  # True if checked
+        # Colors & Sizes
+        colors = [c.strip() for c in request.form.get('colors', '').split(',')] if request.form.get('colors') else []
+        sizes = [s.strip() for s in request.form.get('sizes', '').split(',')] if request.form.get('sizes') else []
 
-        # ✅ Handle color field
-        colors = request.form.get('colors', '')
-        colors = [c.strip() for c in colors.split(',')] if colors else []
-
-        # ✅ Handle size field
-        sizes = request.form.get('sizes', '')
-        sizes = [s.strip() for s in sizes.split(',')] if sizes else []
-
-        # ✅ Optional: ensure sale price is valid
+        # Validate sale price
         if on_sale and sale_price:
             try:
                 if float(sale_price) >= float(price):
@@ -371,7 +373,7 @@ def admin():
                 flash("⚠️ Invalid sale price entered.")
                 return redirect(url_for('admin'))
 
-        # ✅ Handle multiple image uploads
+        # Handle image uploads
         uploaded_files = request.files.getlist('images')
         if not uploaded_files or all(f.filename == '' for f in uploaded_files):
             flash("❌ Please upload at least one image")
@@ -384,14 +386,14 @@ def admin():
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 image_filenames.append(filename)
 
-        # ✅ Create new product
+        # Create new product
         new_product = {
-            'id': str(uuid4()),  # unique ID
+            'id': str(uuid4()),
             'name': name,
             'price': price,
             'sale_price': sale_price if on_sale and sale_price else None,
             'on_sale': on_sale,
-            'featured': featured,  # ✅ save featured status
+            'featured': featured,
             'category': category,
             'description': description,
             'stock': stock,
@@ -406,25 +408,36 @@ def admin():
         flash("✅ Product added successfully!")
         return redirect(url_for('admin'))
 
-    # ✅ Ensure every order has required fields before sending to template
+    # Normalize orders for template display
     for order in orders:
-        if 'id' not in order:
-            order['id'] = str(uuid4())
-        if 'status' not in order:
-            order['status'] = 'Pending'
-        if 'local_time' not in order:
-            order['local_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if 'delivered_time' not in order or order['delivered_time'] is None:  # ✅ fix
-            order['delivered_time'] = ''  # empty string instead of None
+        order['id'] = order.get('id', str(uuid4()))
+        order['status'] = order.get('status', 'Pending')
+        order['local_time'] = order.get('local_time', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        order['delivered_time'] = order.get('delivered_time', '')
+        order['cancelled_time'] = order.get('cancelled_time') or (order['local_time'] if order['status'] == 'Cancelled' else '')
+
+        # ✅ Ensure products list exists for multiple products in a single order
+        if 'products' not in order or not order['products']:
+            order['products'] = [{'name': order.get('name', ''), 'price': order.get('total', 0)}]
+
+        # Unified completed_time for template
+        if order['status'] == 'Delivered':
+            order['completed_time'] = order['delivered_time']
+        elif order['status'] == 'Cancelled':
+            order['completed_time'] = order['cancelled_time']
+        else:
+            order['completed_time'] = ''  # pending
 
     return render_template(
         'admin.html',
         products=products,
         reviews=reviews,
-        orders=orders,  # ✅ ensures orders display in the “All Orders” section
+        orders=orders,
         current_time=datetime.now(timezone.utc),
         active_page='admin'
     )
+
+
 
 
 
