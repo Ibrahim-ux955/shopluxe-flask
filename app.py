@@ -347,6 +347,7 @@ def admin():
     reviews = load_reviews()
     orders = load_orders()
 
+    # ---------------------- ADD NEW PRODUCT ---------------------- #
     if request.method == 'POST':
         name = request.form.get('name', '').title()
         price = request.form.get('price', '')
@@ -376,7 +377,7 @@ def admin():
         # Handle image uploads
         uploaded_files = request.files.getlist('images')
         if not uploaded_files or all(f.filename == '' for f in uploaded_files):
-            flash("❌ Please upload at least one image")
+            flash("❌ Please upload at least one image.")
             return redirect(url_for('admin'))
 
         image_filenames = []
@@ -408,17 +409,29 @@ def admin():
         flash("✅ Product added successfully!")
         return redirect(url_for('admin'))
 
-    # Normalize orders for template display
+    # ---------------------- NORMALIZE ORDERS ---------------------- #
     for order in orders:
         order['id'] = order.get('id', str(uuid4()))
         order['status'] = order.get('status', 'Pending')
         order['local_time'] = order.get('local_time', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         order['delivered_time'] = order.get('delivered_time', '')
-        order['cancelled_time'] = order.get('cancelled_time') or (order['local_time'] if order['status'] == 'Cancelled' else '')
+        order['cancelled_time'] = order.get('cancelled_time') or (
+            order['local_time'] if order['status'] == 'Cancelled' else ''
+        )
 
-        # ✅ Ensure products list exists for multiple products in a single order
-        if 'products' not in order or not order['products']:
-            order['products'] = [{'name': order.get('name', ''), 'price': order.get('total', 0)}]
+        # 🧠 Support both 'items' and 'products'
+        if 'items' in order and not order.get('products'):
+            order['products'] = order['items']
+
+        # 🧩 Fallback for legacy single-item orders
+        if not order.get('products'):
+            order['products'] = [{
+                'name': order.get('product_name', 'Unknown Product'),
+                'price': order.get('total', 0),
+                'quantity': order.get('quantity', 1),
+                'color': order.get('color', '-'),
+                'size': order.get('size', '-')
+            }]
 
         # Unified completed_time for template
         if order['status'] == 'Delivered':
@@ -426,8 +439,9 @@ def admin():
         elif order['status'] == 'Cancelled':
             order['completed_time'] = order['cancelled_time']
         else:
-            order['completed_time'] = ''  # pending
+            order['completed_time'] = ''
 
+    # ---------------------- RENDER TEMPLATE ---------------------- #
     return render_template(
         'admin.html',
         products=products,
@@ -1157,7 +1171,7 @@ def track_order(order_id):
     with open(orders_file, "r") as f:
         orders = json.load(f)
 
-    order = next((o for o in orders if o["id"] == order_id), None)
+    order = next((o for o in orders if str(o["id"]) == str(order_id)), None)
     if not order:
         return "Order not found.", 404
 
@@ -1167,17 +1181,18 @@ def track_order(order_id):
 # ✅ Mark an order as delivered
 @app.route('/mark_delivered/<order_id>', methods=['POST'])
 def mark_delivered(order_id):
-    orders = load_orders()  # Load from JSON file
+    orders = load_orders()
     order_found = False
 
     for o in orders:
         if str(o['id']) == str(order_id):
             o['status'] = 'Delivered'
             o['delivered_time'] = datetime.utcnow().isoformat()
+            o['completed_time'] = o['delivered_time']  # ✅ Add for history tracking
             order_found = True
             user_email = o.get('email')
             name = o.get('name')
-            items = o.get('items', [])
+            items = o.get('products', [])  # ✅ Ensure consistency with template
             total = o.get('total', 0)
             timezone_str = o.get('timezone', 'UTC')
             formatted_time = o.get('local_time', '')
@@ -1189,26 +1204,25 @@ def mark_delivered(order_id):
 
     save_orders(orders)
 
-    # Try sending delivery email to user
+    # ✅ Send delivery email to user
     try:
         base_url = request.url_root.rstrip('/')
         item_lines = [
             f"""
             <div style='display:flex;align-items:center;margin-bottom:10px;border:1px solid #eee;padding:8px;border-radius:10px;'>
-                <img src='{base_url}/static/shoes/{item.get('images',[None])[0]}' 
+                <img src='{base_url}/static/shoes/{(item.get('images') or [None])[0]}' 
                      alt='{item.get('name')}' 
                      style='width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:10px;'>
                 <div>
                     <strong>{item.get('name')}</strong><br>
-                    Qty: {item.get('quantity')} | GH₵ {item.get('price')}
+                    Qty: {item.get('quantity', 1)} | GH₵ {item.get('price')}
                 </div>
             </div>
-            """
-            for item in items
+            """ for item in items
         ]
 
         user_html = render_template(
-            'emails/user_delivered_email.html',  # You can create this template
+            'emails/user_delivered_email.html',
             name=name,
             product_name=''.join(item_lines),
             quantity=len(items),
@@ -1225,14 +1239,16 @@ def mark_delivered(order_id):
     return redirect(url_for('admin'))
 
 
+# ✅ Cancel an order
 @app.route('/cancel_order/<order_id>', methods=['POST'])
 def cancel_order(order_id):
-    orders = load_orders()  # Load orders from JSON
+    orders = load_orders()
     order_found = False
     for o in orders:
         if str(o['id']) == str(order_id):
             o['status'] = 'Cancelled'
             o['cancelled_time'] = datetime.utcnow().isoformat()
+            o['completed_time'] = o['cancelled_time']  # ✅ Add for history tracking
             order_found = True
             user_email = o.get('email')
             user_name = o.get('name')
@@ -1243,7 +1259,6 @@ def cancel_order(order_id):
 
         # ✅ Send cancelled email to user
         try:
-            base_url = request.url_root.rstrip('/')
             track_order_url = url_for('track_order', order_id=quote(order_id), _external=True)
             cancelled_html = render_template(
                 'emails/order_cancelled_email.html',
@@ -1262,7 +1277,6 @@ def cancel_order(order_id):
     return redirect(url_for('admin'))
 
 
-
 @app.route('/order_confirmation')
 def order_confirmation():
     order_info = session.get('order_info')
@@ -1270,7 +1284,8 @@ def order_confirmation():
         flash("⚠️ No order found.")
         return redirect(url_for('cart'))
     return render_template('order_confirmation.html', order=order_info)
-  
+
+
 @app.route('/settings')
 def settings():
     # You can later replace this with user settings logic

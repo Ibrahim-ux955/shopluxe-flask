@@ -132,7 +132,7 @@
 
   <!-- 🔍 Search Bar -->
   <div class="mb-3">
-    <input type="text" id="search-orders" class="form-control" placeholder="Search by Order ID..." />
+    <input type="text" id="search-orders" class="form-control" placeholder="Search by Order ID or Customer Name..." />
   </div>
 
   <div class="table-responsive">
@@ -140,8 +140,8 @@
       <thead class="table-light">
         <tr>
           <th>Order ID</th>
-          <th>Product Name</th>
-          <th>Price (GH₵)</th>
+          <th>Customer / Products</th>
+          <th>Total (GH₵)</th>
           <th>Status</th>
           <th>Time</th>
           <th>Actions</th>
@@ -149,44 +149,94 @@
       </thead>
       <tbody>
         {% for o in orders | selectattr("status", "in", ["Pending", "Processing"]) | sort(attribute="local_time", reverse=True) %}
-          {% for item in o.products %}
-          <tr>
-            <td>{{ o.id }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.price }}</td>
-            <td>
-              {% if o.status == "Pending" %}
-                <span class="badge bg-warning text-dark">Pending</span>
-              {% elif o.status == "Processing" %}
-                <span class="badge bg-info text-dark">Processing</span>
-              {% endif %}
-            </td>
-            <td>{{ o.local_time }}</td>
-            <td>
-              <div class="d-flex gap-2">
-                <form method="POST" action="{{ url_for('mark_delivered', order_id=o.id) }}">
-                  <button type="submit" class="btn btn-sm btn-success">Delivered ✅</button>
-                </form>
-                <form method="POST" action="{{ url_for('cancel_order', order_id=o.id) }}">
-                  <button type="submit" class="btn btn-sm btn-danger">Cancel ❌</button>
-                </form>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
+        <tr>
+          <!-- 🧾 Order ID -->
+          <td><strong>{{ o.id }}</strong></td>
+
+          <!-- 👤 Customer + 🛍️ Products -->
+          <td>
+            <div><strong>{{ o.name }}</strong></div>
+            <ul class="mb-0 small text-muted ps-3">
+              {% for item in o.products %}
+                <li>{{ item.name }} <span class="text-secondary">(x{{ item.quantity or 1 }})</span></li>
+              {% endfor %}
+            </ul>
+          </td>
+
+          <!-- 💰 Total -->
+          <td>GH₵ {{ o.total }}</td>
+
+          <!-- 🚦 Status -->
+          <td>
+            {% if o.status == "Pending" %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% elif o.status == "Processing" %}
+              <span class="badge bg-info text-dark">Processing</span>
+            {% endif %}
+          </td>
+
+          <!-- 🕒 Time -->
+          <td>{{ o.local_time }}</td>
+
+          <!-- ⚙️ Actions -->
+          <td>
+            <div class="d-flex flex-column flex-md-row gap-2">
+              <form method="POST" action="{{ url_for('mark_delivered', order_id=o.id) }}">
+                <button type="submit" class="btn btn-sm btn-success w-100">Delivered ✅</button>
+              </form>
+              <form method="POST" action="{{ url_for('cancel_order', order_id=o.id) }}">
+                <button type="submit" class="btn btn-sm btn-danger w-100">Cancel ❌</button>
+              </form>
+              <button class="btn btn-sm btn-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ o.id }}">
+                Details 📄
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- 📄 Collapsible Details Row -->
+        <tr class="collapse" id="details-{{ o.id }}">
+          <td colspan="6">
+            <div class="p-2 bg-light border rounded">
+              <h6 class="fw-bold mb-2">Order Details</h6>
+              <table class="table table-sm table-bordered mb-0">
+                <thead class="table-secondary">
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Price (GH₵)</th>
+                    <th>Quantity</th>
+                    <th>Color</th>
+                    <th>Size</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in o.products %}
+                  <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.quantity or 1 }}</td>
+                    <td>{{ item.color or '-' }}</td>
+                    <td>{{ item.size or '-' }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
-
-<!-- 📜 Order History Section -->
+ 
+ <!-- 🕓 Order History Section -->
 <div id="section-history" class="admin-section" style="display:none;">
-  <h4 class="mb-3">Order History (Delivered / Cancelled)</h4>
+  <h4 class="mb-3">Order History</h4>
 
   <!-- 🔍 Search Bar -->
   <div class="mb-3">
-    <input type="text" id="search-history" class="form-control" placeholder="Search by Order ID..." />
+    <input type="text" id="search-history" class="form-control" placeholder="Search by Order ID or Customer Name..." />
   </div>
 
   <div class="table-responsive">
@@ -194,45 +244,93 @@
       <thead class="table-light">
         <tr>
           <th>Order ID</th>
-          <th>Product Name</th>
-          <th>Price (GH₵)</th>
+          <th>Customer / Products</th>
+          <th>Total (GH₵)</th>
           <th>Status</th>
-          <th>Ordered Time</th>
-          <th>Completed/Cancelled Time</th>
+          <th>Completed Time</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {% for o in orders | selectattr("status", "in", ["Delivered", "Cancelled"]) | sort(attribute="completed_time", reverse=True) %}
-          {% for item in o.products %}
-          <tr>
-            <td>{{ o.id }}</td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.price }}</td>
-            <td>
-              {% if o.status == "Delivered" %}
-                <span class="badge bg-success">Delivered</span>
-              {% elif o.status == "Cancelled" %}
-                <span class="badge bg-danger">Cancelled</span>
-              {% endif %}
-            </td>
-            <td>{{ o.local_time }}</td>
-            <td>
-              {% if o.completed_time %}
-                {{ o.completed_time | replace('T', ' ') | replace('Z', '') }}
-              {% else %}
-                <span class="text-muted">—</span>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
+  {% for o in orders 
+       | selectattr("status", "in", ["Delivered", "Cancelled"]) 
+       | sort(attribute="completed_time", reverse=True) %}
+  <tr>
+    <!-- 🧾 Order ID -->
+    <td><strong>{{ o.id }}</strong></td>
+
+    <!-- 👤 Customer + 🛍️ Products -->
+    <td>
+      <div><strong>{{ o.name }}</strong></div>
+      <ul class="mb-0 small text-muted ps-3">
+        {% for item in o.products %}
+          <li>{{ item.name }} <span class="text-secondary">(x{{ item.quantity or 1 }})</span></li>
         {% endfor %}
-      </tbody>
-    </table>
+      </ul>
+    </td>
+
+    <!-- 💰 Total -->
+    <td>GH₵ {{ o.total }}</td>
+
+    <!-- 🚦 Status -->
+    <td>
+      {% if o.status == "Delivered" %}
+        <span class="badge bg-success">Delivered</span>
+      {% elif o.status == "Cancelled" %}
+        <span class="badge bg-danger">Cancelled</span>
+      {% endif %}
+    </td>
+
+    <!-- 🕒 Completed Time -->
+    <td>{{ o.completed_time }}</td>
+
+    <!-- ⚙️ Actions -->
+    <td>
+      <button class="btn btn-sm btn-secondary w-100" type="button"
+              data-bs-toggle="collapse" data-bs-target="#history-details-{{ o.id }}">
+        Details 📄
+      </button>
+    </td>
+  </tr>
+
+  <!-- 📄 Collapsible Details Row -->
+  <tr class="collapse" id="history-details-{{ o.id }}">
+    <td colspan="6">
+      <div class="p-2 bg-light border rounded">
+        <h6 class="fw-bold mb-2">Order Details</h6>
+        <table class="table table-sm table-bordered mb-0">
+          <thead class="table-secondary">
+            <tr>
+              <th>Product Name</th>
+              <th>Price (GH₵)</th>
+              <th>Quantity</th>
+              <th>Color</th>
+              <th>Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in o.products %}
+            <tr>
+              <td>{{ item.name }}</td>
+              <td>{{ item.price }}</td>
+              <td>{{ item.quantity or 1 }}</td>
+              <td>{{ item.color or '-' }}</td>
+              <td>{{ item.size or '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
   </div>
 </div>
+ 
 
-
-<!-- 🧠 JS: Toggle + Search (same as before) -->
+<!-- 🧠 JS: Toggle + Search -->
 <script>
   const btnAdd = document.getElementById('btn-add');
   const btnAll = document.getElementById('btn-all');
@@ -269,16 +367,16 @@
     sectionHistory.style.display = 'block';
   });
 
-  // 🔍 Live Search (shared logic)
+  // 🔍 Live Search (Order ID + Customer)
   function setupSearch(inputId, tableId) {
     const input = document.getElementById(inputId);
     const table = document.getElementById(tableId);
     input.addEventListener('keyup', () => {
       const filter = input.value.toLowerCase();
-      const rows = table.querySelectorAll('tbody tr');
+      const rows = table.querySelectorAll('tbody tr:not(.collapse)');
       rows.forEach(row => {
-        const orderId = row.cells[0].textContent.toLowerCase();
-        row.style.display = orderId.includes(filter) ? '' : 'none';
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
       });
     });
   }
