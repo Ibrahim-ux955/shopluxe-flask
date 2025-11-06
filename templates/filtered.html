@@ -1,26 +1,121 @@
-{% extends 'base.html' %}
-
-{% block content %}
-<div class="container mt-4">
-  <h3 class="text-center mb-4">{{ category_name }} Products</h3>
-
-  {% if products %}
-  <div class="row g-3">
-    {% for product in products %}
-      {% include 'partials/product_card.html' %}
-    {% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ selected_category }} - ShopLuxe</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #f9fafb;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin: 80px 0 20px; /* space for sticky header */
+    }
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 25px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+    .nav-btn {
+      display: inline-block;
+      background: #198754;
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      transition: background 0.3s ease, transform 0.2s ease;
+      font-weight: 500;
+    }
+    .nav-btn:hover {
+      background: #157347;
+      transform: scale(1.05);
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      padding: 10px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .product-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .product-card h3 {
+      margin: 10px 0 5px;
+      font-size: 1.1rem;
+    }
+    .product-card p {
+      margin: 0;
+      color: #666;
+    }
+    .no-products {
+      text-align: center;
+      color: #888;
+      font-size: 1.1rem;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ✅ Sticky Header -->
+  <div class="top-bar">
+    <a href="{{ url_for('categories') }}" class="nav-btn">⬅ Back to Categories</a>
+    <a href="{{ url_for('home') }}" class="nav-btn">🏠 Home</a>
   </div>
-  {% else %}
-  <div class="alert alert-warning text-center mt-4">
-    No products found in {{ category_name }}.
+
+  <div class="container">
+    <h1>{{ selected_category }}</h1>
+
+    {% if products and products|length > 0 %}
+      <div class="product-grid">
+        {% for product in products %}
+          <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-card">
+            {% if product.images %}
+              <img src="{{ url_for('static', filename='shoes/' + product.images[0]) }}" alt="{{ product.name }}">
+            {% else %}
+              <img src="{{ url_for('static', filename='placeholder.jpg') }}" alt="No image available">
+            {% endif %}
+            <h3>{{ product.name }}</h3>
+            <p>GH₵ {{ product.price }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="no-products">😔 No products found in this category.</p>
+    {% endif %}
   </div>
-  {% endif %}
-  <div class="text-center mb-3">
-  <a href="{{ url_for('categories') }}" class="btn btn-outline-secondary btn-sm">
-    ← Back to Categories
-  </a>
-</div>
-
-</div>
-{% endblock %}
-
+</body>
+</html>

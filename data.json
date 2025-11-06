@@ -110,5 +110,22 @@
             "8b900e48-aadf-4638-8bcf-1f464f846856.jpeg"
         ],
         "timestamp": "2025-11-06T09:15:44.299731+00:00"
+    },
+    {
+        "id": "1e777167-c966-47c5-bc3e-4163ef55e46e",
+        "name": "Sneaker",
+        "price": "678",
+        "sale_price": null,
+        "on_sale": false,
+        "featured": false,
+        "category": "Tops",
+        "description": "",
+        "stock": 23,
+        "colors": [],
+        "sizes": [],
+        "images": [
+            "batman-x-joker-symphony-d5-1920x1080.jpg"
+        ],
+        "timestamp": "2025-11-06T13:02:25.571171+00:00"
     }
 ]
