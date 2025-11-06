@@ -1491,6 +1491,11 @@ def remove_from_wishlist(product_id):
 @app.route('/wishlist_count')
 def wishlist_count():
     return jsonify({'count': len(session.get('wishlist', []))})
+  
+@app.route('/categories')
+def categories():
+    return render_template('categories.html')
+
 
 
 

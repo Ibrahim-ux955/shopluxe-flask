@@ -161,23 +161,21 @@ nav.navbar.fixed-bottom .container a small {
       {% endif %}
 
       <!-- 🛍️ Categories dropdown (Desktop only, on far right) -->
-      <div class="dropdown d-none d-md-block">
-        <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
-          🛍️ Categories
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">Shoes</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">Men</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">Women</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Children') }}">Children</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Watches') }}">Watches</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Jewelry') }}">Jewelry</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">Accessories</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">Bags</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
+<div class="dropdown d-none d-md-block">
+  <button class="btn btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
+    🛍️ Categories
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">Shoes</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('filtered', category='Tops') }}">Tops</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bottoms') }}">Bottoms</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">Men's</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">Women's</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('filtered', category='Kids') }}">Kid's</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">Accessories</a></li>
+  </ul>
+</div>
+</div>
 </nav>
 
 
@@ -224,13 +222,13 @@ nav.navbar.fixed-bottom .container a small {
       </button>
       <ul class="dropdown-menu">
         <li><a class="dropdown-item" href="{{ url_for('filtered', category='Shoes') }}">Shoes</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">Men</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">Women</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Children') }}">Children</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Watches') }}">Watches</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Jewelry') }}">Jewelry</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">Accessories</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bags') }}">Bags</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Tops') }}">Tops</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Bottoms') }}">Bottoms</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Men') }}">Men's</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Women') }}">Women's</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Kids') }}">Kid's</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('filtered', category='Accessories') }}">Accessories</a>
+        </li>
       </ul>
     </div>
 
@@ -243,10 +241,11 @@ nav.navbar.fixed-bottom .container a small {
       <small>Home</small>
     </a>
 
-    <a href="{{ url_for('filtered', category='all') }}" class="{% if active_page == 'categories' %}active{% endif %}">
-  <i class="bi bi-grid-3x3-gap-fill fs-5"></i>
-  <small>Categories</small>
-</a>
+    <!-- 🛍️ Categories (Goes to full page) -->
+    <a href="{{ url_for('filtered', category='all') }}" class="btn btn-link text-dark text-decoration-none {% if active_page == 'categories' %}active{% endif %}">
+      <div><i class="bi bi-grid-3x3-gap-fill fs-5"></i></div>
+      <small>Categories</small>
+    </a>
 
 
        <!-- 🛒 Cart Button (with live count) -->
