@@ -299,23 +299,23 @@ def filtered(category):
     if category.lower() == 'all':
         filtered_products = all_products
     else:
-        filtered_products = [p for p in all_products if category.lower() in p['category'].lower()]
+        filtered_products = [
+            p for p in all_products
+            if category.lower() in p.get('category', '').lower()
+        ]
 
     # Add index to each product
     products = [{'index': i, **p} for i, p in enumerate(filtered_products)]
 
-    # Featured = products added in last 7 days
-    featured_products = [
-        p for p in filtered_products
-        if (current_time - p['timestamp']).days <= 7
-    ]
+    # If no products found
+    if not products:
+        flash(f"No products found in {category.title()} category.")
 
+    # 🟢 Render a dedicated category results page
     return render_template(
-        'index.html',
+        'filtered.html',
         products=products,
-        featured_products=featured_products,
-        current_time=current_time,
-        selected_category=category,
+        category_name=category.title(),
         active_page='categories'
     )
 

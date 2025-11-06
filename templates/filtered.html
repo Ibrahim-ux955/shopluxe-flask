@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3 class="text-center mb-4">{{ category_name }} Products</h3>
+
+  {% if products %}
+  <div class="row g-3">
+    {% for product in products %}
+      {% include 'partials/product_card.html' %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-warning text-center mt-4">
+    No products found in {{ category_name }}.
+  </div>
+  {% endif %}
+  <div class="text-center mb-3">
+  <a href="{{ url_for('categories') }}" class="btn btn-outline-secondary btn-sm">
+    ← Back to Categories
+  </a>
+</div>
+
+</div>
+{% endblock %}
+
