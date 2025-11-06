@@ -205,14 +205,23 @@ def search():
     products = load_data()
     current_time = datetime.now(timezone.utc)
 
-    # Fix timestamps and images
+    # ✅ Fix timestamps and ensure they are timezone-aware
     for p in products:
         if isinstance(p.get('timestamp'), str):
             try:
-                p['timestamp'] = datetime.fromisoformat(p['timestamp'])
-            except:
-                p['timestamp'] = current_time
+                dt = datetime.fromisoformat(p['timestamp'])
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                p['timestamp'] = dt
+            except Exception:
+                p['timestamp'] = current_time  # fallback if invalid
+        elif isinstance(p.get('timestamp'), datetime):
+            if p['timestamp'].tzinfo is None:
+                p['timestamp'] = p['timestamp'].replace(tzinfo=timezone.utc)
+        else:
+            p['timestamp'] = current_time
 
+        # ✅ Fix image field consistency
         if 'images' not in p and 'image' in p:
             p['images'] = [p['image']]
         elif 'images' in p and 'image' not in p:
@@ -229,8 +238,11 @@ def search():
     else:
         filtered = products
 
-    # Featured = recently added
-    featured_products = [p for p in filtered if (current_time - p['timestamp']).days <= 7]
+    # ✅ Featured = recently added (safe timezone comparison)
+    featured_products = [
+        p for p in filtered
+        if (current_time - p['timestamp']).days <= 7
+    ]
 
     return render_template(
         'index.html',
@@ -242,6 +254,25 @@ def search():
         active_page='search'
     )
 
+@app.route('/live_search')
+def live_search():
+    query = request.args.get('q', '').strip().lower()
+    products = load_data()
+
+    if not query:
+        return jsonify([])
+
+    filtered = [
+        p for p in products
+        if query in p.get('name', '').lower()
+        or query in p.get('category', '').lower()
+        or query in p.get('description', '').lower()
+    ]
+
+    # Send minimal info for faster loading
+    for p in filtered:
+        p['image_url'] = url_for('static', filename='shoes/' + (p.get('images', ['placeholder.jpg'])[0]))
+    return jsonify(filtered)
 
 
 # ✅ Set API key directly for testing (you can remove this later and use env var)

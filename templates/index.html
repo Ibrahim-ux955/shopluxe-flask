@@ -51,11 +51,20 @@
   </div>
 
   <!-- ✅ Search Results Header -->
-  {% if query %}
-    <div class="alert alert-light border text-center">
-      <h5 class="mb-0">Search results for "<strong>{{ query }}</strong>": {{ products|length }} found</h5>
-    </div>
-  {% endif %}
+{% if query %}
+  <div class="alert alert-light border text-center my-3">
+    {% if products %}
+      <h5 class="mb-0">
+        Search results for "<strong>{{ query }}</strong>": {{ products|length }} found
+      </h5>
+    {% else %}
+      <h5 class="mb-0">
+        No results found for "<strong>{{ query }}</strong>"
+      </h5>
+    {% endif %}
+  </div>
+{% endif %}
+
 
   <!-- ✅ No Products Found Message -->
   {% if not (popular_products or new_products or featured_products or sale_products or products) %}

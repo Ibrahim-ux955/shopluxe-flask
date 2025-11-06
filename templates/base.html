@@ -184,20 +184,95 @@ nav.navbar.fixed-bottom .container a small {
 
 
 
-<!-- Search Bar (only on homepage) -->
 {% if active_page == 'home' %}
-<div class="container mt-3">
-  <form class="d-flex justify-content-center" method="get" action="{{ url_for('search') }}">
+<div class="container mt-3 position-relative" style="max-width: 700px;">
+  <div class="input-group shadow-sm">
     <input 
-      class="form-control me-2 w-50 search-input" 
-      type="search" 
-      name="q" 
-      placeholder="Search categories..." 
-      value="{{ query if query else '' }}"
+      id="amazon-live-search"
+      type="search"
+      class="form-control py-2 px-3"
+      placeholder="Search for products..."
+      autocomplete="off"
     >
-    <button class="btn btn-custom search-btn" type="submit">Search</button>
-  </form>
+    <button class="btn btn-dark" type="button" id="amazon-search-btn">
+      <i class="bi bi-search"></i>
+    </button>
+  </div>
+
+  <!-- 🧩 Amazon-style dropdown -->
+  <div id="amazon-search-results" 
+       class="list-group position-absolute w-100 mt-1 bg-white border rounded shadow-sm"
+       style="z-index: 2000; display: none; max-height: 320px; overflow-y: auto;">
+  </div>
 </div>
+
+<script>
+const searchInput = document.getElementById('amazon-live-search');
+const searchBtn = document.getElementById('amazon-search-btn');
+const resultsBox = document.getElementById('amazon-search-results');
+let searchTimeout = null;
+
+function renderResults(data, query) {
+  if (!data.length) {
+    resultsBox.innerHTML = `
+      <div class="list-group-item text-center text-muted py-2">
+        No results found for "<strong>${query}</strong>"
+      </div>`;
+    resultsBox.style.display = 'block';
+    return;
+  }
+
+  let html = '';
+  data.forEach(p => {
+    html += `
+      <a href="/product/${p.id}" 
+         class="list-group-item list-group-item-action d-flex align-items-center py-2">
+        <img src="${p.image_url}" 
+             alt="${p.name}" 
+             style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+        <div class="fw-semibold text-truncate" style="max-width: 400px;">${p.name}</div>
+      </a>`;
+  });
+
+  resultsBox.innerHTML = html;
+  resultsBox.style.display = 'block';
+}
+
+function performSearch() {
+  const query = searchInput.value.trim();
+  if (!query) {
+    resultsBox.style.display = 'none';
+    return;
+  }
+
+  fetch(`/live_search?q=${encodeURIComponent(query)}`)
+    .then(res => res.json())
+    .then(data => renderResults(data, query))
+    .catch(() => {
+      resultsBox.innerHTML = `
+        <div class="list-group-item text-danger text-center">
+          ⚠️ Error loading results
+        </div>`;
+      resultsBox.style.display = 'block';
+    });
+}
+
+// ⏳ Debounce search
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(performSearch, 300);
+});
+
+// 🔘 Manual trigger
+searchBtn.addEventListener('click', performSearch);
+
+// 🧭 Hide dropdown when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.container')) {
+    resultsBox.style.display = 'none';
+  }
+});
+</script>
 {% endif %}
 
 
