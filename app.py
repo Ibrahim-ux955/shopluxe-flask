@@ -284,10 +284,16 @@ def filtered(category):
     current_time = datetime.now(timezone.utc)
     all_products = load_data()
 
-    # Convert string timestamps to datetime objects
+    # Convert timestamps safely and make them timezone-aware
     for p in all_products:
         if isinstance(p.get('timestamp'), str):
-            p['timestamp'] = datetime.fromisoformat(p['timestamp'])
+            try:
+                dt = datetime.fromisoformat(p['timestamp'])
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                p['timestamp'] = dt
+            except Exception:
+                p['timestamp'] = current_time  # fallback if invalid
 
     # Filter products by category
     if category.lower() == 'all':
@@ -295,20 +301,24 @@ def filtered(category):
     else:
         filtered_products = [p for p in all_products if category.lower() in p['category'].lower()]
 
-    # Add index to each product for links
+    # Add index to each product
     products = [{'index': i, **p} for i, p in enumerate(filtered_products)]
 
-    # Define featured products: added in the last 7 days
-    featured_products = [p for p in filtered_products if (current_time - p['timestamp']).days <= 7]
+    # Featured = products added in last 7 days
+    featured_products = [
+        p for p in filtered_products
+        if (current_time - p['timestamp']).days <= 7
+    ]
 
     return render_template(
-    'index.html',
-    products=products,
-    featured_products=featured_products,
-    current_time=current_time,
-    selected_category=category,
-    active_page='categories'
-)
+        'index.html',
+        products=products,
+        featured_products=featured_products,
+        current_time=current_time,
+        selected_category=category,
+        active_page='categories'
+    )
+
 
 
 
