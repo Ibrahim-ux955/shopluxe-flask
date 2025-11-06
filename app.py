@@ -1504,7 +1504,7 @@ def wishlist_count():
   
 @app.route('/categories')
 def categories():
-    return render_template('categories.html')
+    return render_template('categories.html', active_page='categories')
 
 
 

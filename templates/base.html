@@ -242,10 +242,11 @@ nav.navbar.fixed-bottom .container a small {
     </a>
 
     <!-- 🛍️ Categories (Goes to full page) -->
-    <a href="{{ url_for('filtered', category='all') }}" class="btn btn-link text-dark text-decoration-none {% if active_page == 'categories' %}active{% endif %}">
-      <div><i class="bi bi-grid-3x3-gap-fill fs-5"></i></div>
-      <small>Categories</small>
-    </a>
+<a href="{{ url_for('categories') }}" class="btn btn-link text-dark text-decoration-none {% if active_page == 'categories' %}active{% endif %}">
+  <div><i class="bi bi-grid-3x3-gap-fill fs-5"></i></div>
+  <small>Categories</small>
+</a>
+
 
 
        <!-- 🛒 Cart Button (with live count) -->
