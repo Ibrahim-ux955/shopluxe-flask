@@ -61,6 +61,8 @@
               <img src="{{ url_for('static', filename='shoes/' ~ item.image) }}" width="60" height="60" class="rounded-3 me-3" style="object-fit: cover;" alt="{{ item.name }}">
               <div>
                 <strong>{{ item.name }}</strong><br>
+                <!-- ✅ Added color and size display -->
+                <small class="text-muted">Color: {{ item.color or '-' }} | Size: {{ item.size or '-' }}</small><br>
                 <span class="text-primary fw-semibold">GHS {{ item.price }}</span>
                 <div class="d-flex align-items-center mt-1">
                   <!-- Quantity Buttons -->

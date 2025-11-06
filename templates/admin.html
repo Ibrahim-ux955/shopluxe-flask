@@ -210,7 +210,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {% for item in o.products %}
+                  {% for item in o.get("items", o.get("products", [])) %}
+
                   <tr>
                     <td>{{ item.name }}</td>
                     <td>{{ item.price }}</td>
@@ -309,7 +310,8 @@
             </tr>
           </thead>
           <tbody>
-            {% for item in o.products %}
+            {% for item in o.get("items", o.get("products", [])) %}
+
             <tr>
               <td>{{ item.name }}</td>
               <td>{{ item.price }}</td>

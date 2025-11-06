@@ -241,52 +241,55 @@ function updateWishlistCount() {
         {% endif %}
 
         <!-- ✅ Add to Cart -->
-        {% if product.stock is defined %}
-        {% if product.stock > 0 %}
-        <form action="{{ url_for('add_to_cart', index=product.index) }}" method="POST" class="mt-4">
-          <input type="hidden" name="quantity" value="1">
-          <button type="submit" class="add-cart-btn">
-            🛒 Add to Cart
-          </button>
-        </form>
-        {% else %}
-        <p class="text-danger text-center mt-3">Out of Stock</p>
-        {% endif %}
-        {% endif %}
-      </div>
-    </div>
-  </div>
+{% if product.stock is defined %}
+{% if product.stock > 0 %}
+<form action="{{ url_for('add_to_cart', index=product.index) }}" method="POST" class="mt-4" id="addToCartForm">
+  <input type="hidden" name="quantity" value="1">
+  <input type="hidden" name="color" id="selectedColor" value="-">
+  <input type="hidden" name="size" id="selectedSize" value="-">
 
-  <!-- ✅ Related Products -->
-  <hr class="my-5">
-  <h4 class="text-center mb-4">🛍️ Related Products</h4>
-  <div class="row justify-content-center">
-    {% if related %}
-    {% for item in related %}
-    <div class="col-6 col-md-4 col-lg-3 mb-4 text-center">
-      <a href="{{ url_for('product_detail', product_id=item.id) }}" class="text-decoration-none text-dark">
-        <div class="card border-0 shadow-sm h-100 related-item">
-          <img src="{{ url_for('static', filename='shoes/' + item.images[0]) }}" alt="{{ item.name }}"
-            style="width: 100%; aspect-ratio: 1/1;">
-          <div class="p-2">
-            <p class="fw-semibold mb-1" style="font-size: 15px;">{{ item.name }}</p>
-            {% if item.on_sale and item.sale_price %}
-            <p class="mb-0">
-              <span class="text-muted text-decoration-line-through small">GH₵ {{ item.price }}</span><br>
-              <span class="text-danger fw-bold">GH₵ {{ item.sale_price }}</span>
-            </p>
-            {% else %}
-            <p class="text-success fw-bold mb-0">GH₵ {{ item.price }}</p>
-            {% endif %}
-          </div>
+  <button type="submit" class="add-cart-btn">
+    🛒 Add to Cart
+  </button>
+</form>
+{% else %}
+<p class="text-danger text-center mt-3">Out of Stock</p>
+{% endif %}
+{% endif %}
+</div>
+</div>
+</div>
+
+<!-- ✅ Related Products -->
+<hr class="my-5">
+<h4 class="text-center mb-4">🛍️ Related Products</h4>
+<div class="row justify-content-center">
+  {% if related %}
+  {% for item in related %}
+  <div class="col-6 col-md-4 col-lg-3 mb-4 text-center">
+    <a href="{{ url_for('product_detail', product_id=item.id) }}" class="text-decoration-none text-dark">
+      <div class="card border-0 shadow-sm h-100 related-item">
+        <img src="{{ url_for('static', filename='shoes/' + item.images[0]) }}" alt="{{ item.name }}"
+          style="width: 100%; aspect-ratio: 1/1;">
+        <div class="p-2">
+          <p class="fw-semibold mb-1" style="font-size: 15px;">{{ item.name }}</p>
+          {% if item.on_sale and item.sale_price %}
+          <p class="mb-0">
+            <span class="text-muted text-decoration-line-through small">GH₵ {{ item.price }}</span><br>
+            <span class="text-danger fw-bold">GH₵ {{ item.sale_price }}</span>
+          </p>
+          {% else %}
+          <p class="text-success fw-bold mb-0">GH₵ {{ item.price }}</p>
+          {% endif %}
         </div>
-      </a>
-    </div>
-    {% endfor %}
-    {% else %}
-    <p class="text-center text-muted">No related products found.</p>
-    {% endif %}
+      </div>
+    </a>
   </div>
+  {% endfor %}
+  {% else %}
+  <p class="text-center text-muted">No related products found.</p>
+  {% endif %}
+</div>
 </div>
 
 <!-- ✅ JS for thumbnail and selection -->
@@ -306,10 +309,14 @@ function updateWishlistCount() {
   });
   if (thumbs.length > 0) thumbs[0].classList.add('active');
 
+  const colorInput = document.getElementById('selectedColor');
+  const sizeInput = document.getElementById('selectedSize');
+
   document.querySelectorAll('.size-option').forEach(el => {
     el.addEventListener('click', () => {
       document.querySelectorAll('.size-option').forEach(e => e.classList.remove('active'));
       el.classList.add('active');
+      sizeInput.value = el.textContent.trim();
     });
   });
 
@@ -317,6 +324,7 @@ function updateWishlistCount() {
     el.addEventListener('click', () => {
       document.querySelectorAll('.color-option').forEach(e => e.classList.remove('active'));
       el.classList.add('active');
+      colorInput.value = el.getAttribute('title');
     });
   });
 </script>

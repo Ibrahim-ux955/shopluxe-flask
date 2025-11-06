@@ -8,6 +8,7 @@ from itsdangerous import URLSafeTimedSerializer  # ✅ Add this
 import os, json, uuid
 from uuid import uuid4
 from datetime import datetime,timezone, timedelta 
+import pytz
 import resend
 from flask import Flask
 
@@ -97,9 +98,22 @@ ORDERS_FILE = os.path.join(os.path.dirname(__file__), "data/orders.json")
 def load_orders():
     try:
         with open(ORDERS_FILE, 'r') as f:
-            return json.load(f)
+            orders = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return []
+
+    # ✅ Normalize timestamp formats for old entries
+    from datetime import datetime
+    for o in orders:
+        for key in ['delivered_time', 'cancelled_time', 'completed_time']:
+            if key in o and isinstance(o[key], str) and 'T' in o[key]:
+                try:
+                    o[key] = datetime.fromisoformat(o[key]).strftime("%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    pass
+
+    return orders
+
 
 # ✅ Save orders back to file
 def save_orders(data):
@@ -898,32 +912,31 @@ def get_cart():
 
 
 # ✅ Add to Cart (AJAX + fallback)
+# ✅ Add to Cart (includes color & size)
 @app.route('/add_to_cart/<int:index>', methods=['POST'])
 def add_to_cart(index):
     quantity = int(request.form.get("quantity", 1))
+    color = request.form.get("color", "-")
+    size = request.form.get("size", "-")
+
     cart = get_cart()
 
-    # Check if product exists already
+    # Check if the exact same product (index+color+size) already exists
     for item in cart:
-        if item['index'] == index:
+        if item['index'] == index and item.get('color') == color and item.get('size') == size:
             item['quantity'] += quantity
             break
     else:
-        cart.append({'index': index, 'quantity': quantity})
+        cart.append({'index': index, 'quantity': quantity, 'color': color, 'size': size})
 
     session['cart'] = cart
 
-    # ✅ AJAX response for live updates
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({
-            'success': True,
-            'message': '🛒 Added to cart!',
-            'count': len(cart)
-        })
+        return jsonify({'success': True, 'message': '🛒 Added to cart!', 'count': len(cart)})
 
-    # Normal request fallback
     flash("🛒 Product added to cart!")
     return redirect(request.referrer or url_for('index'))
+
 
 
 # ✅ Cart count API (for navbar live badge)
@@ -932,25 +945,24 @@ def cart_count():
     return jsonify({'count': len(session.get('cart', []))})
   
   # 🛒 AJAX Add to Cart (Live)
+# ✅ AJAX Add to Cart (includes color & size)
 @app.route('/add_to_cart_ajax/<int:index>', methods=['POST'])
 def add_to_cart_ajax(index):
+    color = request.form.get("color", "-")
+    size = request.form.get("size", "-")
+
     cart = session.get('cart', [])
-    found = next((item for item in cart if item['index'] == index), None)
+    found = next((item for item in cart if item['index'] == index and item.get('color') == color and item.get('size') == size), None)
 
     if found:
         found['quantity'] += 1
         message = "➕ Increased quantity in cart!"
     else:
-        cart.append({'index': index, 'quantity': 1})
+        cart.append({'index': index, 'quantity': 1, 'color': color, 'size': size})
         message = "🛒 Added to cart!"
 
     session['cart'] = cart
-
-    return jsonify({
-        'success': True,
-        'message': message,
-        'count': len(cart)
-    })
+    return jsonify({'success': True, 'message': message, 'count': len(cart)})
 
 
 
@@ -963,12 +975,17 @@ def cart():
     for item in cart:
         index = item.get("index")
         quantity = item.get("quantity", 1)
+        color = item.get("color", "-")
+        size = item.get("size", "-")
+
         if 0 <= index < len(products):
             product = products[index].copy()
             product['quantity'] = quantity
-            product['index'] = index  # ✅ Needed for template links (increase, decrease, remove)
+            product['index'] = index  # ✅ For template links
+            product['color'] = color  # ✅ Preserve chosen color
+            product['size'] = size    # ✅ Preserve chosen size
 
-            # ✅ Make sure image is included
+            # ✅ Ensure image exists
             if 'images' in product and product['images']:
                 product['image'] = product['images'][0]
             elif 'image' in product:
@@ -976,8 +993,9 @@ def cart():
             else:
                 product['image'] = 'default.png'  # fallback if no image
 
-            cart_items.append(product)
+            cart_items.append(product)  # ✅ Append only once
 
+    # 🧮 Totals
     subtotal = sum(float(p['price']) * p['quantity'] for p in cart_items)
     tax = round(subtotal * 0.10, 2)  # 💡 10% tax
     total = round(subtotal + tax, 2)
@@ -1041,14 +1059,19 @@ def checkout():
     products = load_data()
     cart_items = []
 
-    # Build cart items with quantity
+    # ✅ Build cart items with color, size, and quantity
     for item in cart:
         index = item.get("index")
         quantity = item.get("quantity", 1)
+        color = item.get("color", "-")
+        size = item.get("size", "-")
+
         if 0 <= index < len(products):
             product = products[index].copy()
             product['quantity'] = quantity
             product['id'] = products[index].get('id', index)
+            product['color'] = color
+            product['size'] = size
             cart_items.append(product)
 
     total = sum(float(p['price']) * p['quantity'] for p in cart_items)
@@ -1074,19 +1097,29 @@ def checkout():
         order_id = str(uuid.uuid4())
         base_url = request.url_root.rstrip('/')
 
+        # ✅ Save order with items including color and size
         order = {
             'id': order_id,
             'name': name,
             'email': email,
             'phone': phone,
-            'items': cart_items,
+            'items': [  # ✅ renamed from 'products' → 'items' (to match template)
+                {
+                    "name": p["name"],
+                    "price": p["price"],
+                    "quantity": p["quantity"],
+                    "color": p.get("color", "-"),
+                    "size": p.get("size", "-")
+                }
+                for p in cart_items
+            ],
             'total': total,
             'timestamp': utc_now.isoformat(),
             'local_time': formatted_time,
             'timezone': timezone_str
         }
 
-        # Order summary HTML
+        # ✅ Include color and size in order summary HTML
         item_lines = [
             f"""
             <div style='display:flex;align-items:center;margin-bottom:10px;border:1px solid #eee;padding:8px;border-radius:10px;'>
@@ -1095,6 +1128,7 @@ def checkout():
                      style='width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:10px;'>
                 <div>
                     <strong>{item['name']}</strong> (ID: {item['id']})<br>
+                    Color: {item.get('color', '-')} | Size: {item.get('size', '-')}<br>
                     Qty: {item['quantity']} | GH₵ {item['price']}
                 </div>
             </div>
@@ -1102,8 +1136,8 @@ def checkout():
             for item in cart_items
         ]
 
-        # Save order
-        orders_file = os.path.join(os.path.dirname(__file__), "data/orders.json")  # lowercase
+        # ✅ Save to orders.json
+        orders_file = os.path.join(os.path.dirname(__file__), "data/orders.json")
         if os.path.exists(orders_file):
             with open(orders_file, 'r', encoding='utf-8') as f:
                 try:
@@ -1157,9 +1191,20 @@ def checkout():
             flash("⚠️ Order placed but email could not be sent.")
 
         session.pop('cart', None)
-        return render_template('order_confirmation.html', order=order)
+
+        # ✅ Fix for Jinja .items() conflict
+        order_data = dict(order)
+        if callable(order_data.get("items")):
+            order_data["order_items"] = order_data.pop("items", [])
+        else:
+            order_data["order_items"] = order_data.get("items", [])
+
+        return render_template('order_confirmation.html', order=order_data)
 
     return render_template('checkout.html', cart_items=cart_items, total=total)
+
+
+
 
 @app.route('/track-order/<order_id>')
 def track_order(order_id):
@@ -1187,14 +1232,24 @@ def mark_delivered(order_id):
     for o in orders:
         if str(o['id']) == str(order_id):
             o['status'] = 'Delivered'
-            o['delivered_time'] = datetime.utcnow().isoformat()
-            o['completed_time'] = o['delivered_time']  # ✅ Add for history tracking
+
+            # ✅ Get user's timezone safely
+            timezone_str = o.get('timezone', 'UTC')
+            try:
+                user_tz = pytz.timezone(timezone_str)
+            except pytz.UnknownTimeZoneError:
+                user_tz = pytz.UTC
+
+            # ✅ Store localized timestamp for history display
+            local_time = datetime.now(user_tz).strftime("%Y-%m-%d %H:%M:%S")
+            o['delivered_time'] = local_time
+            o['completed_time'] = local_time  # ✅ Add for history tracking
+
             order_found = True
             user_email = o.get('email')
             name = o.get('name')
             items = o.get('products', [])  # ✅ Ensure consistency with template
             total = o.get('total', 0)
-            timezone_str = o.get('timezone', 'UTC')
             formatted_time = o.get('local_time', '')
             break
 
@@ -1247,8 +1302,19 @@ def cancel_order(order_id):
     for o in orders:
         if str(o['id']) == str(order_id):
             o['status'] = 'Cancelled'
-            o['cancelled_time'] = datetime.utcnow().isoformat()
-            o['completed_time'] = o['cancelled_time']  # ✅ Add for history tracking
+
+            # ✅ Get user's timezone safely
+            timezone_str = o.get('timezone', 'UTC')
+            try:
+                user_tz = pytz.timezone(timezone_str)
+            except pytz.UnknownTimeZoneError:
+                user_tz = pytz.UTC
+
+            # ✅ Store localized timestamp for history display
+            local_time = datetime.now(user_tz).strftime("%Y-%m-%d %H:%M:%S")
+            o['cancelled_time'] = local_time
+            o['completed_time'] = local_time  # ✅ Add for history tracking
+
             order_found = True
             user_email = o.get('email')
             user_name = o.get('name')

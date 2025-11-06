@@ -88,5 +88,27 @@
             "IMG-20251002-WA0006.jpg"
         ],
         "timestamp": "2025-11-02T18:52:16.105324+00:00"
+    },
+    {
+        "id": "79be58d2-55ae-45bf-a67b-784c7ff83df8",
+        "name": "Mm",
+        "price": "45",
+        "sale_price": null,
+        "on_sale": false,
+        "featured": false,
+        "category": "Accessories",
+        "description": "",
+        "stock": 45,
+        "colors": [
+            "blue"
+        ],
+        "sizes": [
+            "27",
+            "28"
+        ],
+        "images": [
+            "8b900e48-aadf-4638-8bcf-1f464f846856.jpeg"
+        ],
+        "timestamp": "2025-11-06T09:15:44.299731+00:00"
     }
 ]

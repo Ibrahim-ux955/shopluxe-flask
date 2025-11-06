@@ -61,16 +61,17 @@
     </div>
 
     <h3>🛍️ Ordered Items</h3>
-{% for item in order['items'] %}
-<div class="product">
-  <img src="{{ url_for('static', filename='shoes/' + item['images'][0]) }}" alt="{{ item['name'] }}">
-  <div>
-    <strong>{{ item['name'] }}</strong><br>
-    Qty: {{ item['quantity'] }} | GH₵ {{ item['price'] }}
-  </div>
-</div>
-{% endfor %}
-
+    {% set items = order.items if order.items is iterable and order.items is not string else [] %}
+    {% for item in items %}
+    <div class="product">
+      <img src="{{ url_for('static', filename='shoes/' + item['images'][0]) }}" alt="{{ item['name'] }}">
+      <div>
+        <strong>{{ item['name'] }}</strong><br>
+        <small>Color: {{ item.get('color', '-') }} | Size: {{ item.get('size', '-') }}</small><br>
+        Qty: {{ item['quantity'] }} | GH₵ {{ item['price'] }}
+      </div>
+    </div>
+    {% endfor %}
 
     <p class="total">Total: GH₵ {{ order.total }}</p>
   </div>
