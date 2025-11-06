@@ -8,7 +8,6 @@ from itsdangerous import URLSafeTimedSerializer  # ✅ Add this
 import os, json, uuid
 from uuid import uuid4
 from datetime import datetime,timezone, timedelta 
-import pytz
 import resend
 from flask import Flask
 
