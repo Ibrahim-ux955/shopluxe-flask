@@ -1504,7 +1504,17 @@ def wishlist_count():
   
 @app.route('/categories')
 def categories():
-    return render_template('categories.html', active_page='categories')
+    categories = [
+        {'name': 'Shoes', 'image': 'shoes.jpg'},
+        {'name': 'Tops', 'image': 'tops.jpg'},
+        {'name': 'Bottoms', 'image': 'bottoms.jpg'},
+        {'name': 'Men\'s', 'image': 'men.jpg'},
+        {'name': 'Women\'s', 'image': 'women.jpg'},
+        {'name': 'Kid\'s', 'image': 'kids.jpg'},
+        {'name': 'Accessories', 'image': 'accessories.jpg'}
+    ]
+    return render_template('categories.html', categories=categories, active_page='categories')
+
 
 
 

@@ -31,6 +31,9 @@
       cursor: pointer;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       transition: transform 0.25s ease, box-shadow 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+      display: block;
     }
 
     .category-card:hover {
@@ -78,61 +81,63 @@
   <h1>🛍️ Shop by Category</h1>
 
   <div class="category-grid">
-    <div class="category-card">
-      <img src="{{ url_for('static', filename='categories/shoe.jpg') }}" alt="Shoes">
+
+    <a href="{{ url_for('filtered', category='Shoes') }}" class="category-card">
+      <img src="{{ url_for('static', filename='categories/shoes.jpg') }}" alt="Shoes">
       <div class="category-info">
         <h3>Shoes</h3>
         <p>Stylish & comfortable kicks</p>
       </div>
-    </div>
+    </a>
 
-    <div class="category-card">
+    <a href="{{ url_for('filtered', category='Tops') }}" class="category-card">
       <img src="{{ url_for('static', filename='categories/tops.jpg') }}" alt="Tops">
       <div class="category-info">
         <h3>Tops</h3>
         <p>Trendy tees and shirts</p>
       </div>
-    </div>
+    </a>
 
-    <div class="category-card">
+    <a href="{{ url_for('filtered', category='Bottoms') }}" class="category-card">
       <img src="{{ url_for('static', filename='categories/bottoms.jpg') }}" alt="Bottoms">
       <div class="category-info">
         <h3>Bottoms</h3>
         <p>Jeans, shorts, and pants</p>
       </div>
-    </div>
+    </a>
 
-    <div class="category-card">
+    <a href="{{ url_for('filtered', category='Men') }}" class="category-card">
       <img src="{{ url_for('static', filename='categories/mens.jpg') }}" alt="Men's">
       <div class="category-info">
         <h3>Men’s</h3>
         <p>Outfits for every occasion</p>
       </div>
-    </div>
+    </a>
 
-    <div class="category-card">
+    <a href="{{ url_for('filtered', category='Women') }}" class="category-card">
       <img src="{{ url_for('static', filename='categories/womens.jpg') }}" alt="Women's">
       <div class="category-info">
         <h3>Women’s</h3>
         <p>Chic and modern styles</p>
       </div>
-    </div>
+    </a>
 
-    <div class="category-card">
+    <a href="{{ url_for('filtered', category='Kids') }}" class="category-card">
       <img src="{{ url_for('static', filename='categories/kids.jpg') }}" alt="Kid's">
       <div class="category-info">
         <h3>Kid’s</h3>
         <p>Fun and comfy wear</p>
       </div>
-    </div>
+    </a>
 
-    <div class="category-card">
+    <a href="{{ url_for('filtered', category='Accessories') }}" class="category-card">
       <img src="{{ url_for('static', filename='categories/accessories.jpg') }}" alt="Accessories">
       <div class="category-info">
         <h3>Accessories</h3>
         <p>Complete your outfit</p>
       </div>
-    </div>
+    </a>
+
   </div>
 </body>
 </html>
